@@ -11,6 +11,7 @@ import {
   FIXTURE_DEFAULT_CONTENT,
   loadAllPalettes,
 } from "../fixture-registry.js";
+import { runManualFlow } from "../../prompts/manual-flow.js";
 import pc from "picocolors";
 
 // ── Default Palette Colors ──────────────────────────────
@@ -104,12 +105,36 @@ export const createCommand = defineCommand({
       default: false,
     },
   },
-  run({ args }) {
-    // ── Resolve project directory ──
+  async run({ args }) {
+    const allPalettes = loadAllPalettes();
+
+    // ── Manual mode: interactive prompts ──
+    if (args.manual) {
+      const defaultProjectName = args.dir ? basename(resolve(args.dir)) : "my-project";
+
+      const config = await runManualFlow({
+        defaultProjectName,
+        manifests: FIXTURE_MANIFESTS,
+        allPalettes,
+      });
+
+      if (!config) {
+        // User cancelled
+        process.exitCode = 0;
+        return;
+      }
+
+      // Override projectDir if dir arg was provided
+      const projectDir = args.dir ? resolve(args.dir) : resolve(config.projectDir);
+      const finalConfig = { ...config, projectDir } as ResolvedConfig;
+
+      return runScaffold(finalConfig, allPalettes, args["dry-run"] ?? false, args.verbose ?? false);
+    }
+
+    // ── Flag-driven mode ──
     const projectDir = resolve(args.dir ?? ".");
     const projectName = basename(projectDir);
 
-    // ── Parse flags into ResolvedConfig ──
     const renderMode = (args.render ?? "static") as "static" | "hybrid" | "server";
     const deployTarget = (args.deploy ?? "cloudflare") as "cloudflare" | "vercel" | "netlify" | "static";
     const database = (args.database ?? "none") as "none" | "d1" | "turso" | "astro-db" | "postgres";
@@ -126,7 +151,6 @@ export const createCommand = defineCommand({
     const blocks = blockNames.map((name) => ({ name, variant: "default" }));
 
     // Resolve palette
-    const allPalettes = loadAllPalettes();
     let paletteColors = { ...DEFAULT_COLORS };
     let palettePreset: string | undefined;
 
@@ -162,75 +186,85 @@ export const createCommand = defineCommand({
       createdWith: "manual",
     } as ResolvedConfig;
 
-    // ── Build scaffold input ──
-    const input: ScaffoldInput = {
-      config,
-      manifests: FIXTURE_MANIFESTS,
-      blockSources: FIXTURE_BLOCK_SOURCES,
-      blockDefaultContent: FIXTURE_DEFAULT_CONTENT,
-      allPalettes,
-    };
-
-    // ── Run scaffold pipeline ──
-    const result = scaffold(input);
-
-    if (!isOk(result)) {
-      console.error(pc.red(`✖ Scaffold failed: ${result.error.message}`));
-      process.exitCode = 1;
-      return;
-    }
-
-    // ── Dry run: show file tree ──
-    if (args["dry-run"]) {
-      console.log(pc.bold("\n📋 Dry run — files that would be created:\n"));
-      const sortedFiles = Object.keys(result.value.files).sort();
-      for (const file of sortedFiles) {
-        console.log(pc.dim("  ") + file);
-      }
-      console.log(pc.dim(`\n  Total: ${sortedFiles.length} files`));
-      return;
-    }
-
-    // ── Write files to disk ──
-    const files = result.value.files;
-    let filesWritten = 0;
-
-    for (const [relativePath, content] of Object.entries(files)) {
-      const fullPath = join(projectDir, relativePath);
-      const parentDir = join(fullPath, "..");
-      mkdirSync(parentDir, { recursive: true });
-      writeFileSync(fullPath, content, "utf-8");
-      filesWritten++;
-
-      if (args.verbose) {
-        console.log(pc.dim(`  created ${relativePath}`));
-      }
-    }
-
-    // ── Success message ──
-    console.log("");
-    console.log(pc.green(pc.bold("✔ Project created successfully!")));
-    console.log("");
-    console.log(`  ${pc.bold("Project:")}  ${projectName}`);
-    console.log(`  ${pc.bold("Dir:")}      ${projectDir}`);
-    console.log(`  ${pc.bold("Render:")}   ${renderMode}`);
-    console.log(`  ${pc.bold("Deploy:")}   ${deployTarget}`);
-    console.log(`  ${pc.bold("CSS:")}      ${cssEngine}`);
-    if (blocks.length > 0) {
-      console.log(`  ${pc.bold("Blocks:")}   ${result.value.resolvedBlockNames.join(", ")}`);
-    }
-    if (locales.length > 1) {
-      console.log(`  ${pc.bold("Locales:")}  ${locales.join(", ")} (default: ${defaultLocale})`);
-    }
-    if (palettePreset) {
-      console.log(`  ${pc.bold("Palette:")}  ${palettePreset}`);
-    }
-    console.log(`  ${pc.bold("Files:")}    ${filesWritten} files written`);
-    console.log("");
-    console.log(pc.dim("  Next steps:"));
-    console.log(pc.dim(`    cd ${projectName}`));
-    console.log(pc.dim("    pnpm install"));
-    console.log(pc.dim("    pnpm dev"));
-    console.log("");
+    return runScaffold(config, allPalettes, args["dry-run"] ?? false, args.verbose ?? false);
   },
 });
+
+// ── Shared Scaffold Execution ───────────────────────────
+
+function runScaffold(
+  config: ResolvedConfig,
+  allPalettes: ReadonlyArray<import("fornix-registry").Palette>,
+  dryRun: boolean,
+  verbose: boolean,
+): void {
+  const input: ScaffoldInput = {
+    config,
+    manifests: FIXTURE_MANIFESTS,
+    blockSources: FIXTURE_BLOCK_SOURCES,
+    blockDefaultContent: FIXTURE_DEFAULT_CONTENT,
+    allPalettes,
+  };
+
+  const result = scaffold(input);
+
+  if (!isOk(result)) {
+    console.error(pc.red(`✖ Scaffold failed: ${result.error.message}`));
+    process.exitCode = 1;
+    return;
+  }
+
+  // ── Dry run: show file tree ──
+  if (dryRun) {
+    console.log(pc.bold("\n📋 Dry run — files that would be created:\n"));
+    const sortedFiles = Object.keys(result.value.files).sort();
+    for (const file of sortedFiles) {
+      console.log(pc.dim("  ") + file);
+    }
+    console.log(pc.dim(`\n  Total: ${sortedFiles.length} files`));
+    return;
+  }
+
+  // ── Write files to disk ──
+  const files = result.value.files;
+  let filesWritten = 0;
+
+  for (const [relativePath, content] of Object.entries(files)) {
+    const fullPath = join(config.projectDir, relativePath);
+    const parentDir = join(fullPath, "..");
+    mkdirSync(parentDir, { recursive: true });
+    writeFileSync(fullPath, content, "utf-8");
+    filesWritten++;
+
+    if (verbose) {
+      console.log(pc.dim(`  created ${relativePath}`));
+    }
+  }
+
+  // ── Success message ──
+  const projectName = basename(config.projectDir);
+  console.log("");
+  console.log(pc.green(pc.bold("✔ Project created successfully!")));
+  console.log("");
+  console.log(`  ${pc.bold("Project:")}  ${config.projectName}`);
+  console.log(`  ${pc.bold("Dir:")}      ${config.projectDir}`);
+  console.log(`  ${pc.bold("Render:")}   ${config.renderMode}`);
+  console.log(`  ${pc.bold("Deploy:")}   ${config.deployTarget}`);
+  console.log(`  ${pc.bold("CSS:")}      ${config.cssEngine}`);
+  if (config.blocks.length > 0) {
+    console.log(`  ${pc.bold("Blocks:")}   ${result.value.resolvedBlockNames.join(", ")}`);
+  }
+  if (config.locales.length > 1) {
+    console.log(`  ${pc.bold("Locales:")}  ${config.locales.join(", ")} (default: ${config.defaultLocale})`);
+  }
+  if (config.palette.preset) {
+    console.log(`  ${pc.bold("Palette:")}  ${config.palette.preset}`);
+  }
+  console.log(`  ${pc.bold("Files:")}    ${filesWritten} files written`);
+  console.log("");
+  console.log(pc.dim("  Next steps:"));
+  console.log(pc.dim(`    cd ${projectName}`));
+  console.log(pc.dim("    pnpm install"));
+  console.log(pc.dim("    pnpm dev"));
+  console.log("");
+}

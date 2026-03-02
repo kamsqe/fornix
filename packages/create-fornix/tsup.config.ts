@@ -6,7 +6,7 @@ export default defineConfig({
   target: "node20",
   outDir: "dist",
   clean: true,
-  dts: true,
+  dts: false, // CLI binary — no consumers need type declarations
   sourcemap: true,
   splitting: false,
   banner: {

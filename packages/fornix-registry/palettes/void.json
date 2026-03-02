@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "void",
+  "displayName": "Void",
+  "category": "dark",
+  "mode": "dark",
+  "colors": {
+    "primary": "#14b8a6",
+    "secondary": "#2dd4bf",
+    "accent": "#f43f5e",
+    "background": "#020617",
+    "foreground": "#e2e8f0"
+  }
+}

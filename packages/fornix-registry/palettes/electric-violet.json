@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "electric-violet",
+  "displayName": "Electric Violet",
+  "category": "vibrant",
+  "mode": "dark",
+  "colors": {
+    "primary": "#8b5cf6",
+    "secondary": "#a78bfa",
+    "accent": "#34d399",
+    "background": "#1e1b4b",
+    "foreground": "#ede9fe"
+  }
+}

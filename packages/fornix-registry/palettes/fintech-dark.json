@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "fintech-dark",
+  "displayName": "Fintech Dark",
+  "category": "brand-inspired",
+  "mode": "dark",
+  "colors": {
+    "primary": "#10b981",
+    "secondary": "#34d399",
+    "accent": "#6366f1",
+    "background": "#0a0a0a",
+    "foreground": "#ecfdf5"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "neon-tokyo",
+  "displayName": "Neon Tokyo",
+  "category": "vibrant",
+  "mode": "dark",
+  "colors": {
+    "primary": "#f43f5e",
+    "secondary": "#fb7185",
+    "accent": "#22d3ee",
+    "background": "#0c0a09",
+    "foreground": "#fef2f2"
+  }
+}

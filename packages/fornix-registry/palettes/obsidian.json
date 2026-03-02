@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "obsidian",
+  "displayName": "Obsidian",
+  "category": "dark",
+  "mode": "dark",
+  "colors": {
+    "primary": "#a855f7",
+    "secondary": "#7c3aed",
+    "accent": "#f472b6",
+    "background": "#09090b",
+    "foreground": "#fafafa"
+  }
+}

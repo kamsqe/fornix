@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "cream",
+  "displayName": "Cream",
+  "category": "light",
+  "mode": "light",
+  "colors": {
+    "primary": "#b45309",
+    "secondary": "#d97706",
+    "accent": "#059669",
+    "background": "#fffbeb",
+    "foreground": "#451a03"
+  }
+}

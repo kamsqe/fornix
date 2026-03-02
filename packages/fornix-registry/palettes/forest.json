@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "forest",
+  "displayName": "Forest",
+  "category": "nature",
+  "mode": "dark",
+  "colors": {
+    "primary": "#22c55e",
+    "secondary": "#4ade80",
+    "accent": "#fbbf24",
+    "background": "#14532d",
+    "foreground": "#dcfce7"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "copper",
+  "displayName": "Copper",
+  "category": "warm",
+  "mode": "dark",
+  "colors": {
+    "primary": "#b45309",
+    "secondary": "#d97706",
+    "accent": "#06b6d4",
+    "background": "#27272a",
+    "foreground": "#fef3c7"
+  }
+}

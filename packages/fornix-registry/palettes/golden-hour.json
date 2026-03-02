@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "golden-hour",
+  "displayName": "Golden Hour",
+  "category": "warm",
+  "mode": "light",
+  "colors": {
+    "primary": "#d97706",
+    "secondary": "#f59e0b",
+    "accent": "#be185d",
+    "background": "#fffbeb",
+    "foreground": "#451a03"
+  }
+}

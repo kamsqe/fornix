@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { BlockManifestSchema } from "../../src/schemas/block-manifest.js";
+import { BlockManifestSchema } from "../../src/schemas/block-manifest";
 
 // ── Fixtures ──────────────────────────────────────────────
 

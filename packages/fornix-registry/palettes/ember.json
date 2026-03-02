@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "ember",
+  "displayName": "Ember",
+  "category": "warm",
+  "mode": "dark",
+  "colors": {
+    "primary": "#ef4444",
+    "secondary": "#f87171",
+    "accent": "#fbbf24",
+    "background": "#1c1917",
+    "foreground": "#fef2f2"
+  }
+}

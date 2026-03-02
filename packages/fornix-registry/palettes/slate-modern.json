@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "slate-modern",
+  "displayName": "Slate Modern",
+  "category": "professional",
+  "mode": "light",
+  "colors": {
+    "primary": "#475569",
+    "secondary": "#64748b",
+    "accent": "#0ea5e9",
+    "background": "#f8fafc",
+    "foreground": "#0f172a"
+  }
+}

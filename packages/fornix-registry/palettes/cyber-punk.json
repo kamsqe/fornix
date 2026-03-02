@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "cyber-punk",
+  "displayName": "Cyber Punk",
+  "category": "vibrant",
+  "mode": "dark",
+  "colors": {
+    "primary": "#eab308",
+    "secondary": "#facc15",
+    "accent": "#ec4899",
+    "background": "#0a0a0a",
+    "foreground": "#fef9c3"
+  }
+}

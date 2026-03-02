@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "pearl",
+  "displayName": "Pearl",
+  "category": "light",
+  "mode": "light",
+  "colors": {
+    "primary": "#0891b2",
+    "secondary": "#06b6d4",
+    "accent": "#e11d48",
+    "background": "#f8fafc",
+    "foreground": "#0c4a6e"
+  }
+}

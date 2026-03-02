@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "arctic",
+  "displayName": "Arctic",
+  "category": "nature",
+  "mode": "light",
+  "colors": {
+    "primary": "#0ea5e9",
+    "secondary": "#38bdf8",
+    "accent": "#6366f1",
+    "background": "#f0f9ff",
+    "foreground": "#0c4a6e"
+  }
+}

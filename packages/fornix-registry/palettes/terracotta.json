@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "name": "terracotta",
+  "displayName": "Terracotta",
+  "category": "warm",
+  "mode": "light",
+  "colors": {
+    "primary": "#c2410c",
+    "secondary": "#dc2626",
+    "accent": "#65a30d",
+    "background": "#fdf2f8",
+    "foreground": "#431407"
+  }
+}

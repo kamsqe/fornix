@@ -1,0 +1,58 @@
+import { parseModule, generateCode, builders } from "magicast";
+import type { ResolvedConfig } from "../../schemas/config.js";
+import { ok, err, type Result } from "../../utils/result.js";
+
+// ── Adapter Map ──────────────────────────────────────────
+
+const ADAPTER_MAP: Record<string, { package: string; identifier: string }> = {
+  cloudflare: { package: "@astrojs/cloudflare", identifier: "cloudflare" },
+  vercel: { package: "@astrojs/vercel", identifier: "vercel" },
+  netlify: { package: "@astrojs/netlify", identifier: "netlify" },
+};
+
+// ── Public API ───────────────────────────────────────────
+
+export function generateAstroConfig(
+  config: ResolvedConfig,
+): Result<string, Error> {
+  try {
+    const module = parseModule("export default defineConfig({});");
+
+    module.imports.$add({
+      from: "astro/config",
+      imported: "defineConfig",
+      local: "defineConfig",
+    });
+
+    const configObject = module.exports.default.$args[0];
+
+    configObject.output = config.renderMode;
+
+    const adapter = ADAPTER_MAP[config.deployTarget];
+    if (adapter) {
+      module.imports.$add({
+        from: adapter.package,
+        imported: "default",
+        local: adapter.identifier,
+      });
+      configObject.adapter = builders.functionCall(adapter.identifier);
+    }
+
+    if (config.locales.length >= 2) {
+      configObject.i18n = {
+        defaultLocale: config.defaultLocale,
+        locales: config.locales,
+        routing: {
+          prefixDefaultLocale: false,
+        },
+      };
+    }
+
+    const { code } = generateCode(module);
+    return ok(code);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : String(error);
+    return err(new Error(`Failed to generate astro.config.mjs: ${message}`));
+  }
+}

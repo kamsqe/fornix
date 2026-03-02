@@ -32,7 +32,8 @@
     "pkg-types": "^1.3.0",
     "defu": "^6.1.4",
     "fast-glob": "^3.3.3",
-    "picocolors": "^1.1.0"
+    "picocolors": "^1.1.0",
+    "fornix-registry": "workspace:*"
   },
   "devDependencies": {
     "tsup": "^8.3.0",

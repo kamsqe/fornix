@@ -38,6 +38,9 @@ importers:
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
+      fornix-registry:
+        specifier: workspace:*
+        version: link:../fornix-registry
       giget:
         specifier: ^1.2.3
         version: 1.2.5

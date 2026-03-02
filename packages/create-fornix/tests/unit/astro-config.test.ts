@@ -47,11 +47,11 @@ function parseAsEsm(code: string): boolean {
 describe("generateAstroConfig", () => {
   // ── Render Mode ──
 
-  it("sets output to 'static' for static renderMode", () => {
+  it("does not set output for static renderMode (Astro v5 default)", () => {
     const result = generateAstroConfig(baseConfig({ renderMode: "static" }));
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
-      expect(result.value).toContain("output: \"static\"");
+      expect(result.value).not.toContain("output:");
     }
   });
 
@@ -63,11 +63,11 @@ describe("generateAstroConfig", () => {
     }
   });
 
-  it("sets output to 'hybrid' for hybrid renderMode", () => {
+  it("does not set output for hybrid renderMode (Astro v5 merged into static)", () => {
     const result = generateAstroConfig(baseConfig({ renderMode: "hybrid" }));
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
-      expect(result.value).toContain("output: \"hybrid\"");
+      expect(result.value).not.toContain("output:");
     }
   });
 

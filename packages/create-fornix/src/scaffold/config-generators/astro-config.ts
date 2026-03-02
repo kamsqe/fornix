@@ -26,7 +26,11 @@ export function generateAstroConfig(
 
     const configObject = module.exports.default.$args[0];
 
-    configObject.output = config.renderMode;
+    // Astro v5: only "static" (default) and "server" remain.
+    // "hybrid" was removed — static now supports per-page prerender opt-out.
+    if (config.renderMode === "server") {
+      configObject.output = "server";
+    }
 
     const adapter = ADAPTER_MAP[config.deployTarget];
     if (adapter) {

@@ -10,6 +10,7 @@ export function generateStructure(config: ResolvedConfig): FileMap {
   const files: FileMap = {};
 
   // 1. package.json
+  const adapterDeps = getAdapterDependencies(config);
   const pkg = {
     name: config.projectName,
     type: "module",
@@ -23,10 +24,12 @@ export function generateStructure(config: ResolvedConfig): FileMap {
     },
     dependencies: {
       astro: "^5.2.0",
+      "@astrojs/check": "^0.9.0",
       ...(config.cssEngine === "tailwind" && {
         tailwindcss: "^4.0.0",
         "@tailwindcss/vite": "^4.0.0",
       }),
+      ...adapterDeps,
     },
     devDependencies: {
       typescript: "^5.7.0",
@@ -127,4 +130,22 @@ const { title } = Astro.props;
   }
 
   return files;
+}
+
+// ── Adapter Dependencies ─────────────────────────────────
+
+function getAdapterDependencies(
+  config: ResolvedConfig
+): Record<string, string> {
+  if (config.renderMode === "static" && config.deployTarget === "static") {
+    return {};
+  }
+
+  const adapterMap: Record<string, Record<string, string>> = {
+    cloudflare: { "@astrojs/cloudflare": "^12.0.0" },
+    vercel: { "@astrojs/vercel": "^8.0.0" },
+    netlify: { "@astrojs/netlify": "^6.0.0" },
+  };
+
+  return adapterMap[config.deployTarget] ?? {};
 }

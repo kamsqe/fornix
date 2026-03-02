@@ -22,6 +22,7 @@ Everything depends on these. They define the contracts that every other module c
 
 ### Phase 1: `BlockManifest` Schema
 > **Package:** `fornix-registry` · **Agent:** `blocks-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 Build the Zod schema that defines what a block IS.
 
@@ -44,6 +45,7 @@ Build the Zod schema that defines what a block IS.
 
 ### Phase 2: `PaletteRegistry` Schema
 > **Package:** `fornix-registry` · **Agent:** `registry-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/registry-agent.md`
 
 Define the schema for pre-built palettes and create the first batch.
 
@@ -67,6 +69,7 @@ Define the schema for pre-built palettes and create the first batch.
 
 ### Phase 3: `ResolvedConfig` Schema
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Define THE contract between user input and the scaffold pipeline.
 
@@ -90,6 +93,7 @@ Define THE contract between user input and the scaffold pipeline.
 
 ### Phase 4: `ProjectManifest` Schema
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Define the tracking file (`fornix.json`) that the CLI writes into generated projects.
 
@@ -109,6 +113,7 @@ Define the tracking file (`fornix.json`) that the CLI writes into generated proj
 
 ### Phase 5: `IntentSchema` + AI Types
 > **Package:** `create-fornix` · **Agent:** `ai-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/ai-agent.md`
 
 Define AI contracts even though AI is built later. Types must exist from Day 1.
 
@@ -131,6 +136,7 @@ Define AI contracts even though AI is built later. Types must exist from Day 1.
 
 ### Phase 6: `Result<T, E>` Utility + Error Types
 > **Package:** `create-fornix` · **Agent:** `AGENTS.md` (principle 10)
+> **Attach:** `.context/AGENTS.md`
 
 Establish the error handling pattern used everywhere.
 
@@ -156,6 +162,7 @@ The scaffold pipeline is the product. Given a config, produce a project.
 
 ### Phase 7: Dependency Resolver
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Pure function: given selected blocks + manifest data, resolve dependencies and detect problems.
 
@@ -178,6 +185,7 @@ Pure function: given selected blocks + manifest data, resolve dependencies and d
 
 ### Phase 8: Config Validator
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Validate that a `ResolvedConfig` is internally consistent beyond schema validation.
 
@@ -203,6 +211,7 @@ Validate that a `ResolvedConfig` is internally consistent beyond schema validati
 
 ### Phase 9: Project Structure Generator
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Create the base Astro project directory structure (no blocks yet).
 
@@ -224,6 +233,7 @@ Create the base Astro project directory structure (no blocks yet).
 
 ### Phase 10: Astro Config Generator (magicast)
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Generate `astro.config.mjs` from `ResolvedConfig` using magicast for safe AST manipulation.
 
@@ -249,6 +259,7 @@ Generate `astro.config.mjs` from `ResolvedConfig` using magicast for safe AST ma
 
 ### Phase 11: Tailwind + Palette Config Generator
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md` + `registry-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md` + `.context/agents/registry-agent.md`
 
 Generate Tailwind config and palette CSS custom properties.
 
@@ -272,6 +283,7 @@ Generate Tailwind config and palette CSS custom properties.
 
 ### Phase 12: Block Placer
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Copy block files into the correct project locations.
 
@@ -293,6 +305,7 @@ Copy block files into the correct project locations.
 
 ### Phase 13: Content Collection Wiring
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Generate `src/content/config.ts` and wire block content schemas. Handle i18n content structure.
 
@@ -315,6 +328,7 @@ Generate `src/content/config.ts` and wire block content schemas. Handle i18n con
 
 ### Phase 14: i18n Wiring
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 When `locales.length >= 2`, scaffold the i18n infrastructure.
 
@@ -335,6 +349,7 @@ When `locales.length >= 2`, scaffold the i18n infrastructure.
 
 ### Phase 15: Full Scaffold Pipeline Assembly
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md`
 
 Wire phases 7–14 into the single `scaffold()` function.
 
@@ -357,6 +372,7 @@ Wire phases 7–14 into the single `scaffold()` function.
 
 ### Phase 16: Real Filesystem + `astro check` Validation
 > **Package:** `create-fornix` · **Agent:** `testing-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/testing-agent.md` + `.context/agents/scaffold-agent.md`
 
 Prove the scaffold output is a real, valid Astro project.
 
@@ -381,6 +397,7 @@ The entry point for users. Connects user input to the scaffold pipeline.
 
 ### Phase 17: citty Command Skeleton
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 Set up the CLI framework with all commands defined (handlers empty).
 
@@ -403,6 +420,7 @@ Set up the CLI framework with all commands defined (handlers empty).
 
 ### Phase 18: Flag-Driven Create (Non-Interactive)
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 Make `create-fornix` work with flags only (no prompts), wired to the scaffold pipeline.
 
@@ -424,6 +442,7 @@ Make `create-fornix` work with flags only (no prompts), wired to the scaffold pi
 
 ### Phase 19: Interactive Prompts (Manual Mode)
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 Build the @clack/prompts interactive flow.
 
@@ -444,6 +463,7 @@ Build the @clack/prompts interactive flow.
 
 ### Phase 20: Post-Scaffold Hooks
 > **Package:** `create-fornix` · **Agent:** `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/scaffold-agent.md` + `.context/agents/cli-agent.md`
 
 Run actions after scaffold: install deps, git init, print next steps.
 
@@ -471,6 +491,7 @@ Create real, minimal blocks to make the scaffold produce actual pages.
 
 ### Phase 21: First Section Block — `hero-gradient`
 > **Package:** `fornix-blocks` · **Agent:** `blocks-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 Build the first real block end-to-end.
 
@@ -492,6 +513,7 @@ Build the first real block end-to-end.
 
 ### Phase 22: `footer-minimal` + `features-grid` Blocks
 > **Package:** `fornix-blocks` · **Agent:** `blocks-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 Add 2 more section blocks to test combinations.
 
@@ -510,6 +532,7 @@ Add 2 more section blocks to test combinations.
 
 ### Phase 23: `theme-switcher` Block
 > **Package:** `fornix-blocks` · **Agent:** `blocks-agent.md` + `registry-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md` + `.context/agents/registry-agent.md`
 
 Build the runtime palette switcher component.
 
@@ -530,6 +553,7 @@ Build the runtime palette switcher component.
 
 ### Phase 24: First Integration Block — `db-d1`
 > **Package:** `fornix-blocks` · **Agent:** `blocks-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 Build a block that adds serverside infrastructure.
 
@@ -548,6 +572,7 @@ Build a block that adds serverside infrastructure.
 
 ### Phase 25: `auth-better-auth` Block
 > **Package:** `fornix-blocks` · **Agent:** `blocks-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 Auth block that depends on the db block.
 
@@ -572,6 +597,7 @@ Blocks move from local to remote.
 
 ### Phase 26: Registry Index Builder
 > **Package:** `fornix-registry` · **Agent:** `registry-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/registry-agent.md`
 
 Script that reads all blocks and produces a `registry.json` index.
 
@@ -591,6 +617,7 @@ Script that reads all blocks and produces a `registry.json` index.
 
 ### Phase 27: Block Fetcher (giget)
 > **Package:** `create-fornix` · **Agent:** `registry-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/registry-agent.md`
 
 Fetch blocks from a GitHub registry repo.
 
@@ -610,6 +637,7 @@ Fetch blocks from a GitHub registry repo.
 
 ### Phase 28: `fornix list` Command
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 Display available blocks from the registry.
 
@@ -627,6 +655,7 @@ Display available blocks from the registry.
 
 ### Phase 29: `fornix add` Command
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md` + `scaffold-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md` + `.context/agents/scaffold-agent.md`
 
 Add a block to an existing project.
 
@@ -645,6 +674,7 @@ Add a block to an existing project.
 
 ### Phase 30: `fornix remove` Command
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 Remove a block from an existing project.
 
@@ -662,6 +692,7 @@ Remove a block from an existing project.
 
 ### Phase 31: `fornix status` Command
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 Show what's installed in the current project.
 
@@ -684,6 +715,7 @@ Plug in AI to make the primary interface work.
 
 ### Phase 32: Rules Engine
 > **Package:** `create-fornix` · **Agent:** `ai-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/ai-agent.md`
 
 Deterministic rules that don't need AI. Runs on the `Intent` object.
 
@@ -706,6 +738,7 @@ Deterministic rules that don't need AI. Runs on the `Intent` object.
 
 ### Phase 33: System Prompt Builder
 > **Package:** `create-fornix` · **Agent:** `ai-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/ai-agent.md`
 
 Build the dynamic system prompt from the block registry.
 
@@ -727,6 +760,7 @@ Build the dynamic system prompt from the block registry.
 
 ### Phase 34: Mock AI Provider
 > **Package:** `create-fornix` · **Agent:** `ai-agent.md` + `testing-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/ai-agent.md` + `.context/agents/testing-agent.md`
 
 Create a mock provider for testing the AI flow without real API calls.
 
@@ -745,6 +779,7 @@ Create a mock provider for testing the AI flow without real API calls.
 
 ### Phase 35: Provider Abstraction + Real Providers
 > **Package:** `create-fornix` · **Agent:** `ai-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/ai-agent.md`
 
 Implement the provider resolution and at least 2 real providers.
 
@@ -766,6 +801,7 @@ Implement the provider resolution and at least 2 real providers.
 
 ### Phase 36: AI Conversation Loop
 > **Package:** `create-fornix` · **Agent:** `ai-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/ai-agent.md`
 
 The full AI pipeline: analyze → clarify → resolve → content → palette.
 
@@ -787,6 +823,7 @@ The full AI pipeline: analyze → clarify → resolve → content → palette.
 
 ### Phase 37: AI Mode in Create Command
 > **Package:** `create-fornix` · **Agent:** `cli-agent.md` + `ai-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md` + `.context/agents/ai-agent.md`
 
 Wire the AI conversation into the `create` command as the default path.
 
@@ -805,6 +842,7 @@ Wire the AI conversation into the `create` command as the default path.
 
 ### Phase 38: Multi-Locale Content Generation
 > **Package:** `create-fornix` · **Agent:** `ai-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/ai-agent.md`
 
 AI generates content for ALL locales when i18n is enabled.
 
@@ -829,6 +867,7 @@ Build the full block collection.
 
 ### Phase 39: Section Blocks Batch 1 (5 blocks)
 > `hero-split`, `hero-video`, `pricing-table`, `cta-banner`, `footer-rich`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 **Verification per block:**
 - [ ] Manifest parses
@@ -840,6 +879,7 @@ Build the full block collection.
 
 ### Phase 40: Section Blocks Batch 2 (5 blocks)
 > `features-bento`, `pricing-comparison`, `testimonials-carousel`, `testimonials-wall`, `faq-accordion`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 **Same verification as Phase 39.**
 
@@ -847,6 +887,7 @@ Build the full block collection.
 
 ### Phase 41: Section Blocks Batch 3 (4 blocks)
 > `cta-newsletter`, `contact-form`, `header-sticky`, `header-transparent`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 **Same verification as Phase 39.**
 - [ ] Additional: `contact-form` works with Astro Actions
@@ -855,6 +896,7 @@ Build the full block collection.
 
 ### Phase 42: Integration Blocks (3 blocks)
 > `payments-stripe`, `email-resend`, `analytics-cf`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 **Verification per block:**
 - [ ] Manifest parses with correct `requiredMode` and `envVars`
@@ -865,6 +907,7 @@ Build the full block collection.
 
 ### Phase 43: Feature Blocks (2 blocks)
 > `blog-mdx`, `docs-collection`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 **Verification per block:**
 - [ ] Content collections wired correctly
@@ -876,6 +919,7 @@ Build the full block collection.
 
 ### Phase 44: Layout Blocks (3 blocks)
 > `layout-marketing`, `layout-docs`, `layout-dashboard`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 **Verification per block:**
 - [ ] All text from content collections
@@ -892,6 +936,7 @@ AI agents can control Fornix programmatically.
 
 ### Phase 45: MCP Server Skeleton
 > **Package:** `create-fornix` · **Agent:** `mcp-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/mcp-agent.md`
 
 Set up the MCP server and wire the `fornix mcp serve` command.
 
@@ -909,6 +954,7 @@ Set up the MCP server and wire the `fornix mcp serve` command.
 
 ### Phase 46: MCP Tool Implementations
 > **Package:** `create-fornix` · **Agent:** `mcp-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/mcp-agent.md`
 
 Wire MCP tools to real CLI functions.
 
@@ -927,6 +973,7 @@ Wire MCP tools to real CLI functions.
 
 ### Phase 47: Auto-Generated Agent Context
 > **Package:** `create-fornix` · **Agent:** `mcp-agent.md`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/mcp-agent.md` + `.context/agents/scaffold-agent.md`
 
 Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
@@ -949,6 +996,7 @@ Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
 ### Phase 48: Recipes
 > `--recipe saas`, `--recipe agency`, `--recipe docs`, `--recipe blog`, `--recipe portfolio`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md` + `.context/agents/registry-agent.md`
 
 **What to build:** Pre-defined `ResolvedConfig` partials. Recipe = curated block list + palette + render mode.
 
@@ -960,6 +1008,7 @@ Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
 ### Phase 49: `fornix doctor`
 > Diagnose common issues in a Fornix project.
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 **Verification:**
 - [ ] Detects missing `fornix.json`
@@ -970,6 +1019,7 @@ Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
 ### Phase 50: Runtime AI Blocks
 > `ai-chatbot`, `ai-search`, `ai-og-images`
+> **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md` + `.context/agents/ai-agent.md`
 
 **Verification per block:**
 - [ ] Manifest parses
@@ -980,6 +1030,7 @@ Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
 ### Phase 51: Error Polish
 > Every error message is actionable. Every edge case has a clean exit.
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md`
 
 **Verification:**
 - [ ] Invalid project name → helpful message with valid name suggestion
@@ -991,6 +1042,7 @@ Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
 ### Phase 52: Performance
 > CLI runs in <10 seconds (excluding install).
+> **Attach:** `.context/AGENTS.md` + `.context/agents/testing-agent.md`
 
 **Verification:**
 - [ ] Benchmark: `time create-fornix ./tmp --recipe saas --yes` < 10s
@@ -1000,6 +1052,7 @@ Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
 ### Phase 53: Documentation Site
 > Built with Fornix itself (`--recipe docs`).
+> **Attach:** `.context/AGENTS.md` + `.context/agents/registry-agent.md`
 
 **Verification:**
 - [ ] Docs site builds and deploys
@@ -1009,6 +1062,7 @@ Auto-generate `CLAUDE.md` and `.cursor/rules/` during scaffold.
 
 ### Phase 54: npm Publish
 > `create-fornix` on npm.
+> **Attach:** `.context/AGENTS.md` + `.context/agents/cli-agent.md` + `.context/agents/registry-agent.md`
 
 **Verification:**
 - [ ] `npx create-fornix --help` works globally

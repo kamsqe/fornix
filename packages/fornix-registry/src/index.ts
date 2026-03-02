@@ -1,9 +1,8 @@
-/**
- * Fornix Registry — Block metadata schemas and registry tooling
- *
- * This package exports:
- * - BlockManifest schema and type (what a block IS)
- * - Registry types and utilities
- */
-
-export {};
+export {
+  BlockManifestSchema,
+  type BlockManifest,
+  type BlockFile,
+  type BlockEnvVar,
+  type BlockAIMetadata,
+  type ContentSlot,
+} from "./schemas/block-manifest.js";

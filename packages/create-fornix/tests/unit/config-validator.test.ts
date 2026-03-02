@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { validateConfig } from "../../src/scaffold/config-validator";
-import { isOk, isErr } from "../../src/utils/result";
+import { validateConfig, type ValidationError } from "../../src/scaffold/config-validator";
+import { isOk, isErr, type Result } from "../../src/utils/result";
 import type { ResolvedConfig } from "../../src/schemas/config";
 import type { BlockManifest } from "fornix-registry";
 
@@ -102,11 +102,11 @@ describe("validateConfig", () => {
         { name: "auth-better-auth", variant: "default" },
       ],
     });
-    const result = validateConfig(config, manifests);
+    const result: Result<ResolvedConfig, ValidationError[]> = validateConfig(config, manifests);
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      const messages = result.error.map((e) => e.message);
-      expect(messages.some((m) => m.includes("auth-better-auth") && m.includes("server"))).toBe(true);
+      const messages = result.error.map((e: ValidationError) => e.message);
+      expect(messages.some((m: string) => m.includes("auth-better-auth") && m.includes("server"))).toBe(true);
     }
   });
 
@@ -117,11 +117,11 @@ describe("validateConfig", () => {
       renderMode: "static",
       database: "d1",
     });
-    const result = validateConfig(config, manifests);
+    const result: Result<ResolvedConfig, ValidationError[]> = validateConfig(config, manifests);
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      const messages = result.error.map((e) => e.message);
-      expect(messages.some((m) => m.includes("database") || m.includes("d1"))).toBe(true);
+      const messages = result.error.map((e: ValidationError) => e.message);
+      expect(messages.some((m: string) => m.includes("database") || m.includes("d1"))).toBe(true);
     }
   });
 
@@ -131,11 +131,11 @@ describe("validateConfig", () => {
     const config = baseConfig({
       blocks: [{ name: "nonexistent-block", variant: "default" }],
     });
-    const result = validateConfig(config, manifests);
+    const result: Result<ResolvedConfig, ValidationError[]> = validateConfig(config, manifests);
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      const messages = result.error.map((e) => e.message);
-      expect(messages.some((m) => m.includes("nonexistent-block"))).toBe(true);
+      const messages = result.error.map((e: ValidationError) => e.message);
+      expect(messages.some((m: string) => m.includes("nonexistent-block"))).toBe(true);
     }
   });
 
@@ -146,11 +146,11 @@ describe("validateConfig", () => {
       locales: ["en"],
       defaultLocale: "es",
     } as Partial<ResolvedConfig>);
-    const result = validateConfig(config, manifests);
+    const result: Result<ResolvedConfig, ValidationError[]> = validateConfig(config, manifests);
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
-      const messages = result.error.map((e) => e.message);
-      expect(messages.some((m) => m.includes("defaultLocale") || m.includes("es"))).toBe(true);
+      const messages = result.error.map((e: ValidationError) => e.message);
+      expect(messages.some((m: string) => m.includes("defaultLocale") || m.includes("es"))).toBe(true);
     }
   });
 
@@ -162,7 +162,7 @@ describe("validateConfig", () => {
       database: "d1",
       blocks: [{ name: "auth-better-auth", variant: "default" }],
     });
-    const result = validateConfig(config, manifests);
+    const result: Result<ResolvedConfig, ValidationError[]> = validateConfig(config, manifests);
     expect(isErr(result)).toBe(true);
     if (isErr(result)) {
       // Should have at least 2 errors: database+static AND auth+static

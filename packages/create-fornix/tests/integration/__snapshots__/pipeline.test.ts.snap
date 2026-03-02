@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`scaffold > file tree matches snapshot for i18n config 1`] = `
+[
+  ".gitignore",
+  "astro.config.mjs",
+  "fornix.json",
+  "package.json",
+  "src/components/sections/footer-minimal.astro",
+  "src/components/sections/hero-gradient.astro",
+  "src/content/config.ts",
+  "src/content/en/sections/hero-gradient.json",
+  "src/content/es/sections/hero-gradient.json",
+  "src/i18n/utils.ts",
+  "src/layouts/Layout.astro",
+  "src/pages/[locale]/index.astro",
+  "src/pages/index.astro",
+  "src/styles/palettes/_current.css",
+  "tailwind.css",
+  "tsconfig.json",
+  "wrangler.json",
+]
+`;
+
+exports[`scaffold > file tree matches snapshot for server + auth + db config 1`] = `
+[
+  ".env.example",
+  ".gitignore",
+  "astro.config.mjs",
+  "fornix.json",
+  "package.json",
+  "src/layouts/Layout.astro",
+  "src/lib/db.ts",
+  "src/middleware/auth.ts",
+  "src/pages/api/auth.ts",
+  "src/pages/index.astro",
+  "src/styles/palettes/_current.css",
+  "tailwind.css",
+  "tsconfig.json",
+  "wrangler.json",
+]
+`;
+
+exports[`scaffold > file tree matches snapshot for static + cloudflare config 1`] = `
+[
+  ".gitignore",
+  "astro.config.mjs",
+  "fornix.json",
+  "package.json",
+  "src/components/sections/footer-minimal.astro",
+  "src/components/sections/hero-gradient.astro",
+  "src/content/config.ts",
+  "src/content/sections/hero-gradient.json",
+  "src/layouts/Layout.astro",
+  "src/pages/index.astro",
+  "src/styles/palettes/_current.css",
+  "tailwind.css",
+  "tsconfig.json",
+  "wrangler.json",
+]
+`;

@@ -5,7 +5,7 @@
  * Used for testing the AI flow without real API calls.
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { IntentSchema, type Intent } from "../rules.js";
@@ -98,10 +98,18 @@ export function createMockProvider(): AIProvider {
 // ── Helpers ──────────────────────────────────────────────
 
 function resolveFixtureDir(): string {
-  // In tests, __dirname-based resolution
   const thisDir = dirname(fileURLToPath(import.meta.url));
-  // Walk from src/ai/providers/ → tests/fixtures/ai-responses/
-  return join(thisDir, "..", "..", "..", "tests", "fixtures", "ai-responses");
+
+  // Source layout: src/ai/providers/ → ../../.. → tests/fixtures/ai-responses/
+  const fromSource = join(thisDir, "..", "..", "..", "tests", "fixtures", "ai-responses");
+  if (existsSync(fromSource)) return fromSource;
+
+  // Bundled layout: dist/ → .. → tests/fixtures/ai-responses/
+  const fromDist = join(thisDir, "..", "tests", "fixtures", "ai-responses");
+  if (existsSync(fromDist)) return fromDist;
+
+  // Fallback to source path (will error on read, with a clear message)
+  return fromSource;
 }
 
 /**

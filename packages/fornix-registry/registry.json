@@ -1,0 +1,885 @@
+{
+  "version": 1,
+  "generatedAt": "2026-03-03T05:08:29.560Z",
+  "blocks": [
+    {
+      "schemaVersion": 1,
+      "name": "auth-better-auth",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "Authentication with Better Auth — email/password + OAuth providers, session management, and protected routes",
+      "category": "auth",
+      "tags": [
+        "auth",
+        "authentication",
+        "login",
+        "signup",
+        "oauth",
+        "session",
+        "better-auth"
+      ],
+      "dependencies": {
+        "better-auth": "^1.2.0"
+      },
+      "requires": [
+        "db-d1"
+      ],
+      "conflicts": [],
+      "requiredMode": "server",
+      "envVars": [
+        {
+          "name": "AUTH_SECRET",
+          "description": "Secret key for signing session tokens (generate with: openssl rand -hex 32)",
+          "required": true
+        },
+        {
+          "name": "GITHUB_CLIENT_ID",
+          "description": "GitHub OAuth application client ID",
+          "required": true
+        },
+        {
+          "name": "GITHUB_CLIENT_SECRET",
+          "description": "GitHub OAuth application client secret",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "auth.ts",
+          "destination": "src/lib/auth.ts"
+        },
+        {
+          "source": "middleware.ts",
+          "destination": "src/middleware/auth.ts"
+        },
+        {
+          "source": "auth-api.ts",
+          "destination": "src/pages/api/auth/[...all].ts"
+        },
+        {
+          "source": "login.astro",
+          "destination": "src/pages/login.astro"
+        },
+        {
+          "source": "signup.astro",
+          "destination": "src/pages/signup.astro"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when the project needs user authentication — login, signup, session management, and protected routes. Better Auth supports email/password and OAuth providers (GitHub, Google, etc.).",
+        "whenNotToUse": "Don't use for public-only sites with no user accounts, or projects that need a different auth provider (e.g. Clerk, Auth0). Not suitable for static-only deployments.",
+        "pairsWith": [
+          "db-d1"
+        ],
+        "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "db-d1",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "Cloudflare D1 database integration with Drizzle ORM, migration support, and type-safe queries",
+      "category": "database",
+      "tags": [
+        "database",
+        "d1",
+        "cloudflare",
+        "drizzle",
+        "orm",
+        "sql"
+      ],
+      "dependencies": {
+        "drizzle-orm": "^0.38.0",
+        "drizzle-kit": "^0.30.0"
+      },
+      "requires": [],
+      "conflicts": [],
+      "requiredMode": "server",
+      "envVars": [
+        {
+          "name": "D1_DATABASE_ID",
+          "description": "Cloudflare D1 database ID from the Workers dashboard",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "db.ts",
+          "destination": "src/lib/db.ts"
+        },
+        {
+          "source": "schema.ts",
+          "destination": "src/lib/db-schema.ts"
+        },
+        {
+          "source": "drizzle.config.ts",
+          "destination": "drizzle.config.ts"
+        },
+        {
+          "source": "migrations/.gitkeep",
+          "destination": "drizzle/migrations/.gitkeep"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when the project needs a database for user data, content, or application state. D1 is Cloudflare's serverless SQLite database — ideal for edge-deployed Astro apps on Workers.",
+        "whenNotToUse": "Don't use for static-only sites, purely client-side apps, or projects that already have a different database integration (turso, postgres). Not suitable for read-heavy workloads exceeding D1 limits.",
+        "pairsWith": [
+          "auth-better-auth"
+        ],
+        "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "features-grid",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Responsive grid of feature cards with icons, titles, and descriptions",
+      "category": "features",
+      "tags": [
+        "features",
+        "grid",
+        "cards",
+        "benefits"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "two-column",
+        "icon-left"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "features-grid.astro",
+          "destination": "src/components/sections/features-grid.astro"
+        },
+        {
+          "source": "features-grid.css",
+          "destination": "src/styles/sections/features-grid.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use to showcase product features, benefits, or capabilities in a visually scannable grid. Best placed after the hero section on landing pages.",
+        "whenNotToUse": "Don't use for pricing comparisons (use pricing-table), detailed documentation, or content that needs sequential reading order.",
+        "pairsWith": [
+          "hero-gradient",
+          "cta-simple",
+          "footer-minimal"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline above the feature grid",
+            "maxLength": 80,
+            "example": "Everything You Need"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Optional supporting text below the headline",
+            "maxLength": 200,
+            "example": "Powerful features to help you build faster and ship with confidence."
+          },
+          "features": {
+            "type": "array",
+            "description": "List of feature cards to display in the grid",
+            "example": [
+              {
+                "icon": "⚡",
+                "title": "Lightning Fast",
+                "description": "Built on Astro for zero JS by default."
+              }
+            ],
+            "items": {
+              "icon": {
+                "type": "string",
+                "description": "Emoji or icon identifier"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "minItems": 2,
+            "maxItems": 12
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "footer-minimal",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Clean, minimal footer with copyright, navigation links, and optional social icons",
+      "category": "footer",
+      "tags": [
+        "footer",
+        "navigation",
+        "minimal",
+        "bottom"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "centered",
+        "two-column"
+      ],
+      "slots": [
+        "social-icons"
+      ],
+      "files": [
+        {
+          "source": "footer-minimal.astro",
+          "destination": "src/components/sections/footer-minimal.astro"
+        },
+        {
+          "source": "footer-minimal.css",
+          "destination": "src/styles/sections/footer-minimal.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use as the site-wide footer on every page. Best for marketing sites, landing pages, and simple apps that need copyright info and basic navigation links.",
+        "whenNotToUse": "Don't use for complex footers with newsletter signup, multi-column link lists, or embedded widgets. Use a dedicated footer-mega block instead.",
+        "pairsWith": [
+          "hero-gradient",
+          "features-grid",
+          "cta-simple"
+        ],
+        "contentSlots": {
+          "copyright": {
+            "type": "string",
+            "description": "Copyright text (e.g. '© 2026 Acme Inc.')",
+            "maxLength": 100,
+            "example": "© 2026 Acme Inc. All rights reserved."
+          },
+          "links": {
+            "type": "array",
+            "description": "Navigation links displayed in the footer",
+            "example": [
+              {
+                "label": "Privacy",
+                "href": "/privacy"
+              },
+              {
+                "label": "Terms",
+                "href": "/terms"
+              }
+            ],
+            "items": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              }
+            },
+            "minItems": 0,
+            "maxItems": 8
+          },
+          "tagline": {
+            "type": "string",
+            "description": "Optional short tagline or description below the logo/brand",
+            "maxLength": 120,
+            "example": "Built with Fornix"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "hero-gradient",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Full-width hero section with gradient background, headline, subheadline, and CTA button",
+      "category": "hero",
+      "tags": [
+        "hero",
+        "landing",
+        "gradient",
+        "above-fold"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "centered",
+        "split"
+      ],
+      "slots": [
+        "badge",
+        "cta-secondary"
+      ],
+      "files": [
+        {
+          "source": "hero-gradient.astro",
+          "destination": "src/components/sections/hero-gradient.astro"
+        },
+        {
+          "source": "hero-gradient.css",
+          "destination": "src/styles/sections/hero-gradient.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use as the primary above-fold hero section on landing pages. Best for marketing sites, SaaS landing pages, and product pages that need a strong visual first impression with a gradient background.",
+        "whenNotToUse": "Don't use for internal dashboard pages, documentation sites, or pages where a simpler text-only hero would be more appropriate. Avoid stacking multiple hero blocks.",
+        "pairsWith": [
+          "cta-simple",
+          "features-grid",
+          "footer-minimal"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Primary headline text displayed prominently",
+            "maxLength": 80,
+            "example": "Build Beautiful Websites Faster"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting text below the headline",
+            "maxLength": 200,
+            "example": "The CLI-first framework for Astro + Cloudflare that lets you ship in minutes, not months."
+          },
+          "ctaText": {
+            "type": "string",
+            "description": "Call-to-action button label",
+            "maxLength": 30,
+            "example": "Get Started"
+          },
+          "ctaHref": {
+            "type": "string",
+            "description": "Call-to-action button URL",
+            "example": "#get-started"
+          },
+          "badge": {
+            "type": "string",
+            "description": "Optional small badge text above the headline (e.g. 'New', 'Beta')",
+            "maxLength": 30,
+            "example": "Now in Beta"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "theme-switcher",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Client-side palette switcher UI with dropdown selector and localStorage persistence",
+      "category": "theme",
+      "tags": [
+        "theme",
+        "palette",
+        "switcher",
+        "dark-mode",
+        "customization"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "pill",
+        "minimal"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "theme-switcher.astro",
+          "destination": "src/components/sections/theme-switcher.astro"
+        },
+        {
+          "source": "theme-switcher.css",
+          "destination": "src/styles/sections/theme-switcher.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when the project has themeSwitcher enabled and multiple palettes are available. Provides a floating UI for users to switch between palettes at runtime.",
+        "whenNotToUse": "Don't use if the project only has one palette or if palette switching should be hidden from end users. Not needed for admin-only theme controls.",
+        "pairsWith": [
+          "hero-gradient",
+          "footer-minimal"
+        ],
+        "contentSlots": {
+          "label": {
+            "type": "string",
+            "description": "Accessible label for the switcher",
+            "maxLength": 30,
+            "example": "Theme"
+          }
+        }
+      }
+    }
+  ],
+  "palettes": [
+    {
+      "schemaVersion": 1,
+      "name": "arctic",
+      "displayName": "Arctic",
+      "category": "nature",
+      "mode": "light",
+      "colors": {
+        "primary": "#0ea5e9",
+        "secondary": "#38bdf8",
+        "accent": "#6366f1",
+        "background": "#f0f9ff",
+        "foreground": "#0c4a6e"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "charcoal",
+      "displayName": "Charcoal",
+      "category": "dark",
+      "mode": "dark",
+      "colors": {
+        "primary": "#3b82f6",
+        "secondary": "#60a5fa",
+        "accent": "#f59e0b",
+        "background": "#1c1917",
+        "foreground": "#e7e5e4"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "copper",
+      "displayName": "Copper",
+      "category": "warm",
+      "mode": "dark",
+      "colors": {
+        "primary": "#b45309",
+        "secondary": "#d97706",
+        "accent": "#06b6d4",
+        "background": "#27272a",
+        "foreground": "#fef3c7"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "corporate-blue",
+      "displayName": "Corporate Blue",
+      "category": "professional",
+      "mode": "light",
+      "colors": {
+        "primary": "#1e40af",
+        "secondary": "#2563eb",
+        "accent": "#0d9488",
+        "background": "#f0f9ff",
+        "foreground": "#1e3a5f"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "cotton",
+      "displayName": "Cotton",
+      "category": "light",
+      "mode": "light",
+      "colors": {
+        "primary": "#7c3aed",
+        "secondary": "#8b5cf6",
+        "accent": "#10b981",
+        "background": "#fafaf9",
+        "foreground": "#1c1917"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "cream",
+      "displayName": "Cream",
+      "category": "light",
+      "mode": "light",
+      "colors": {
+        "primary": "#b45309",
+        "secondary": "#d97706",
+        "accent": "#059669",
+        "background": "#fffbeb",
+        "foreground": "#451a03"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "cyber-punk",
+      "displayName": "Cyber Punk",
+      "category": "vibrant",
+      "mode": "dark",
+      "colors": {
+        "primary": "#eab308",
+        "secondary": "#facc15",
+        "accent": "#ec4899",
+        "background": "#0a0a0a",
+        "foreground": "#fef9c3"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "deep-sea",
+      "displayName": "Deep Sea",
+      "category": "cool",
+      "mode": "dark",
+      "colors": {
+        "primary": "#06b6d4",
+        "secondary": "#22d3ee",
+        "accent": "#f97316",
+        "background": "#042f2e",
+        "foreground": "#ccfbf1"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "desert-sand",
+      "displayName": "Desert Sand",
+      "category": "nature",
+      "mode": "light",
+      "colors": {
+        "primary": "#c2410c",
+        "secondary": "#ea580c",
+        "accent": "#0d9488",
+        "background": "#fef3c7",
+        "foreground": "#431407"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "electric-violet",
+      "displayName": "Electric Violet",
+      "category": "vibrant",
+      "mode": "dark",
+      "colors": {
+        "primary": "#8b5cf6",
+        "secondary": "#a78bfa",
+        "accent": "#34d399",
+        "background": "#1e1b4b",
+        "foreground": "#ede9fe"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "ember",
+      "displayName": "Ember",
+      "category": "warm",
+      "mode": "dark",
+      "colors": {
+        "primary": "#ef4444",
+        "secondary": "#f87171",
+        "accent": "#fbbf24",
+        "background": "#1c1917",
+        "foreground": "#fef2f2"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "executive",
+      "displayName": "Executive",
+      "category": "professional",
+      "mode": "dark",
+      "colors": {
+        "primary": "#d4af37",
+        "secondary": "#f5d063",
+        "accent": "#4ade80",
+        "background": "#1a1a2e",
+        "foreground": "#eef2ff"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "fintech-dark",
+      "displayName": "Fintech Dark",
+      "category": "brand-inspired",
+      "mode": "dark",
+      "colors": {
+        "primary": "#10b981",
+        "secondary": "#34d399",
+        "accent": "#6366f1",
+        "background": "#0a0a0a",
+        "foreground": "#ecfdf5"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "forest",
+      "displayName": "Forest",
+      "category": "nature",
+      "mode": "dark",
+      "colors": {
+        "primary": "#22c55e",
+        "secondary": "#4ade80",
+        "accent": "#fbbf24",
+        "background": "#14532d",
+        "foreground": "#dcfce7"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "frost",
+      "displayName": "Frost",
+      "category": "cool",
+      "mode": "light",
+      "colors": {
+        "primary": "#6366f1",
+        "secondary": "#818cf8",
+        "accent": "#f43f5e",
+        "background": "#eef2ff",
+        "foreground": "#312e81"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "glacier",
+      "displayName": "Glacier",
+      "category": "cool",
+      "mode": "light",
+      "colors": {
+        "primary": "#0284c7",
+        "secondary": "#0ea5e9",
+        "accent": "#c026d3",
+        "background": "#ecfeff",
+        "foreground": "#164e63"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "golden-hour",
+      "displayName": "Golden Hour",
+      "category": "warm",
+      "mode": "light",
+      "colors": {
+        "primary": "#d97706",
+        "secondary": "#f59e0b",
+        "accent": "#be185d",
+        "background": "#fffbeb",
+        "foreground": "#451a03"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "health-clean",
+      "displayName": "Health Clean",
+      "category": "brand-inspired",
+      "mode": "light",
+      "colors": {
+        "primary": "#0891b2",
+        "secondary": "#06b6d4",
+        "accent": "#16a34a",
+        "background": "#f0fdfa",
+        "foreground": "#134e4a"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "luxury-gold",
+      "displayName": "Luxury Gold",
+      "category": "brand-inspired",
+      "mode": "dark",
+      "colors": {
+        "primary": "#d4af37",
+        "secondary": "#f5d063",
+        "accent": "#e11d48",
+        "background": "#0c0a09",
+        "foreground": "#fef9c3"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "midnight",
+      "displayName": "Midnight",
+      "category": "dark",
+      "mode": "dark",
+      "colors": {
+        "primary": "#6366f1",
+        "secondary": "#818cf8",
+        "accent": "#c084fc",
+        "background": "#0f172a",
+        "foreground": "#f8fafc"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "neon-tokyo",
+      "displayName": "Neon Tokyo",
+      "category": "vibrant",
+      "mode": "dark",
+      "colors": {
+        "primary": "#f43f5e",
+        "secondary": "#fb7185",
+        "accent": "#22d3ee",
+        "background": "#0c0a09",
+        "foreground": "#fef2f2"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "obsidian",
+      "displayName": "Obsidian",
+      "category": "dark",
+      "mode": "dark",
+      "colors": {
+        "primary": "#a855f7",
+        "secondary": "#7c3aed",
+        "accent": "#f472b6",
+        "background": "#09090b",
+        "foreground": "#fafafa"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "ocean-breeze",
+      "displayName": "Ocean Breeze",
+      "category": "nature",
+      "mode": "light",
+      "colors": {
+        "primary": "#0077b6",
+        "secondary": "#0096c7",
+        "accent": "#f4845f",
+        "background": "#caf0f8",
+        "foreground": "#023e8a"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "pearl",
+      "displayName": "Pearl",
+      "category": "light",
+      "mode": "light",
+      "colors": {
+        "primary": "#0891b2",
+        "secondary": "#06b6d4",
+        "accent": "#e11d48",
+        "background": "#f8fafc",
+        "foreground": "#0c4a6e"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "slate-modern",
+      "displayName": "Slate Modern",
+      "category": "professional",
+      "mode": "light",
+      "colors": {
+        "primary": "#475569",
+        "secondary": "#64748b",
+        "accent": "#0ea5e9",
+        "background": "#f8fafc",
+        "foreground": "#0f172a"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "snow",
+      "displayName": "Snow",
+      "category": "light",
+      "mode": "light",
+      "colors": {
+        "primary": "#2563eb",
+        "secondary": "#3b82f6",
+        "accent": "#f97316",
+        "background": "#ffffff",
+        "foreground": "#0f172a"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "startup-bold",
+      "displayName": "Startup Bold",
+      "category": "brand-inspired",
+      "mode": "light",
+      "colors": {
+        "primary": "#7c3aed",
+        "secondary": "#8b5cf6",
+        "accent": "#f97316",
+        "background": "#faf5ff",
+        "foreground": "#3b0764"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "storm",
+      "displayName": "Storm",
+      "category": "cool",
+      "mode": "dark",
+      "colors": {
+        "primary": "#64748b",
+        "secondary": "#94a3b8",
+        "accent": "#38bdf8",
+        "background": "#0f172a",
+        "foreground": "#cbd5e1"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "sunset-glow",
+      "displayName": "Sunset Glow",
+      "category": "vibrant",
+      "mode": "dark",
+      "colors": {
+        "primary": "#f97316",
+        "secondary": "#fb923c",
+        "accent": "#a855f7",
+        "background": "#18181b",
+        "foreground": "#fff7ed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "terracotta",
+      "displayName": "Terracotta",
+      "category": "warm",
+      "mode": "light",
+      "colors": {
+        "primary": "#c2410c",
+        "secondary": "#dc2626",
+        "accent": "#65a30d",
+        "background": "#fdf2f8",
+        "foreground": "#431407"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "trust",
+      "displayName": "Trust",
+      "category": "professional",
+      "mode": "light",
+      "colors": {
+        "primary": "#0369a1",
+        "secondary": "#0284c7",
+        "accent": "#16a34a",
+        "background": "#f0fdfa",
+        "foreground": "#0c4a6e"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "void",
+      "displayName": "Void",
+      "category": "dark",
+      "mode": "dark",
+      "colors": {
+        "primary": "#14b8a6",
+        "secondary": "#2dd4bf",
+        "accent": "#f43f5e",
+        "background": "#020617",
+        "foreground": "#e2e8f0"
+      }
+    }
+  ]
+}

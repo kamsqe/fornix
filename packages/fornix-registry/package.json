@@ -23,6 +23,7 @@
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
+    "build:registry": "tsup scripts/build-registry.ts --format esm --outDir scripts/dist --no-splitting --no-dts --silent && node scripts/dist/build-registry.js",
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:watch": "vitest",

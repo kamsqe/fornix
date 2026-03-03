@@ -44,6 +44,61 @@ You MUST only select blocks that exist in the catalog below. Never invent block 
 - **Category:** features
 - **Tags:** none
 
+### hero-video
+- **Description:** Block hero-video
+- **Category:** general
+- **Tags:** none
+
+### features-bento
+- **Description:** Block features-bento
+- **Category:** general
+- **Tags:** none
+
+### pricing-table
+- **Description:** Block pricing-table
+- **Category:** general
+- **Tags:** none
+
+### faq-accordion
+- **Description:** Block faq-accordion
+- **Category:** general
+- **Tags:** none
+
+### footer-rich
+- **Description:** Block footer-rich
+- **Category:** general
+- **Tags:** none
+
+### testimonials-carousel
+- **Description:** Block testimonials-carousel
+- **Category:** general
+- **Tags:** none
+
+### contact-form
+- **Description:** Block contact-form
+- **Category:** general
+- **Tags:** none
+
+### hero-split
+- **Description:** Block hero-split
+- **Category:** general
+- **Tags:** none
+
+### header-transparent
+- **Description:** Block header-transparent
+- **Category:** general
+- **Tags:** none
+
+### cta-newsletter
+- **Description:** Block cta-newsletter
+- **Category:** general
+- **Tags:** none
+
+### header-sticky
+- **Description:** Block header-sticky
+- **Category:** general
+- **Tags:** none
+
 ## INTEGRATION Blocks
 
 ### auth-better-auth
@@ -52,14 +107,12 @@ You MUST only select blocks that exist in the catalog below. Never invent block 
 - **Tags:** none
 - **Requires:** db-d1
 - **Required mode:** server
-- **npm deps:** better-auth
 
 ### db-d1
 - **Description:** Block db-d1
 - **Category:** database
 - **Tags:** none
 - **Required mode:** server
-- **npm deps:** drizzle-orm, drizzle-kit
 
 ## FEATURE Blocks
 
@@ -67,13 +120,11 @@ You MUST only select blocks that exist in the catalog below. Never invent block 
 - **Description:** Block blog-mdx
 - **Category:** blog
 - **Tags:** none
-- **npm deps:** @astrojs/mdx, @astrojs/rss
 
 ### docs-collection
 - **Description:** Block docs-collection
 - **Category:** docs
 - **Tags:** none
-- **npm deps:** @astrojs/mdx
 
 ## LAYOUT Blocks
 

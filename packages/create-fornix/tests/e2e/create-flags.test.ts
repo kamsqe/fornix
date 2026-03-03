@@ -142,4 +142,27 @@ describe("create (flag-driven)", { timeout: 60_000 }, () => {
     expect(fornixJson.renderMode).toBe("static");
     expect(fornixJson.deployTarget).toBe("static");
   });
+
+  it("--recipe saas produces correct setup and files", () => {
+    const base = createTempDir();
+    const projectDir = join(base, "recipe-saas-project");
+
+    runCLI(`${projectDir} --recipe saas --yes --no-install --no-git`);
+
+    // Verify CLAUDE.md exists
+    expect(existsSync(join(projectDir, "CLAUDE.md"))).toBe(true);
+    
+    // Verify specific blocks
+    expect(existsSync(join(projectDir, "src/components/sections/hero-video.astro"))).toBe(true);
+    expect(existsSync(join(projectDir, "src/components/sections/pricing-table.astro"))).toBe(true);
+    
+    // Verify render mode and deploy target mapped over from recipe
+    const astroConfig = readFileSync(join(projectDir, "astro.config.mjs"), "utf-8");
+    expect(astroConfig).toContain("cloudflare");
+
+    const fornixJson = JSON.parse(readFileSync(join(projectDir, "fornix.json"), "utf-8"));
+    expect(fornixJson.createdWith).toBe("recipe");
+    expect(fornixJson.blocks.length).toBeGreaterThan(3);
+    expect(fornixJson.blocks.find((b: any) => b.name === "hero-video")).toBeDefined();
+  });
 });

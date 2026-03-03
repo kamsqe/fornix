@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 const CLI_PATH = join(__dirname, "../../dist/index.js");
 
 function runCLI(args: string): string {
-  return execSync(`node ${CLI_PATH} create ${args}`, {
+  return execSync(`node ${join(__dirname, "../../dist/index.js")} create ${args}`, {
     encoding: "utf-8",
     timeout: 30_000,
     stdio: ["pipe", "pipe", "pipe"],

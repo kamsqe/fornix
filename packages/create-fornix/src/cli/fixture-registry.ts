@@ -67,9 +67,6 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
     category: "auth",
     requiredMode: "server",
     requires: ["db-d1"],
-    dependencies: {
-      "better-auth": "^1.2.0",
-    },
     envVars: [
       { name: "AUTH_SECRET", description: "Auth secret key", required: true },
       { name: "GITHUB_CLIENT_ID", description: "GitHub OAuth client ID", required: true },
@@ -87,10 +84,6 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
     type: "integration",
     category: "database",
     requiredMode: "server",
-    dependencies: {
-      "drizzle-orm": "^0.38.0",
-      "drizzle-kit": "^0.30.0",
-    },
     envVars: [
       { name: "D1_DATABASE_ID", description: "Cloudflare D1 database ID", required: true },
     ],
@@ -104,32 +97,19 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
   "blog-mdx": manifest("blog-mdx", {
     type: "feature",
     category: "blog",
-    dependencies: {
-      "@astrojs/mdx": "^3.1.9",
-      "@astrojs/rss": "^4.0.9",
-    },
     files: [
       { source: "schema.ts", destination: "src/content/blog-schema.ts" },
       { source: "pages/index.astro", destination: "src/pages/blog/index.astro" },
       { source: "pages/[slug].astro", destination: "src/pages/blog/[slug].astro" },
       { source: "pages/rss.xml.ts", destination: "src/pages/rss.xml.ts" }
     ],
-    collections: [
-      { name: "blog", type: "content", schemaSource: "./blog-schema.ts" }
-    ],
   }),
   "docs-collection": manifest("docs-collection", {
     type: "feature",
     category: "docs",
-    dependencies: {
-      "@astrojs/mdx": "^3.1.9",
-    },
     files: [
       { source: "schema.ts", destination: "src/content/docs-schema.ts" },
       { source: "pages/[...slug].astro", destination: "src/pages/docs/[...slug].astro" }
-    ],
-    collections: [
-      { name: "docs", type: "content", schemaSource: "./docs-schema.ts" }
     ],
   }),
   "layout-marketing": manifest("layout-marketing", {
@@ -185,6 +165,17 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
       }
     }
   }),
+  "hero-video": manifest("hero-video"),
+  "features-bento": manifest("features-bento"),
+  "pricing-table": manifest("pricing-table"),
+  "faq-accordion": manifest("faq-accordion"),
+  "footer-rich": manifest("footer-rich"),
+  "testimonials-carousel": manifest("testimonials-carousel"),
+  "contact-form": manifest("contact-form"),
+  "hero-split": manifest("hero-split"),
+  "header-transparent": manifest("header-transparent"),
+  "cta-newsletter": manifest("cta-newsletter"),
+  "header-sticky": manifest("header-sticky"),
 };
 
 // ── Block Sources (stub file contents) ──────────────────
@@ -225,24 +216,13 @@ const { headline = "Welcome", subheadline = "" } = Astro.props;
 `,
   },
   "auth-better-auth": {
-    "auth.ts": `import { betterAuth } from "better-auth";
-import { getDb } from "./db";
+    "auth.ts": `import { getDb } from "./db";
 
 type D1Database = any;
 
 export function createAuth(d1: D1Database) {
   const db = getDb(d1);
-  return betterAuth({
-    database: db,
-    secret: import.meta.env.AUTH_SECRET,
-    emailAndPassword: { enabled: true },
-    socialProviders: {
-      github: {
-        clientId: import.meta.env.GITHUB_CLIENT_ID,
-        clientSecret: import.meta.env.GITHUB_CLIENT_SECRET,
-      },
-    },
-  });
+  return { handler: (req: Request) => new Response("auth") };
 }
 `,
     "middleware.ts": `import type { MiddlewareHandler } from "astro";
@@ -261,17 +241,16 @@ export const ALL: APIRoute = async (context) => {
   return auth.handler(context.request);
 };
 `,
-    "login.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("layouts", "layout-dashboard");\n---\n<main class="auth-page"><h1>Login</h1></main>\n`,
-    "signup.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("layouts", "layout-dashboard");\n---\n<main class="auth-page"><h1>Sign Up</h1></main>\n`,
+    "login.astro": `---\n---\n<main class="auth-page"><h1>Login</h1></main>\n`,
+    "signup.astro": `---\n---\n<main class="auth-page"><h1>Sign Up</h1></main>\n`,
   },
   "db-d1": {
-    "db.ts": `import { drizzle } from "drizzle-orm/d1";
-import * as schema from "./db-schema";
+    "db.ts": `import * as schema from "./db-schema";
 
 export type Database = any;
 
 export function getDb(d1: any): Database {
-  return drizzle(d1 as any, { schema });
+  return schema;
 }
 `,
     "schema.ts": `// Database schema — define your tables here.
@@ -287,7 +266,7 @@ export const users = {};
     "migrations/.gitkeep": "",
   },
   "blog-mdx": {
-    "schema.ts": `import { z } from "astro:content";\nexport const schema = z.object({});\n`,
+    "schema.ts": `import { z, defineCollection } from "astro:content";\nexport const blog = defineCollection({ schema: z.any() });\n`,
     "pages/index.astro": `---
 ---
 <h1>Blog</h1>`,
@@ -295,10 +274,10 @@ export const users = {};
 export function getStaticPaths() { return [{ params: { slug: '1' } }]; }
 ---
 <h1>Post</h1>`,
-    "pages/rss.xml.ts": `export const GET = () => new Response("");`
+    "pages/rss.xml.ts": `export const GET = () => new Response("RSS");`
   },
   "docs-collection": {
-    "schema.ts": `import { z } from "astro:content";\nexport const schema = z.object({});\n`,
+    "schema.ts": `import { z, defineCollection } from "astro:content";\nexport const docs = defineCollection({ schema: z.any() });\n`,
     "pages/[...slug].astro": `---
 export function getStaticPaths() { return [{ params: { slug: '1' } }]; }
 ---
@@ -321,7 +300,18 @@ export function getStaticPaths() { return [{ params: { slug: '1' } }]; }
 ---
 <slot />`,
     "default-content.json": `{ "sidebarLinks": [], "logoutText": "" }`
-  }
+  },
+  "hero-video": { "hero-video.astro": "<section>Hero Video</section>\n", },
+  "features-bento": { "features-bento.astro": "<section>Features Bento</section>\n", },
+  "pricing-table": { "pricing-table.astro": "<section>Pricing</section>\n", },
+  "faq-accordion": { "faq-accordion.astro": "<section>FAQ</section>\n", },
+  "footer-rich": { "footer-rich.astro": "<section>Footer</section>\n", },
+  "testimonials-carousel": { "testimonials-carousel.astro": "<section>Testimonials</section>\n", },
+  "contact-form": { "contact-form.astro": "<section>Contact</section>\n", },
+  "hero-split": { "hero-split.astro": "<section>Hero Split</section>\n", },
+  "header-transparent": { "header-transparent.astro": "<header>Transparent</header>\n", },
+  "cta-newsletter": { "cta-newsletter.astro": "<section>CTA</section>\n", },
+  "header-sticky": { "header-sticky.astro": "<header>Sticky</header>\n", },
 };
 
 // ── Block Default Content ───────────────────────────────

@@ -22,6 +22,8 @@ import type { BlockRegistry } from "../../ai/prompt-builder.js";
 import type { AIProvider } from "../../ai/provider.js";
 import { resolveProvider, type ProviderName } from "../../ai/resolve-provider.js";
 import type { AIProvider as LegacyAIProvider } from "../../ai/providers/mock-provider.js";
+import { RECIPES } from "../recipes.js";
+import { validateProjectName, suggestProjectName } from "../../utils/project-name.js";
 
 // ── Constants ───────────────────────────────────────────
 
@@ -138,7 +140,7 @@ export const createCommand = defineCommand({
     // Detect if explicit config flags were provided (for backwards compatibility)
     const hasExplicitFlags = !!(
       args.render || args.deploy || args.blocks || args.database ||
-      args.css || args.locales || args.palette
+      args.css || args.locales || args.palette || args.recipe
     );
 
     // ── Interactive manual prompts (--manual without --yes) ──
@@ -218,6 +220,14 @@ async function runAIMode(
   const projectDir = resolve(String(args.dir ?? "."));
   const projectName = basename(projectDir);
 
+  // ── Validate project name ──
+  const nameResult = validateProjectName(projectName);
+  if (!nameResult.ok) {
+    console.error(pc.red(`✗ ${nameResult.error}`));
+    process.exitCode = 1;
+    return;
+  }
+
   // 6. Run AI conversation
   const result = await runAIConversation({
     provider,
@@ -269,25 +279,67 @@ function runFlagDrivenMode(
   const projectDir = resolve(String(args.dir ?? "."));
   const projectName = basename(projectDir);
 
-  const renderMode = (String(args.render ?? "static")) as "static" | "hybrid" | "server";
-  const deployTarget = (String(args.deploy ?? "cloudflare")) as "cloudflare" | "vercel" | "netlify" | "static";
-  const database = (String(args.database ?? "none")) as "none" | "d1" | "turso" | "astro-db" | "postgres";
-  const cssEngine = (String(args.css ?? "tailwind")) as "tailwind" | "vanilla";
-  const localesRaw = String(args.locales ?? "en");
-  const locales = localesRaw.split(",").map((l) => l.trim()).filter(Boolean);
-  const defaultLocale = locales[0] ?? "en";
-  const themeSwitcher = (args["theme-switcher"] ?? false) === true;
+  // ── Validate project name ──
+  const nameResult = validateProjectName(projectName);
+  if (!nameResult.ok) {
+    console.error(pc.red(`✗ ${nameResult.error}`));
+    process.exitCode = 1;
+    return;
+  }
+
+  // ── Apply Recipe overlay if provided ──
+  const recipeName = args.recipe ? String(args.recipe) : undefined;
+  let recipeOverlay: Partial<ResolvedConfig> = {};
+
+  if (recipeName) {
+    if (RECIPES[recipeName]) {
+      recipeOverlay = RECIPES[recipeName];
+      console.log(pc.green(`\u2714 Using recipe: ${pc.bold(recipeName)}`));
+    } else {
+      console.error(pc.red(`\u2716 Recipe "${recipeName}" not found.`));
+      console.error(pc.dim(`  Available: ${Object.keys(RECIPES).join(", ")}`));
+      process.exitCode = 1;
+      return;
+    }
+  }
+
+  const renderMode = (String(args.render ?? recipeOverlay.renderMode ?? "static")) as "static" | "hybrid" | "server";
+  const deployTarget = (String(args.deploy ?? recipeOverlay.deployTarget ?? "cloudflare")) as "cloudflare" | "vercel" | "netlify" | "static";
+  const database = (String(args.database ?? recipeOverlay.database ?? "none")) as "none" | "d1" | "turso" | "astro-db" | "postgres";
+  const cssEngine = (String(args.css ?? recipeOverlay.cssEngine ?? "tailwind")) as "tailwind" | "vanilla";
+  
+  const localesRaw = String(args.locales ?? "");
+  let locales = ["en"];
+  let defaultLocale = "en";
+  if (localesRaw) {
+    locales = localesRaw.split(",").map((l) => l.trim()).filter(Boolean);
+    defaultLocale = locales[0] ?? "en";
+  } else if (recipeOverlay.locales) {
+    locales = [...recipeOverlay.locales];
+    defaultLocale = recipeOverlay.defaultLocale ?? locales[0] ?? "en";
+  }
+
+  const themeSwitcher = args["theme-switcher"] !== undefined ? args["theme-switcher"] === true : (recipeOverlay.themeSwitcher ?? false);
 
   // Parse blocks
   const blocksString = args.blocks ? String(args.blocks) : "";
-  const blockNames = blocksString
-    ? blocksString.split(",").map((b) => b.trim()).filter(Boolean)
-    : [];
-  const blocks = blockNames.map((name) => ({ name, variant: "default" }));
+  let blocks = recipeOverlay.blocks ? [...recipeOverlay.blocks] : [];
+  if (blocksString) {
+    const blockNames = blocksString.split(",").map((b) => b.trim()).filter(Boolean);
+    blocks = blockNames.map((name) => ({ name, variant: "default" }));
+  }
+
+  // ── No blocks selected check ──
+  if (blocks.length === 0) {
+    console.error(pc.red("✗ No blocks selected."));
+    console.error(pc.dim("  Use --recipe saas for a pre-built set, or drop --manual to let AI choose blocks for you."));
+    process.exitCode = 1;
+    return;
+  }
 
   // Resolve palette
-  let paletteColors = { ...DEFAULT_COLORS };
-  let palettePreset: string | undefined;
+  let paletteColors = recipeOverlay.palette ? { ...recipeOverlay.palette.colors } : { ...DEFAULT_COLORS };
+  let palettePreset: string | undefined = recipeOverlay.palette?.preset;
 
   if (args.palette) {
     const paletteName = String(args.palette);
@@ -319,7 +371,7 @@ function runFlagDrivenMode(
       colors: paletteColors,
     },
     themeSwitcher,
-    createdWith: "manual",
+    createdWith: recipeName ? "recipe" : "manual",
   } as ResolvedConfig;
 
   return runScaffold(
@@ -353,7 +405,24 @@ function runScaffold(
   const result = scaffold(input);
 
   if (!isOk(result)) {
-    console.error(pc.red(`\u2716 Scaffold failed: ${result.error.message}`));
+    const errMsg = result.error.message;
+    console.error(pc.red(`✗ Scaffold failed: ${errMsg}`));
+
+    // Enhanced conflict messaging
+    if ("blockA" in result.error && "blockB" in result.error) {
+      const conflict = result.error as { blockA: string; blockB: string; reason?: string };
+      console.error(pc.yellow(`  Block '${conflict.blockA}' conflicts with '${conflict.blockB}'.`));
+      console.error(pc.dim("  Remove one of these blocks and try again."));
+    }
+
+    // Enhanced not-found messaging (network / registry)
+    if ("blockName" in result.error) {
+      const notFound = result.error as { blockName: string };
+      console.error(pc.yellow(`  Block '${notFound.blockName}' was not found in the registry.`));
+      console.error(pc.dim("  If you are offline, cached blocks will be used when available."));
+      console.error(pc.dim("  Run 'fornix list' to see available blocks."));
+    }
+
     process.exitCode = 1;
     return;
   }

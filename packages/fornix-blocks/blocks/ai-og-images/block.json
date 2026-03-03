@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "ai-og-images",
+  "version": "1.0.0",
+  "type": "integration",
+  "description": "Dynamic Open Graph image generation using Cloudflare Workers AI for social sharing previews.",
+  "category": "ai",
+  "tags": [
+    "ai",
+    "og-images",
+    "workers-ai",
+    "cloudflare",
+    "social",
+    "seo"
+  ],
+  "dependencies": {
+    "ai": "^4.0.0"
+  },
+  "requires": [],
+  "conflicts": [],
+  "requiredMode": "hybrid",
+  "envVars": [
+    {
+      "name": "CLOUDFLARE_ACCOUNT_ID",
+      "description": "Your Cloudflare account ID for Workers AI",
+      "required": true
+    },
+    {
+      "name": "CLOUDFLARE_AI_TOKEN",
+      "description": "API token for Cloudflare Workers AI",
+      "required": true
+    }
+  ],
+  "variants": [
+    "default"
+  ],
+  "slots": [],
+  "files": [
+    {
+      "source": "og-generator.ts",
+      "destination": "src/lib/og-generator.ts"
+    },
+    {
+      "source": "og-api.ts",
+      "destination": "src/pages/api/og.ts"
+    }
+  ],
+  "ai": {
+    "whenToUse": "When the user wants dynamic, AI-generated Open Graph images for social sharing on blog posts, docs, or marketing pages.",
+    "whenNotToUse": "When the project uses static pre-made OG images, or for internal dashboards with no public sharing needs.",
+    "pairsWith": [
+      "blog-mdx",
+      "docs-collection"
+    ],
+    "contentSlots": {}
+  }
+}

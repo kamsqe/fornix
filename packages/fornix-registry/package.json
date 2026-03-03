@@ -8,13 +8,9 @@
   "types": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "types": "./dist/index.d.mts",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
       "default": "./src/index.ts"
-    },
-    "./schemas/*": {
-      "import": "./dist/schemas/*.mjs",
-      "types": "./dist/schemas/*.d.mts"
     }
   },
   "files": [

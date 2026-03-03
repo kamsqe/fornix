@@ -67,14 +67,20 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
     category: "auth",
     requiredMode: "server",
     requires: ["db-d1"],
+    dependencies: {
+      "better-auth": "^1.2.0",
+    },
     envVars: [
       { name: "AUTH_SECRET", description: "Auth secret key", required: true },
       { name: "GITHUB_CLIENT_ID", description: "GitHub OAuth client ID", required: true },
       { name: "GITHUB_CLIENT_SECRET", description: "GitHub OAuth client secret", required: true },
     ],
     files: [
+      { source: "auth.ts", destination: "src/lib/auth.ts" },
       { source: "middleware.ts", destination: "src/middleware/auth.ts" },
-      { source: "auth-api.ts", destination: "src/pages/api/auth.ts" },
+      { source: "auth-api.ts", destination: "src/pages/api/auth/[...all].ts" },
+      { source: "login.astro", destination: "src/pages/login.astro" },
+      { source: "signup.astro", destination: "src/pages/signup.astro" },
     ],
   }),
   "db-d1": manifest("db-d1", {
@@ -135,14 +141,42 @@ const { headline = "Welcome", subheadline = "" } = Astro.props;
 `,
   },
   "auth-better-auth": {
-    "middleware.ts": `export function onRequest() {
-  // Auth middleware placeholder
+    "auth.ts": `import { betterAuth } from "better-auth";
+import { getDb } from "./db";
+
+export function createAuth(d1: D1Database) {
+  const db = getDb(d1);
+  return betterAuth({
+    database: db,
+    secret: import.meta.env.AUTH_SECRET,
+    emailAndPassword: { enabled: true },
+    socialProviders: {
+      github: {
+        clientId: import.meta.env.GITHUB_CLIENT_ID,
+        clientSecret: import.meta.env.GITHUB_CLIENT_SECRET,
+      },
+    },
+  });
 }
 `,
-    "auth-api.ts": `export function POST() {
-  return new Response("ok");
-}
+    "middleware.ts": `import type { MiddlewareHandler } from "astro";
+import { createAuth } from "../lib/auth";
+
+export const authMiddleware: MiddlewareHandler = async (context, next) => {
+  return next();
+};
 `,
+    "auth-api.ts": `import type { APIRoute } from "astro";
+import { createAuth } from "../../lib/auth";
+
+export const ALL: APIRoute = async (context) => {
+  const d1 = (context.locals as Record<string, { env: { DB: D1Database } }>).runtime.env.DB;
+  const auth = createAuth(d1);
+  return auth.handler(context.request);
+};
+`,
+    "login.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("sections", "auth-login");\n---\n<main class="auth-page"><h1>Login</h1></main>\n`,
+    "signup.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("sections", "auth-signup");\n---\n<main class="auth-page"><h1>Sign Up</h1></main>\n`,
   },
   "db-d1": {
     "db.ts": `import { drizzle } from "drizzle-orm/d1";

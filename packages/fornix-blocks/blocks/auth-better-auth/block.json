@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "name": "auth-better-auth",
+  "version": "1.0.0",
+  "type": "integration",
+  "description": "Authentication with Better Auth — email/password + OAuth providers, session management, and protected routes",
+  "category": "auth",
+  "tags": ["auth", "authentication", "login", "signup", "oauth", "session", "better-auth"],
+  "dependencies": {
+    "better-auth": "^1.2.0"
+  },
+  "requires": ["db-d1"],
+  "conflicts": [],
+  "requiredMode": "server",
+  "envVars": [
+    {
+      "name": "AUTH_SECRET",
+      "description": "Secret key for signing session tokens (generate with: openssl rand -hex 32)",
+      "required": true
+    },
+    {
+      "name": "GITHUB_CLIENT_ID",
+      "description": "GitHub OAuth application client ID",
+      "required": true
+    },
+    {
+      "name": "GITHUB_CLIENT_SECRET",
+      "description": "GitHub OAuth application client secret",
+      "required": true
+    }
+  ],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "auth.ts",
+      "destination": "src/lib/auth.ts"
+    },
+    {
+      "source": "middleware.ts",
+      "destination": "src/middleware/auth.ts"
+    },
+    {
+      "source": "auth-api.ts",
+      "destination": "src/pages/api/auth/[...all].ts"
+    },
+    {
+      "source": "login.astro",
+      "destination": "src/pages/login.astro"
+    },
+    {
+      "source": "signup.astro",
+      "destination": "src/pages/signup.astro"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when the project needs user authentication — login, signup, session management, and protected routes. Better Auth supports email/password and OAuth providers (GitHub, Google, etc.).",
+    "whenNotToUse": "Don't use for public-only sites with no user accounts, or projects that need a different auth provider (e.g. Clerk, Auth0). Not suitable for static-only deployments.",
+    "pairsWith": ["db-d1"],
+    "contentSlots": {}
+  }
+}

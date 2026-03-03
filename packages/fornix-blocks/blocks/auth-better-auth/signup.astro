@@ -1,0 +1,44 @@
+---
+/**
+ * Signup page — create a new account with email/password.
+ *
+ * All text is sourced from the content collection.
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "auth-signup");
+const content = entry?.data ?? {
+  title: "",
+  nameLabel: "",
+  emailLabel: "",
+  passwordLabel: "",
+  submitText: "",
+  loginLink: "",
+};
+---
+
+<main class="auth-page">
+  <div class="auth-card">
+    <h1 class="auth-card__title">{content.title}</h1>
+
+    <form method="POST" action="/api/auth/sign-up/email" class="auth-form">
+      <label class="auth-form__label">
+        <span>{content.nameLabel}</span>
+        <input type="text" name="name" required class="auth-form__input" />
+      </label>
+      <label class="auth-form__label">
+        <span>{content.emailLabel}</span>
+        <input type="email" name="email" required class="auth-form__input" />
+      </label>
+      <label class="auth-form__label">
+        <span>{content.passwordLabel}</span>
+        <input type="password" name="password" required minlength="8" class="auth-form__input" />
+      </label>
+      <button type="submit" class="auth-form__submit">{content.submitText}</button>
+    </form>
+
+    <p class="auth-footer">
+      <a href="/login">{content.loginLink}</a>
+    </p>
+  </div>
+</main>

@@ -13,6 +13,7 @@ import { generatePaletteCSS } from "./config-generators/palette-css.js";
 import { placeBlocks } from "./block-placer.js";
 import { wireContent } from "./content-wiring.js";
 import { wireI18n } from "./i18n-wiring.js";
+import { generateAgentContext } from "./agent-context-generator.js";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -130,6 +131,10 @@ export function scaffold(
 
   // 11. Write fornix.json (ProjectManifest)
   files["fornix.json"] = generateProjectManifest(config, resolvedManifests);
+
+  // 12. Generate Agent Context (CLAUDE.md and .cursor/rules/fornix.mdc)
+  const agentContextFiles = generateAgentContext(config, resolvedManifests);
+  Object.assign(files, agentContextFiles);
 
   return ok({ files, resolvedBlockNames });
 }

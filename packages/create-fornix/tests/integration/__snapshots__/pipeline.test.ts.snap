@@ -2,7 +2,9 @@
 
 exports[`scaffold > file tree matches snapshot for i18n config 1`] = `
 [
+  ".cursor/rules/fornix.mdc",
   ".gitignore",
+  "CLAUDE.md",
   "astro.config.mjs",
   "fornix.json",
   "package.json",
@@ -24,8 +26,10 @@ exports[`scaffold > file tree matches snapshot for i18n config 1`] = `
 
 exports[`scaffold > file tree matches snapshot for server + auth + db config 1`] = `
 [
+  ".cursor/rules/fornix.mdc",
   ".env.example",
   ".gitignore",
+  "CLAUDE.md",
   "astro.config.mjs",
   "fornix.json",
   "package.json",
@@ -43,7 +47,9 @@ exports[`scaffold > file tree matches snapshot for server + auth + db config 1`]
 
 exports[`scaffold > file tree matches snapshot for static + cloudflare config 1`] = `
 [
+  ".cursor/rules/fornix.mdc",
   ".gitignore",
+  "CLAUDE.md",
   "astro.config.mjs",
   "fornix.json",
   "package.json",

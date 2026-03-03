@@ -55,6 +55,8 @@ describe("create (flag-driven)", { timeout: 60_000 }, () => {
     expect(existsSync(join(projectDir, "fornix.json"))).toBe(true);
     expect(existsSync(join(projectDir, "tsconfig.json"))).toBe(true);
     expect(existsSync(join(projectDir, ".gitignore"))).toBe(true);
+    expect(existsSync(join(projectDir, "CLAUDE.md"))).toBe(true);
+    expect(existsSync(join(projectDir, ".cursor/rules/fornix.mdc"))).toBe(true);
 
     // Block file placed
     expect(existsSync(join(projectDir, "src/components/sections/hero-gradient.astro"))).toBe(true);

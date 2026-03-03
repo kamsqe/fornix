@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "name": "payments-stripe",
+  "version": "1.0.0",
+  "type": "integration",
+  "description": "Stripe integration for processing payments and managing subscriptions.",
+  "category": "payments",
+  "tags": [
+    "stripe",
+    "payments",
+    "ecommerce"
+  ],
+  "dependencies": {
+    "stripe": "^14.20.0"
+  },
+  "requires": [],
+  "conflicts": [],
+  "requiredMode": "hybrid",
+  "envVars": [
+    {
+      "name": "STRIPE_SECRET_KEY",
+      "description": "Your Stripe secret API key",
+      "required": true
+    },
+    {
+      "name": "STRIPE_WEBHOOK_SECRET",
+      "description": "Your Stripe webhook signing secret",
+      "required": true
+    },
+    {
+      "name": "PUBLIC_STRIPE_KEY",
+      "description": "Your Stripe public API key",
+      "required": true
+    }
+  ],
+  "variants": [
+    "default"
+  ],
+  "slots": [],
+  "files": [
+    {
+      "source": "stripe.ts",
+      "destination": "src/lib/stripe.ts"
+    }
+  ],
+  "ai": {
+    "whenToUse": "When the project requires processing payments, subscriptions, checkout, or receiving money from users.",
+    "whenNotToUse": "When no monetary transactions handle.",
+    "pairsWith": [
+      "auth-better-auth",
+      "pricing-table"
+    ],
+    "contentSlots": {}
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "name": "email-resend",
+  "version": "1.0.0",
+  "type": "integration",
+  "description": "Email sending integration using Resend.",
+  "category": "email",
+  "tags": [
+    "email",
+    "resend",
+    "transactional"
+  ],
+  "dependencies": {
+    "resend": "^3.2.0"
+  },
+  "requires": [],
+  "conflicts": [],
+  "requiredMode": "hybrid",
+  "envVars": [
+    {
+      "name": "RESEND_API_KEY",
+      "description": "Your Resend API key",
+      "required": true
+    }
+  ],
+  "variants": [
+    "default"
+  ],
+  "slots": [],
+  "files": [
+    {
+      "source": "resend.ts",
+      "destination": "src/lib/resend.ts"
+    }
+  ],
+  "ai": {
+    "whenToUse": "When the project requires sending transactional emails, such as magic links, receipts, or notifications.",
+    "whenNotToUse": "For purely static sites with no backend, or when using a different email provider.",
+    "pairsWith": [
+      "auth-better-auth",
+      "contact-form"
+    ],
+    "contentSlots": {}
+  }
+}

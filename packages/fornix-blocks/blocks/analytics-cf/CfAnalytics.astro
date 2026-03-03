@@ -1,0 +1,13 @@
+---
+// Cloudflare Web Analytics
+// Token is injected during build/runtime via import.meta.env
+const token = import.meta.env.CF_ANALYTICS_TOKEN;
+---
+
+{token && (
+  <script
+    defer
+    src="https://static.cloudflareinsights.com/beacon.min.js"
+    data-cf-beacon={`{"token": "${token}"}`}
+  ></script>
+)}

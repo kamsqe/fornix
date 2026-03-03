@@ -1,0 +1,38 @@
+---
+/**
+ * Hero Gradient — full-width hero section with gradient background.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/hero-gradient.json` (or per-locale
+ * `src/content/{locale}/sections/hero-gradient.json` when i18n is enabled).
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "hero-gradient");
+const { headline, subheadline, ctaText, ctaHref, badge } = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  ctaText: "",
+  ctaHref: "#",
+  badge: "",
+};
+---
+
+<section class="hero-gradient">
+  <div class="hero-gradient__inner">
+    {badge && (
+      <span class="hero-gradient__badge">{badge}</span>
+    )}
+    <h1 class="hero-gradient__headline">{headline}</h1>
+    {subheadline && (
+      <p class="hero-gradient__subheadline">{subheadline}</p>
+    )}
+    {ctaText && (
+      <a href={ctaHref} class="hero-gradient__cta">{ctaText}</a>
+    )}
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/hero-gradient.css";
+</style>

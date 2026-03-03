@@ -11,6 +11,10 @@
     "lint": "echo 'No lint configured yet'",
     "typecheck": "echo 'No typecheck configured yet'"
   },
+  "dependencies": {
+    "fornix-registry": "workspace:*",
+    "zod": "^3.24.0"
+  },
   "devDependencies": {
     "vitest": "^2.1.0",
     "@types/node": "^22.10.0"

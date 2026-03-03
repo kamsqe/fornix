@@ -111,13 +111,13 @@ export async function runManualFlow(
     .filter(Boolean);
   const defaultLocale = locales[0] ?? "en";
 
-  // 7. Palette selection (grouped by category)
+  // 7. Palette selection (grouped by category with separators)
   const paletteOptions = buildPaletteOptions(input.allPalettes);
   let selectedPalette: Palette | undefined;
 
   if (paletteOptions.length > 0) {
     const paletteChoice = await p.select({
-      message: "Choose a color palette",
+      message: "Choose a default color palette",
       options: paletteOptions,
     });
     if (p.isCancel(paletteChoice)) return handleCancel();
@@ -125,12 +125,17 @@ export async function runManualFlow(
     selectedPalette = input.allPalettes.find((pal) => pal.name === paletteChoice);
   }
 
-  // 8. Theme switcher toggle
-  const themeSwitcher = await p.confirm({
-    message: "Enable theme switcher? (allows users to change palettes at runtime)",
-    initialValue: false,
-  });
-  if (p.isCancel(themeSwitcher)) return handleCancel();
+  // 8. Theme switcher toggle (only if 2+ palettes available)
+  let themeSwitcher = false;
+  if (input.allPalettes.length >= 2) {
+    const paletteCount = input.allPalettes.length;
+    const switcherChoice = await p.confirm({
+      message: `Enable theme switcher? (includes all ${paletteCount} registry palettes for runtime switching)`,
+      initialValue: false,
+    });
+    if (p.isCancel(switcherChoice)) return handleCancel();
+    themeSwitcher = switcherChoice as boolean;
+  }
 
   // ── Build ResolvedConfig ──
   const config: ResolvedConfig = {
@@ -154,7 +159,7 @@ export async function runManualFlow(
         foreground: "#f8fafc",
       },
     },
-    themeSwitcher: themeSwitcher as boolean,
+    themeSwitcher,
     createdWith: "manual",
   } as ResolvedConfig;
 
@@ -216,31 +221,24 @@ function buildPaletteOptions(
 ): Array<{ value: string; label: string; hint?: string }> {
   if (palettes.length === 0) return [];
 
-  // Group by category
-  const categories = new Map<string, Palette[]>();
-  for (const palette of palettes) {
+  // Sort palettes by category (alphabetical), then by display name within each category
+  const sorted = [...palettes].sort((a, b) => {
+    const catA = a.category ?? "other";
+    const catB = b.category ?? "other";
+    if (catA !== catB) return catA.localeCompare(catB);
+    return a.displayName.localeCompare(b.displayName);
+  });
+
+  // Build options — category shown in hint, mode emoji in label
+  return sorted.map((palette) => {
+    const modeLabel = palette.mode === "dark" ? "🌙" : "☀️";
     const category = palette.category ?? "other";
-    if (!categories.has(category)) {
-      categories.set(category, []);
-    }
-    categories.get(category)!.push(palette);
-  }
-
-  // Build flat options with color preview swatches
-  const options: Array<{ value: string; label: string; hint?: string }> = [];
-
-  for (const [category, categoryPalettes] of categories) {
-    for (const palette of categoryPalettes) {
-      const modeLabel = palette.mode === "dark" ? "🌙" : "☀️";
-      options.push({
-        value: palette.name,
-        label: `${modeLabel} ${palette.displayName}`,
-        hint: `${category} — ${palette.colors.primary}`,
-      });
-    }
-  }
-
-  return options;
+    return {
+      value: palette.name,
+      label: `${modeLabel} ${palette.displayName}`,
+      hint: `${category} · ${palette.colors.primary}`,
+    };
+  });
 }
 
 function buildSummary(
@@ -269,7 +267,11 @@ function buildSummary(
     lines.push(`${pc.bold("Palette:")}      ${pc.dim("default")}`);
   }
 
-  lines.push(`${pc.bold("Theme switcher:")} ${config.themeSwitcher ? pc.green("yes") : pc.dim("no")}`);
+  if (config.themeSwitcher) {
+    lines.push(`${pc.bold("Theme switcher:")} ${pc.green("yes")} (all registry palettes included)`);
+  } else {
+    lines.push(`${pc.bold("Theme switcher:")} ${pc.dim("no")}`);
+  }
 
   return lines.join("\n");
 }

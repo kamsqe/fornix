@@ -1,0 +1,42 @@
+---
+/**
+ * Features Bento — asymmetric bento grid layout for feature showcases.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "features-bento");
+const { headline, subheadline, items } = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  items: [],
+};
+---
+
+<section class="features-bento">
+  <div class="features-bento__header">
+    <h2 class="features-bento__headline">{headline}</h2>
+    {subheadline && (
+      <p class="features-bento__subheadline">{subheadline}</p>
+    )}
+  </div>
+  <div class="features-bento__grid">
+    {(items as Array<{
+      icon: string;
+      title: string;
+      description: string;
+      size: string;
+    }>).map((item) => (
+      <div class:list={["features-bento__card", `features-bento__card--${item.size}`]}>
+        <span class="features-bento__icon">{item.icon}</span>
+        <h3 class="features-bento__title">{item.title}</h3>
+        <p class="features-bento__description">{item.description}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/features-bento.css";
+</style>

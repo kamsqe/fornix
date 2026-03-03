@@ -1,0 +1,111 @@
+.pricing-comparison {
+  padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pricing-comparison__header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.pricing-comparison__headline {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-foreground);
+  margin-bottom: 1rem;
+}
+
+.pricing-comparison__subheadline {
+  font-size: 1.125rem;
+  color: var(--color-secondary);
+}
+
+.pricing-comparison__table-wrapper {
+  overflow-x: auto;
+}
+
+.pricing-comparison__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.pricing-comparison__plan-header {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border-bottom: 2px solid var(--color-secondary);
+}
+
+.pricing-comparison__plan-header--highlighted {
+  background: var(--color-primary);
+  color: var(--color-background);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.pricing-comparison__plan-name {
+  display: block;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.pricing-comparison__plan-price {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-top: 0.25rem;
+  color: var(--color-accent);
+}
+
+.pricing-comparison__plan-header--highlighted .pricing-comparison__plan-price {
+  color: var(--color-background);
+}
+
+.pricing-comparison__feature-header {
+  width: 200px;
+}
+
+.pricing-comparison__row {
+  border-bottom: 1px solid var(--color-secondary);
+}
+
+.pricing-comparison__feature-name {
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.pricing-comparison__value {
+  padding: 1rem;
+  text-align: center;
+  color: var(--color-foreground);
+}
+
+.pricing-comparison__cta-cell {
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+.pricing-comparison__cta {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--color-primary);
+  color: var(--color-background);
+  font-weight: 600;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.pricing-comparison__cta:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .pricing-comparison__feature-header {
+    width: 120px;
+  }
+
+  .pricing-comparison__table {
+    font-size: 0.875rem;
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "headline": "What Our Customers Say",
+  "testimonials": [
+    { "quote": "This tool completely changed how we build websites. Shipping is 10x faster now.", "name": "Sarah Chen", "role": "CTO at TechCorp", "avatar": "/avatars/sarah.jpg" },
+    { "quote": "The block system is genius. We compose entire pages in minutes.", "name": "Marcus Rivera", "role": "Lead Developer at StartupXYZ", "avatar": "/avatars/marcus.jpg" },
+    { "quote": "Best developer experience I've had in years. The AI suggestions are spot-on.", "name": "Aisha Patel", "role": "Freelance Developer", "avatar": "/avatars/aisha.jpg" }
+  ]
+}

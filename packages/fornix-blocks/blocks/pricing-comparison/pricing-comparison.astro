@@ -1,0 +1,77 @@
+---
+/**
+ * Pricing Comparison — feature comparison table across tiers.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "pricing-comparison");
+const { headline, subheadline, plans, features } = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  plans: [],
+  features: [],
+};
+---
+
+<section class="pricing-comparison">
+  <div class="pricing-comparison__header">
+    <h2 class="pricing-comparison__headline">{headline}</h2>
+    {subheadline && (
+      <p class="pricing-comparison__subheadline">{subheadline}</p>
+    )}
+  </div>
+  <div class="pricing-comparison__table-wrapper">
+    <table class="pricing-comparison__table">
+      <thead>
+        <tr>
+          <th class="pricing-comparison__feature-header"></th>
+          {(plans as Array<{
+            name: string;
+            price: string;
+            ctaText: string;
+            ctaHref: string;
+            highlighted: boolean;
+          }>).map((plan) => (
+            <th class:list={["pricing-comparison__plan-header", { "pricing-comparison__plan-header--highlighted": plan.highlighted }]}>
+              <span class="pricing-comparison__plan-name">{plan.name}</span>
+              <span class="pricing-comparison__plan-price">{plan.price}</span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {(features as Array<{
+          name: string;
+          values: string[];
+        }>).map((feature) => (
+          <tr class="pricing-comparison__row">
+            <td class="pricing-comparison__feature-name">{feature.name}</td>
+            {feature.values.map((value: string) => (
+              <td class="pricing-comparison__value">{value}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          {(plans as Array<{
+            ctaText: string;
+            ctaHref: string;
+            highlighted: boolean;
+          }>).map((plan) => (
+            <td class="pricing-comparison__cta-cell">
+              <a href={plan.ctaHref} class="pricing-comparison__cta">{plan.ctaText}</a>
+            </td>
+          ))}
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/pricing-comparison.css";
+</style>

@@ -1,0 +1,56 @@
+---
+/**
+ * Testimonials Wall — masonry-style grid of testimonials.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "testimonials-wall");
+const { headline, subheadline, testimonials } = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  testimonials: [],
+};
+---
+
+<section class="testimonials-wall">
+  <div class="testimonials-wall__header">
+    <h2 class="testimonials-wall__headline">{headline}</h2>
+    {subheadline && (
+      <p class="testimonials-wall__subheadline">{subheadline}</p>
+    )}
+  </div>
+  <div class="testimonials-wall__grid">
+    {(testimonials as Array<{
+      quote: string;
+      name: string;
+      role: string;
+      avatar: string;
+    }>).map((item) => (
+      <div class="testimonials-wall__card">
+        <blockquote class="testimonials-wall__quote">{item.quote}</blockquote>
+        <div class="testimonials-wall__author">
+          {item.avatar && (
+            <img
+              src={item.avatar}
+              alt={item.name}
+              class="testimonials-wall__avatar"
+              width="40"
+              height="40"
+              loading="lazy"
+            />
+          )}
+          <div>
+            <span class="testimonials-wall__name">{item.name}</span>
+            <span class="testimonials-wall__role">{item.role}</span>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/testimonials-wall.css";
+</style>

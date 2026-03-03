@@ -1,0 +1,42 @@
+---
+/**
+ * FAQ Accordion — expandable Q&A section using native details/summary.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Uses native HTML <details>/<summary> for zero-JS accordion behavior.
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "faq-accordion");
+const { headline, subheadline, items } = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  items: [],
+};
+---
+
+<section class="faq-accordion">
+  <div class="faq-accordion__header">
+    <h2 class="faq-accordion__headline">{headline}</h2>
+    {subheadline && (
+      <p class="faq-accordion__subheadline">{subheadline}</p>
+    )}
+  </div>
+  <div class="faq-accordion__list">
+    {(items as Array<{
+      question: string;
+      answer: string;
+    }>).map((item) => (
+      <details class="faq-accordion__item">
+        <summary class="faq-accordion__question">{item.question}</summary>
+        <div class="faq-accordion__answer">
+          <p>{item.answer}</p>
+        </div>
+      </details>
+    ))}
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/faq-accordion.css";
+</style>

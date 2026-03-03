@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "name": "pricing-comparison",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Feature comparison table across pricing tiers with checkmarks and detailed feature rows",
+  "category": "pricing",
+  "tags": ["pricing", "comparison", "table", "features", "enterprise"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "compact", "sticky-header"],
+  "slots": [],
+  "files": [
+    {
+      "source": "pricing-comparison.astro",
+      "destination": "src/components/sections/pricing-comparison.astro"
+    },
+    {
+      "source": "pricing-comparison.css",
+      "destination": "src/styles/sections/pricing-comparison.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when you need a detailed feature-by-feature comparison across plans. Best for enterprise SaaS, complex products, or any page where users need to evaluate multiple options side-by-side.",
+    "whenNotToUse": "Don't use for simple 2-3 plan pricing — use pricing-table instead. Avoid when feature lists are short or plans differ only in limits.",
+    "pairsWith": ["hero-split", "cta-banner", "faq-accordion", "footer-rich"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Section headline",
+        "maxLength": 60,
+        "example": "Compare Plans"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Supporting text",
+        "maxLength": 200,
+        "example": "See which plan is right for your team."
+      },
+      "plans": {
+        "type": "array",
+        "description": "Array of plan column headers",
+        "minItems": 2,
+        "maxItems": 4,
+        "items": {
+          "name": { "type": "string" },
+          "price": { "type": "string" },
+          "ctaText": { "type": "string" },
+          "ctaHref": { "type": "string" },
+          "highlighted": { "type": "boolean" }
+        },
+        "example": [
+          { "name": "Starter", "price": "$9/mo", "ctaText": "Get Started", "ctaHref": "#starter", "highlighted": false },
+          { "name": "Pro", "price": "$29/mo", "ctaText": "Start Trial", "ctaHref": "#pro", "highlighted": true },
+          { "name": "Enterprise", "price": "Custom", "ctaText": "Contact Us", "ctaHref": "#enterprise", "highlighted": false }
+        ]
+      },
+      "features": {
+        "type": "array",
+        "description": "Array of feature rows with availability per plan",
+        "items": {
+          "name": { "type": "string" },
+          "values": { "type": "array" }
+        },
+        "example": [
+          { "name": "Projects", "values": ["3", "Unlimited", "Unlimited"] },
+          { "name": "Team Members", "values": ["1", "10", "Unlimited"] },
+          { "name": "Analytics", "values": ["Basic", "Advanced", "Custom"] },
+          { "name": "API Access", "values": ["✗", "✓", "✓"] },
+          { "name": "SSO", "values": ["✗", "✗", "✓"] },
+          { "name": "SLA", "values": ["✗", "✗", "99.9%"] }
+        ]
+      }
+    }
+  }
+}

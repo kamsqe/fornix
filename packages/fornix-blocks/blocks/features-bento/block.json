@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "name": "features-bento",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Bento grid layout showcasing features in asymmetric, visually interesting cards of varying sizes",
+  "category": "features",
+  "tags": ["features", "bento", "grid", "showcase", "modern"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "compact", "wide"],
+  "slots": [],
+  "files": [
+    {
+      "source": "features-bento.astro",
+      "destination": "src/components/sections/features-bento.astro"
+    },
+    {
+      "source": "features-bento.css",
+      "destination": "src/styles/sections/features-bento.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when you want a modern, magazine-style feature showcase with asymmetric card sizes. Great for SaaS products, creative agencies, and tech companies that want visual variety over uniform grids.",
+    "whenNotToUse": "Don't use when features need equal visual weight or when you have fewer than 4 features. Avoid for documentation or content-heavy pages where a simple list is more appropriate.",
+    "pairsWith": ["hero-gradient", "hero-split", "cta-banner", "pricing-table"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Section headline above the bento grid",
+        "maxLength": 60,
+        "example": "Everything You Need, Nothing You Don't"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Supporting text below the headline",
+        "maxLength": 200,
+        "example": "Powerful features designed to help you build faster and ship with confidence."
+      },
+      "items": {
+        "type": "array",
+        "description": "Array of feature items for the bento grid",
+        "minItems": 4,
+        "maxItems": 8,
+        "items": {
+          "icon": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "size": { "type": "string" }
+        },
+        "example": [
+          { "icon": "⚡", "title": "Lightning Fast", "description": "Zero JavaScript by default. Your site loads instantly on any device.", "size": "large" },
+          { "icon": "🧩", "title": "Modular Blocks", "description": "Compose from pre-built, tested blocks.", "size": "small" },
+          { "icon": "🎨", "title": "Beautiful Themes", "description": "Curated palettes that look stunning.", "size": "small" },
+          { "icon": "🌍", "title": "Global Ready", "description": "Built-in i18n with locale-based content collections.", "size": "medium" },
+          { "icon": "☁️", "title": "Edge First", "description": "Deploy to Cloudflare Workers for global edge performance.", "size": "medium" },
+          { "icon": "🤖", "title": "AI Powered", "description": "Smart scaffolding that understands your project.", "size": "large" }
+        ]
+      }
+    }
+  }
+}

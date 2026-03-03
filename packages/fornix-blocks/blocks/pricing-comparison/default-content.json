@@ -1,0 +1,17 @@
+{
+  "headline": "Compare Plans",
+  "subheadline": "See which plan is right for your team.",
+  "plans": [
+    { "name": "Starter", "price": "$9/mo", "ctaText": "Get Started", "ctaHref": "#starter", "highlighted": false },
+    { "name": "Pro", "price": "$29/mo", "ctaText": "Start Trial", "ctaHref": "#pro", "highlighted": true },
+    { "name": "Enterprise", "price": "Custom", "ctaText": "Contact Us", "ctaHref": "#enterprise", "highlighted": false }
+  ],
+  "features": [
+    { "name": "Projects", "values": ["3", "Unlimited", "Unlimited"] },
+    { "name": "Team Members", "values": ["1", "10", "Unlimited"] },
+    { "name": "Analytics", "values": ["Basic", "Advanced", "Custom"] },
+    { "name": "API Access", "values": ["✗", "✓", "✓"] },
+    { "name": "SSO", "values": ["✗", "✗", "✓"] },
+    { "name": "SLA", "values": ["✗", "✗", "99.9%"] }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "name": "testimonials-wall",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Masonry-style wall of testimonials showing all quotes at once for maximum social proof impact",
+  "category": "testimonials",
+  "tags": ["testimonials", "masonry", "social-proof", "wall", "grid"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "two-column", "three-column"],
+  "slots": [],
+  "files": [
+    {
+      "source": "testimonials-wall.astro",
+      "destination": "src/components/sections/testimonials-wall.astro"
+    },
+    {
+      "source": "testimonials-wall.css",
+      "destination": "src/styles/sections/testimonials-wall.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when you want all testimonials visible at once in a masonry grid. Great for dedicated testimonial pages, or sections where quantity of social proof matters. Works best with 6+ testimonials of varying length.",
+    "whenNotToUse": "Don't use with fewer than 4 testimonials. Avoid when you need one prominent testimonial — use testimonials-carousel instead.",
+    "pairsWith": ["hero-gradient", "cta-banner", "pricing-table", "footer-rich"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Section headline",
+        "maxLength": 60,
+        "example": "Loved by Teams Worldwide"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Supporting text",
+        "maxLength": 200,
+        "example": "See why thousands of developers choose our platform."
+      },
+      "testimonials": {
+        "type": "array",
+        "description": "Array of testimonial objects",
+        "minItems": 4,
+        "maxItems": 20,
+        "items": {
+          "quote": { "type": "string" },
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "avatar": { "type": "string" }
+        },
+        "example": [
+          { "quote": "Incredible DX. We migrated our entire marketing site in a weekend.", "name": "James Wilson", "role": "Engineering Manager", "avatar": "" },
+          { "quote": "The AI-first approach saves hours of setup time.", "name": "Lily Zhang", "role": "Founder at Launchpad", "avatar": "" },
+          { "quote": "Finally a framework that gets content management right.", "name": "Omar Hassan", "role": "Content Lead", "avatar": "" },
+          { "quote": "Block composition is the future. This nails it.", "name": "Eva Kowalski", "role": "Senior Developer", "avatar": "" },
+          { "quote": "We shipped 3 client projects in one month using this.", "name": "David Park", "role": "Agency Owner", "avatar": "" },
+          { "quote": "Clean code, great patterns, easy to customize.", "name": "Nina Sharma", "role": "Full-Stack Developer", "avatar": "" }
+        ]
+      }
+    }
+  }
+}

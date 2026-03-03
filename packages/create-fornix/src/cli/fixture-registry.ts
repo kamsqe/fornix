@@ -132,6 +132,59 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
       { name: "docs", type: "content", schemaSource: "./docs-schema.ts" }
     ],
   }),
+  "layout-marketing": manifest("layout-marketing", {
+    type: "layout",
+    category: "marketing",
+    files: [
+      { source: "layout-marketing.astro", destination: "src/layouts/layout-marketing.astro" },
+      { source: "default-content.json", destination: "src/content/layouts/layout-marketing.json" }
+    ],
+    ai: {
+      whenToUse: "marketing pages",
+      whenNotToUse: "dashboards",
+      pairsWith: [],
+      contentSlots: {
+        headerLinks: { type: "array" },
+        footerText: { type: "string" }
+      }
+    }
+  }),
+  "layout-docs": manifest("layout-docs", {
+    type: "layout",
+    category: "docs",
+    files: [
+      { source: "layout-docs.astro", destination: "src/layouts/layout-docs.astro" },
+      { source: "default-content.json", destination: "src/content/layouts/layout-docs.json" }
+    ],
+    ai: {
+      whenToUse: "docs",
+      whenNotToUse: "marketing",
+      pairsWith: [],
+      contentSlots: {
+        headerTitle: { type: "string" },
+        footerText: { type: "string" }
+      }
+    }
+  }),
+  "layout-dashboard": manifest("layout-dashboard", {
+    type: "layout",
+    category: "dashboard",
+    requiredMode: "server",
+    requires: ["auth-better-auth"],
+    files: [
+      { source: "layout-dashboard.astro", destination: "src/layouts/layout-dashboard.astro" },
+      { source: "default-content.json", destination: "src/content/layouts/layout-dashboard.json" }
+    ],
+    ai: {
+      whenToUse: "dashboards",
+      whenNotToUse: "marketing",
+      pairsWith: [],
+      contentSlots: {
+        sidebarLinks: { type: "array" },
+        logoutText: { type: "string" }
+      }
+    }
+  }),
 };
 
 // ── Block Sources (stub file contents) ──────────────────
@@ -175,6 +228,8 @@ const { headline = "Welcome", subheadline = "" } = Astro.props;
     "auth.ts": `import { betterAuth } from "better-auth";
 import { getDb } from "./db";
 
+type D1Database = any;
+
 export function createAuth(d1: D1Database) {
   const db = getDb(d1);
   return betterAuth({
@@ -198,37 +253,36 @@ export const authMiddleware: MiddlewareHandler = async (context, next) => {
 };
 `,
     "auth-api.ts": `import type { APIRoute } from "astro";
-import { createAuth } from "../../lib/auth";
+import { createAuth } from "../../../lib/auth";
 
 export const ALL: APIRoute = async (context) => {
-  const d1 = (context.locals as Record<string, { env: { DB: D1Database } }>).runtime.env.DB;
+  const d1 = (context.locals as Record<string, { env: { DB: any } }>).runtime.env.DB;
   const auth = createAuth(d1);
   return auth.handler(context.request);
 };
 `,
-    "login.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("sections", "auth-login");\n---\n<main class="auth-page"><h1>Login</h1></main>\n`,
-    "signup.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("sections", "auth-signup");\n---\n<main class="auth-page"><h1>Sign Up</h1></main>\n`,
+    "login.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("layouts", "layout-dashboard");\n---\n<main class="auth-page"><h1>Login</h1></main>\n`,
+    "signup.astro": `---\nimport { getEntry } from "astro:content";\nconst entry = await getEntry("layouts", "layout-dashboard");\n---\n<main class="auth-page"><h1>Sign Up</h1></main>\n`,
   },
   "db-d1": {
     "db.ts": `import { drizzle } from "drizzle-orm/d1";
 import * as schema from "./db-schema";
 
-export type Database = ReturnType<typeof drizzle>;
+export type Database = any;
 
-export function getDb(d1: D1Database): Database {
-  return drizzle(d1, { schema });
+export function getDb(d1: any): Database {
+  return drizzle(d1 as any, { schema });
 }
 `,
     "schema.ts": `// Database schema — define your tables here.
 // See: https://orm.drizzle.team/docs/sql-schema-declaration
+export const users = {};
 `,
-    "drizzle.config.ts": `import type { Config } from "drizzle-kit";
-
-export default {
+    "drizzle.config.ts": `export default {
   schema: "./src/lib/db-schema.ts",
   out: "./drizzle/migrations",
   dialect: "sqlite",
-} satisfies Config;
+} as any;
 `,
     "migrations/.gitkeep": "",
   },
@@ -238,7 +292,7 @@ export default {
 ---
 <h1>Blog</h1>`,
     "pages/[slug].astro": `---
-export function getStaticPaths() { return []; }
+export function getStaticPaths() { return [{ params: { slug: '1' } }]; }
 ---
 <h1>Post</h1>`,
     "pages/rss.xml.ts": `export const GET = () => new Response("");`
@@ -246,9 +300,27 @@ export function getStaticPaths() { return []; }
   "docs-collection": {
     "schema.ts": `import { z } from "astro:content";\nexport const schema = z.object({});\n`,
     "pages/[...slug].astro": `---
-export function getStaticPaths() { return []; }
+export function getStaticPaths() { return [{ params: { slug: '1' } }]; }
 ---
 <h1>Docs</h1>`
+  },
+  "layout-marketing": {
+    "layout-marketing.astro": `---
+---
+<slot />`,
+    "default-content.json": `{ "headerLinks": [], "footerText": "" }`
+  },
+  "layout-docs": {
+    "layout-docs.astro": `---
+---
+<slot />`,
+    "default-content.json": `{ "headerTitle": "", "footerText": "" }`
+  },
+  "layout-dashboard": {
+    "layout-dashboard.astro": `---
+---
+<slot />`,
+    "default-content.json": `{ "sidebarLinks": [], "logoutText": "" }`
   }
 };
 

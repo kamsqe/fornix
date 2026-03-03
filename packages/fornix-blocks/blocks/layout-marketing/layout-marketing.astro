@@ -1,0 +1,37 @@
+---
+import { getEntry } from "astro:content";
+
+const { data } = await getEntry("layoutmarketing", "layout-marketing");
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marketing Site</title>
+  </head>
+  <body class="min-h-screen flex flex-col font-sans text-gray-900 bg-white">
+    <header class="border-b border-gray-100 py-4 px-6 flex items-center justify-between">
+      <div class="font-bold text-xl tracking-tight">AcmeCorp</div>
+      <nav class="hidden md:flex gap-6">
+        {data.headerLinks.map((link: { href: string; label: string }) => (
+          <a href={link.href} class="text-gray-600 hover:text-gray-900 transition-colors">
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <a href="/login" class="bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors">
+        Log In
+      </a>
+    </header>
+
+    <main class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="border-t border-gray-100 py-8 text-center text-gray-500 text-sm">
+      <p>{data.footerText}</p>
+    </footer>
+  </body>
+</html>

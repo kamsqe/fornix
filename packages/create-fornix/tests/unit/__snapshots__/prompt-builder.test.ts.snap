@@ -61,6 +61,54 @@ You MUST only select blocks that exist in the catalog below. Never invent block 
 - **Required mode:** server
 - **npm deps:** drizzle-orm, drizzle-kit
 
+## FEATURE Blocks
+
+### blog-mdx
+- **Description:** Block blog-mdx
+- **Category:** blog
+- **Tags:** none
+- **npm deps:** @astrojs/mdx, @astrojs/rss
+
+### docs-collection
+- **Description:** Block docs-collection
+- **Category:** docs
+- **Tags:** none
+- **npm deps:** @astrojs/mdx
+
+## LAYOUT Blocks
+
+### layout-marketing
+- **Description:** Block layout-marketing
+- **Category:** marketing
+- **Tags:** none
+- **When to use:** marketing pages
+- **When NOT to use:** dashboards
+- **Content slots:**
+  - \`headerLinks\` (array)
+  - \`footerText\` (string)
+
+### layout-docs
+- **Description:** Block layout-docs
+- **Category:** docs
+- **Tags:** none
+- **When to use:** docs
+- **When NOT to use:** marketing
+- **Content slots:**
+  - \`headerTitle\` (string)
+  - \`footerText\` (string)
+
+### layout-dashboard
+- **Description:** Block layout-dashboard
+- **Category:** dashboard
+- **Tags:** none
+- **When to use:** dashboards
+- **When NOT to use:** marketing
+- **Content slots:**
+  - \`sidebarLinks\` (array)
+  - \`logoutText\` (string)
+- **Requires:** auth-better-auth
+- **Required mode:** server
+
 
 # Available Palettes
 
@@ -80,10 +128,12 @@ Palette names (use these exact values):
 These blocks REQUIRE \`renderMode: 'server'\`. Selecting them with static mode is invalid:
 - \`auth-better-auth\` (server)
 - \`db-d1\` (server)
+- \`layout-dashboard\` (server)
 
 ## Block Dependencies
 These blocks require other blocks to be included:
 - \`auth-better-auth\` requires: \`db-d1\`
+- \`layout-dashboard\` requires: \`auth-better-auth\`
 
 ## Deterministic Rules (applied automatically)
 The following rules are applied by the rules engine BEFORE your output:

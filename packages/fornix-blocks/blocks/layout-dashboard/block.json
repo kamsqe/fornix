@@ -1,0 +1,52 @@
+{
+  "$schema": "../../node_modules/fornix-registry/schema/block-manifest.json",
+  "schemaVersion": 1,
+  "name": "layout-dashboard",
+  "version": "1.0.0",
+  "type": "layout",
+  "description": "A protected dashboard layout shell requiring authentication, with sidebar navigation and a user profile dropdown.",
+  "category": "dashboard",
+  "tags": ["layout", "dashboard", "app", "auth"],
+  "dependencies": {},
+  "requires": ["auth-better-auth"],
+  "conflicts": [],
+  "requiredMode": "server",
+  "envVars": [],
+  "variants": ["default"],
+  "slots": ["main"],
+  "files": [
+    {
+      "source": "layout-dashboard.astro",
+      "destination": "src/layouts/layout-dashboard.astro"
+    },
+    {
+      "source": "default-content.json",
+      "destination": "src/content/layouts/layout-dashboard.json"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Inside SaaS web apps or protected routes where the user must be logged in.",
+    "whenNotToUse": "For public marketing pages or documentation.",
+    "pairsWith": ["auth-better-auth"],
+    "contentSlots": {
+      "sidebarLinks": {
+        "type": "array",
+        "description": "Navigation links shown in the dashboard sidebar",
+        "items": {
+          "type": "object",
+          "properties": {
+            "label": { "type": "string" },
+            "href": { "type": "string" },
+            "icon": { "type": "string" }
+          },
+          "required": ["label", "href"]
+        },
+        "minItems": 1
+      },
+      "logoutText": {
+        "type": "string",
+        "description": "Text for the logout button"
+      }
+    }
+  }
+}

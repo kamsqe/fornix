@@ -25,7 +25,9 @@ function baseOptions(
     defaultLocale: "en",
     brand: {
       name: "TestCo",
+      tagline: null,
       description: "A test company",
+      targetAudience: null,
       tone: "professional",
     },
     industry: "technology",
@@ -191,7 +193,9 @@ describe("multi-locale content generation", () => {
       locales: ["en"],
       brand: {
         name: "SuperApp",
+        tagline: null,
         description: "A super app",
+        targetAudience: null,
         tone: "casual",
       },
     });

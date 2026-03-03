@@ -13,3 +13,5 @@ export {
   type Palette,
   type PaletteRegistry,
 } from "./schemas/palette.js";
+
+export { BUILTIN_PALETTES } from "./builtin-palettes.js";

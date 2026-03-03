@@ -213,12 +213,12 @@ describe("IntentSchema", () => {
 
   // ── Optional brand fields ──
 
-  it("does not require optional brand fields (tagline, targetAudience)", () => {
+  it("defaults optional brand fields (tagline, targetAudience) to null", () => {
     const result = IntentSchema.safeParse(validSaasIntent);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.brand.tagline).toBeUndefined();
-      expect(result.data.brand.targetAudience).toBeUndefined();
+      expect(result.data.brand.tagline).toBeNull();
+      expect(result.data.brand.targetAudience).toBeNull();
     }
   });
 });

@@ -8,7 +8,7 @@
  * breaking tests/builds when they aren't installed.
  */
 
-import { IntentSchema, type Intent } from "../rules.js";
+import { IntentSchema, type Intent } from "../schemas.js";
 import { ok, err, type Result } from "../../utils/result.js";
 import type { AIProvider, ProviderError } from "./mock-provider.js";
 

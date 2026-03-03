@@ -14,7 +14,9 @@ function baseIntent(overrides: Partial<Intent> = {}): Intent {
     industry: "technology",
     brand: {
       name: "TestCo",
+      tagline: null,
       description: "A test company",
+      targetAudience: null,
       tone: "professional",
     },
     needsAuth: false,

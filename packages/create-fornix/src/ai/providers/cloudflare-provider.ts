@@ -6,7 +6,7 @@
  * Requires CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN.
  */
 
-import { IntentSchema, type Intent } from "../rules.js";
+import { IntentSchema, type Intent } from "../schemas.js";
 import { ok, err, type Result } from "../../utils/result.js";
 import type { AIProvider, ProviderError } from "./mock-provider.js";
 

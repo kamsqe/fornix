@@ -1,0 +1,132 @@
+---
+/**
+ * Theme Switcher — client-side palette switcher UI.
+ *
+ * This is a client-side island (client:load) that reads available palettes
+ * from window.__fornixPalettes (populated by the switcher script) and provides
+ * a dropdown UI to swap palettes at runtime with localStorage persistence.
+ *
+ * Content label is sourced from the content collection.
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "theme-switcher");
+const { label } = entry?.data ?? { label: "Theme" };
+---
+
+<div class="theme-switcher" data-label={label}>
+  <button
+    class="theme-switcher__toggle"
+    aria-label={label}
+    aria-expanded="false"
+    aria-haspopup="listbox"
+    type="button"
+  >
+    <span class="theme-switcher__icon" aria-hidden="true">🎨</span>
+    <span class="theme-switcher__label">{label}</span>
+    <span class="theme-switcher__chevron" aria-hidden="true">▾</span>
+  </button>
+  <ul class="theme-switcher__menu" role="listbox" aria-label={label}></ul>
+</div>
+
+<style>
+  @import "../../styles/sections/theme-switcher.css";
+</style>
+
+<script>
+  function initThemeSwitcher(): void {
+    const STORAGE_KEY = "fornix-palette";
+    const wrapper = document.querySelector(".theme-switcher");
+    if (!wrapper) return;
+
+    const toggle = wrapper.querySelector<HTMLButtonElement>(".theme-switcher__toggle");
+    const menu = wrapper.querySelector<HTMLUListElement>(".theme-switcher__menu");
+    if (!toggle || !menu) return;
+
+    // Read palettes from the global set by src/scripts/theme-switcher.js
+    const palettes: string[] = (window as Record<string, unknown>).__fornixPalettes as string[] ?? [];
+    if (palettes.length === 0) return;
+
+    const switchPalette: ((name: string) => void) | undefined =
+      (window as Record<string, unknown>).__fornixSwitchPalette as ((name: string) => void) | undefined;
+
+    // Build menu items
+    const currentPalette = localStorage.getItem(STORAGE_KEY) ?? palettes[0];
+
+    for (const name of palettes) {
+      const li = document.createElement("li");
+      li.setAttribute("role", "option");
+      li.setAttribute("aria-selected", name === currentPalette ? "true" : "false");
+      li.className = "theme-switcher__option";
+      if (name === currentPalette) {
+        li.classList.add("theme-switcher__option--active");
+      }
+      li.dataset.palette = name;
+      li.textContent = name.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+      li.addEventListener("click", () => selectPalette(name));
+      menu.appendChild(li);
+    }
+
+    // Toggle dropdown
+    let isOpen = false;
+
+    function openMenu(): void {
+      isOpen = true;
+      toggle.setAttribute("aria-expanded", "true");
+      menu.classList.add("theme-switcher__menu--open");
+    }
+
+    function closeMenu(): void {
+      isOpen = false;
+      toggle.setAttribute("aria-expanded", "false");
+      menu.classList.remove("theme-switcher__menu--open");
+    }
+
+    toggle.addEventListener("click", () => {
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    // Close on outside click
+    document.addEventListener("click", (e: Event) => {
+      if (isOpen && !wrapper.contains(e.target as Node)) {
+        closeMenu();
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        closeMenu();
+        toggle.focus();
+      }
+    });
+
+    function selectPalette(name: string): void {
+      if (switchPalette) {
+        switchPalette(name);
+      }
+
+      // Update active state
+      const options = menu.querySelectorAll(".theme-switcher__option");
+      for (const opt of options) {
+        const el = opt as HTMLElement;
+        const isActive = el.dataset.palette === name;
+        el.classList.toggle("theme-switcher__option--active", isActive);
+        el.setAttribute("aria-selected", isActive ? "true" : "false");
+      }
+
+      closeMenu();
+    }
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initThemeSwitcher);
+  } else {
+    initThemeSwitcher();
+  }
+</script>

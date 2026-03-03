@@ -899,9 +899,9 @@ Build the full block collection.
 > **Attach:** `.context/AGENTS.md` + `.context/agents/blocks-agent.md`
 
 **Verification per block:**
-- [ ] Manifest parses with correct `requiredMode` and `envVars`
-- [ ] Dependency chain works (stripe needs hybrid/server)
-- [ ] Scaffold → required env vars documented in generated `.env.example`
+- [x] Manifest parses with correct `requiredMode` and `envVars`
+- [x] Dependency chain works (stripe needs hybrid/server)
+- [x] Scaffold → required env vars documented in generated `.env.example`
 
 ---
 

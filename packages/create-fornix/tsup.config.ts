@@ -9,6 +9,7 @@ export default defineConfig({
   dts: false, // CLI binary — no consumers need type declarations
   sourcemap: true,
   splitting: false,
+  noExternal: ["fornix-registry"], // Bundle workspace dep — not available on npm
   banner: {
     js: "#!/usr/bin/env node",
   },

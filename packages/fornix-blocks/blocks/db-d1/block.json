@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "name": "db-d1",
+  "version": "1.0.0",
+  "type": "integration",
+  "description": "Cloudflare D1 database integration with Drizzle ORM, migration support, and type-safe queries",
+  "category": "database",
+  "tags": ["database", "d1", "cloudflare", "drizzle", "orm", "sql"],
+  "dependencies": {
+    "drizzle-orm": "^0.38.0",
+    "drizzle-kit": "^0.30.0"
+  },
+  "requires": [],
+  "conflicts": [],
+  "requiredMode": "server",
+  "envVars": [
+    {
+      "name": "D1_DATABASE_ID",
+      "description": "Cloudflare D1 database ID from the Workers dashboard",
+      "required": true
+    }
+  ],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "db.ts",
+      "destination": "src/lib/db.ts"
+    },
+    {
+      "source": "schema.ts",
+      "destination": "src/lib/db-schema.ts"
+    },
+    {
+      "source": "drizzle.config.ts",
+      "destination": "drizzle.config.ts"
+    },
+    {
+      "source": "migrations/.gitkeep",
+      "destination": "drizzle/migrations/.gitkeep"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when the project needs a database for user data, content, or application state. D1 is Cloudflare's serverless SQLite database — ideal for edge-deployed Astro apps on Workers.",
+    "whenNotToUse": "Don't use for static-only sites, purely client-side apps, or projects that already have a different database integration (turso, postgres). Not suitable for read-heavy workloads exceeding D1 limits.",
+    "pairsWith": ["auth-better-auth"],
+    "contentSlots": {}
+  }
+}

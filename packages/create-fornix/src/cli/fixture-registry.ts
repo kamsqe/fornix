@@ -81,11 +81,18 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
     type: "integration",
     category: "database",
     requiredMode: "server",
+    dependencies: {
+      "drizzle-orm": "^0.38.0",
+      "drizzle-kit": "^0.30.0",
+    },
     envVars: [
       { name: "D1_DATABASE_ID", description: "Cloudflare D1 database ID", required: true },
     ],
     files: [
       { source: "db.ts", destination: "src/lib/db.ts" },
+      { source: "schema.ts", destination: "src/lib/db-schema.ts" },
+      { source: "drizzle.config.ts", destination: "drizzle.config.ts" },
+      { source: "migrations/.gitkeep", destination: "drizzle/migrations/.gitkeep" },
     ],
   }),
 };
@@ -138,9 +145,27 @@ const { headline = "Welcome", subheadline = "" } = Astro.props;
 `,
   },
   "db-d1": {
-    "db.ts": `// D1 database connection placeholder
-export const database = {};
+    "db.ts": `import { drizzle } from "drizzle-orm/d1";
+import * as schema from "./db-schema";
+
+export type Database = ReturnType<typeof drizzle>;
+
+export function getDb(d1: D1Database): Database {
+  return drizzle(d1, { schema });
+}
 `,
+    "schema.ts": `// Database schema — define your tables here.
+// See: https://orm.drizzle.team/docs/sql-schema-declaration
+`,
+    "drizzle.config.ts": `import type { Config } from "drizzle-kit";
+
+export default {
+  schema: "./src/lib/db-schema.ts",
+  out: "./drizzle/migrations",
+  dialect: "sqlite",
+} satisfies Config;
+`,
+    "migrations/.gitkeep": "",
   },
 };
 

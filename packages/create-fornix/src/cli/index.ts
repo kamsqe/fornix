@@ -4,6 +4,7 @@ import { addCommand } from "./commands/add.js";
 import { removeCommand } from "./commands/remove.js";
 import { listCommand } from "./commands/list.js";
 import { statusCommand } from "./commands/status.js";
+import { mcpCommand } from "./commands/mcp.js";
 
 export const main = defineCommand({
   meta: {
@@ -17,5 +18,6 @@ export const main = defineCommand({
     remove: removeCommand,
     list: listCommand,
     status: statusCommand,
+    mcp: mcpCommand,
   },
 });

@@ -1,6 +1,6 @@
 {
   "name": "create-fornix",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "CLI-first Astro + Cloudflare project generator",
   "type": "module",
   "license": "MIT",
@@ -35,7 +35,6 @@
     "citty": "^0.1.6",
     "defu": "^6.1.4",
     "fast-glob": "^3.3.3",
-
     "giget": "^1.2.3",
     "magicast": "^0.3.5",
     "picocolors": "^1.1.0",

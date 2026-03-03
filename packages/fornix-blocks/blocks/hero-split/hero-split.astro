@@ -1,0 +1,55 @@
+---
+/**
+ * Hero Split — side-by-side hero with text and media.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/hero-split.json` (or per-locale
+ * `src/content/{locale}/sections/hero-split.json` when i18n is enabled).
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "hero-split");
+const {
+  headline,
+  subheadline,
+  ctaText,
+  ctaHref,
+  secondaryCtaText,
+  secondaryCtaHref,
+  imageAlt,
+} = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  ctaText: "",
+  ctaHref: "#",
+  secondaryCtaText: "",
+  secondaryCtaHref: "#",
+  imageAlt: "",
+};
+---
+
+<section class="hero-split">
+  <div class="hero-split__content">
+    <h1 class="hero-split__headline">{headline}</h1>
+    {subheadline && (
+      <p class="hero-split__subheadline">{subheadline}</p>
+    )}
+    <div class="hero-split__actions">
+      {ctaText && (
+        <a href={ctaHref} class="hero-split__cta hero-split__cta--primary">{ctaText}</a>
+      )}
+      {secondaryCtaText && (
+        <a href={secondaryCtaHref} class="hero-split__cta hero-split__cta--secondary">{secondaryCtaText}</a>
+      )}
+    </div>
+  </div>
+  <div class="hero-split__media">
+    <slot name="media">
+      <div class="hero-split__placeholder" role="img" aria-label={imageAlt}></div>
+    </slot>
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/hero-split.css";
+</style>

@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "name": "hero-video",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Hero section with background video, overlay text, and call-to-action for immersive landing pages",
+  "category": "hero",
+  "tags": ["hero", "landing", "video", "above-fold", "immersive"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "muted", "autoplay"],
+  "slots": ["video-fallback"],
+  "files": [
+    {
+      "source": "hero-video.astro",
+      "destination": "src/components/sections/hero-video.astro"
+    },
+    {
+      "source": "hero-video.css",
+      "destination": "src/styles/sections/hero-video.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for immersive landing pages where a background video creates atmosphere and engagement. Best for creative agencies, product launches, event pages, and brand-heavy sites that need visual impact.",
+    "whenNotToUse": "Don't use for content-heavy pages, blogs, documentation, or sites where page load performance is critical. Avoid when users are likely on slow connections.",
+    "pairsWith": ["cta-banner", "features-grid", "footer-rich"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Primary headline overlaid on the video",
+        "maxLength": 60,
+        "example": "Experience the Future"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Supporting text below the headline",
+        "maxLength": 200,
+        "example": "Immersive experiences that captivate and convert."
+      },
+      "ctaText": {
+        "type": "string",
+        "description": "Call-to-action button label",
+        "maxLength": 30,
+        "example": "Get Started"
+      },
+      "ctaHref": {
+        "type": "string",
+        "description": "CTA button URL",
+        "example": "#start"
+      },
+      "videoUrl": {
+        "type": "string",
+        "description": "URL or path to the background video file",
+        "example": "/videos/hero-bg.mp4"
+      },
+      "posterUrl": {
+        "type": "string",
+        "description": "Poster image shown before video loads",
+        "example": "/images/hero-poster.jpg"
+      }
+    }
+  }
+}

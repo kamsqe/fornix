@@ -1,0 +1,57 @@
+---
+/**
+ * Pricing Table — tiered pricing cards with feature lists.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "pricing-table");
+const { headline, subheadline, plans } = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  plans: [],
+};
+---
+
+<section class="pricing-table">
+  <div class="pricing-table__header">
+    <h2 class="pricing-table__headline">{headline}</h2>
+    {subheadline && (
+      <p class="pricing-table__subheadline">{subheadline}</p>
+    )}
+  </div>
+  <div class="pricing-table__grid">
+    {(plans as Array<{
+      name: string;
+      price: string;
+      period: string;
+      description: string;
+      features: string[];
+      ctaText: string;
+      ctaHref: string;
+      highlighted: boolean;
+    }>).map((plan) => (
+      <div class:list={["pricing-table__card", { "pricing-table__card--highlighted": plan.highlighted }]}>
+        <div class="pricing-table__card-header">
+          <h3 class="pricing-table__plan-name">{plan.name}</h3>
+          <div class="pricing-table__price">
+            <span class="pricing-table__amount">{plan.price}</span>
+            {plan.period && <span class="pricing-table__period">{plan.period}</span>}
+          </div>
+          <p class="pricing-table__description">{plan.description}</p>
+        </div>
+        <ul class="pricing-table__features">
+          {plan.features.map((feature: string) => (
+            <li class="pricing-table__feature">{feature}</li>
+          ))}
+        </ul>
+        <a href={plan.ctaHref} class="pricing-table__cta">{plan.ctaText}</a>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/pricing-table.css";
+</style>

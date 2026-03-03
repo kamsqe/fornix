@@ -1,0 +1,137 @@
+.pricing-table {
+  padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.pricing-table__header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.pricing-table__headline {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--color-foreground);
+  margin-bottom: 1rem;
+}
+
+.pricing-table__subheadline {
+  font-size: 1.125rem;
+  color: var(--color-secondary);
+  max-width: 56ch;
+  margin: 0 auto;
+}
+
+.pricing-table__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  align-items: stretch;
+}
+
+.pricing-table__card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-background);
+  border: 1px solid var(--color-secondary);
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pricing-table__card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-table__card--highlighted {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
+  position: relative;
+}
+
+.pricing-table__card-header {
+  margin-bottom: 2rem;
+}
+
+.pricing-table__plan-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  margin-bottom: 0.5rem;
+}
+
+.pricing-table__price {
+  margin-bottom: 0.5rem;
+}
+
+.pricing-table__amount {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.pricing-table__period {
+  font-size: 1rem;
+  color: var(--color-secondary);
+}
+
+.pricing-table__description {
+  font-size: 0.9rem;
+  color: var(--color-secondary);
+}
+
+.pricing-table__features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.pricing-table__feature {
+  font-size: 0.95rem;
+  color: var(--color-foreground);
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.pricing-table__feature::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.pricing-table__cta {
+  display: block;
+  text-align: center;
+  padding: 0.875rem 2rem;
+  background: var(--color-primary);
+  color: var(--color-background);
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.pricing-table__cta:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .pricing-table {
+    padding: 3rem 1.5rem;
+  }
+
+  .pricing-table__grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}

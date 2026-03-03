@@ -1,0 +1,36 @@
+{
+  "headline": "Simple, Transparent Pricing",
+  "subheadline": "Choose the plan that fits your needs. Upgrade or downgrade anytime.",
+  "plans": [
+    {
+      "name": "Free",
+      "price": "$0",
+      "period": "/month",
+      "description": "For individuals getting started",
+      "features": ["1 project", "Basic analytics", "Community support"],
+      "ctaText": "Get Started",
+      "ctaHref": "#signup",
+      "highlighted": false
+    },
+    {
+      "name": "Pro",
+      "price": "$29",
+      "period": "/month",
+      "description": "For growing teams",
+      "features": ["Unlimited projects", "Advanced analytics", "Priority support", "Custom domain"],
+      "ctaText": "Start Free Trial",
+      "ctaHref": "#trial",
+      "highlighted": true
+    },
+    {
+      "name": "Enterprise",
+      "price": "Custom",
+      "period": "",
+      "description": "For large organizations",
+      "features": ["Everything in Pro", "SSO", "Dedicated support", "SLA", "Custom integrations"],
+      "ctaText": "Contact Sales",
+      "ctaHref": "#contact",
+      "highlighted": false
+    }
+  ]
+}

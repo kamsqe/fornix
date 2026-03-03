@@ -12,7 +12,8 @@
     "registry": "https://registry.npmjs.org"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "dev": "tsup --watch",

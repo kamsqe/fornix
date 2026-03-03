@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "features-grid",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Responsive grid of feature cards with icons, titles, and descriptions",
+  "category": "features",
+  "tags": ["features", "grid", "cards", "benefits"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "two-column", "icon-left"],
+  "slots": [],
+  "files": [
+    {
+      "source": "features-grid.astro",
+      "destination": "src/components/sections/features-grid.astro"
+    },
+    {
+      "source": "features-grid.css",
+      "destination": "src/styles/sections/features-grid.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use to showcase product features, benefits, or capabilities in a visually scannable grid. Best placed after the hero section on landing pages.",
+    "whenNotToUse": "Don't use for pricing comparisons (use pricing-table), detailed documentation, or content that needs sequential reading order.",
+    "pairsWith": ["hero-gradient", "cta-simple", "footer-minimal"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Section headline above the feature grid",
+        "maxLength": 80,
+        "example": "Everything You Need"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Optional supporting text below the headline",
+        "maxLength": 200,
+        "example": "Powerful features to help you build faster and ship with confidence."
+      },
+      "features": {
+        "type": "array",
+        "description": "List of feature cards to display in the grid",
+        "minItems": 2,
+        "maxItems": 12,
+        "items": {
+          "icon": { "type": "string", "description": "Emoji or icon identifier" },
+          "title": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "example": [
+          { "icon": "⚡", "title": "Lightning Fast", "description": "Built on Astro for zero JS by default." }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+---
+/**
+ * Footer Minimal — clean, minimal site footer.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/footer-minimal.json`.
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "footer-minimal");
+const { copyright, tagline, links } = entry?.data ?? {
+  copyright: "",
+  tagline: "",
+  links: [],
+};
+---
+
+<footer class="footer-minimal">
+  <div class="footer-minimal__inner">
+    {tagline && (
+      <p class="footer-minimal__tagline">{tagline}</p>
+    )}
+    {links.length > 0 && (
+      <nav class="footer-minimal__nav" aria-label="Footer">
+        <ul class="footer-minimal__links">
+          {links.map((link: { label: string; href: string }) => (
+            <li>
+              <a href={link.href} class="footer-minimal__link">{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+    <p class="footer-minimal__copyright">{copyright}</p>
+  </div>
+</footer>
+
+<style>
+  @import "../../styles/sections/footer-minimal.css";
+</style>

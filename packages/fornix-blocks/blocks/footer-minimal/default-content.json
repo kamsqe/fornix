@@ -1,0 +1,9 @@
+{
+  "copyright": "© 2026 Acme Inc. All rights reserved.",
+  "tagline": "Built with Fornix",
+  "links": [
+    { "label": "Privacy", "href": "/privacy" },
+    { "label": "Terms", "href": "/terms" },
+    { "label": "Contact", "href": "/contact" }
+  ]
+}

@@ -1,0 +1,38 @@
+---
+/**
+ * Features Grid — responsive grid of feature cards.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/features-grid.json`.
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "features-grid");
+const { headline, subheadline, features } = entry?.data ?? {
+  headline: "",
+  subheadline: "",
+  features: [],
+};
+---
+
+<section class="features-grid">
+  <div class="features-grid__header">
+    <h2 class="features-grid__headline">{headline}</h2>
+    {subheadline && (
+      <p class="features-grid__subheadline">{subheadline}</p>
+    )}
+  </div>
+  <div class="features-grid__cards">
+    {features.map((feature: { icon: string; title: string; description: string }) => (
+      <article class="features-grid__card">
+        <span class="features-grid__icon">{feature.icon}</span>
+        <h3 class="features-grid__title">{feature.title}</h3>
+        <p class="features-grid__description">{feature.description}</p>
+      </article>
+    ))}
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/features-grid.css";
+</style>

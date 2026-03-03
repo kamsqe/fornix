@@ -1,0 +1,36 @@
+{
+  "headline": "Everything You Need",
+  "subheadline": "Powerful features to help you build faster and ship with confidence.",
+  "features": [
+    {
+      "icon": "⚡",
+      "title": "Lightning Fast",
+      "description": "Built on Astro for zero JavaScript by default. Your site loads instantly."
+    },
+    {
+      "icon": "🧩",
+      "title": "Block-Based",
+      "description": "Compose your site from pre-built, tested blocks. Add and remove with a single command."
+    },
+    {
+      "icon": "🎨",
+      "title": "Beautiful Themes",
+      "description": "Choose from curated palettes or bring your own. Switch themes at runtime."
+    },
+    {
+      "icon": "🌍",
+      "title": "i18n Ready",
+      "description": "Built-in internationalization with content collections organized by locale."
+    },
+    {
+      "icon": "☁️",
+      "title": "Edge Deployed",
+      "description": "Deploy to Cloudflare Workers for global edge performance out of the box."
+    },
+    {
+      "icon": "🤖",
+      "title": "AI-Assisted",
+      "description": "Smart scaffolding with AI that understands your project and suggests the right blocks."
+    }
+  ]
+}

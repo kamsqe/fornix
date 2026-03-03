@@ -1,0 +1,66 @@
+/* ── Footer Minimal Section ───────────────────────────── */
+
+.footer-minimal {
+  padding: 2.5rem 2rem;
+  background: var(--color-surface, #0f172a);
+  color: var(--color-muted, #94a3b8);
+  border-top: 1px solid var(--color-border, rgba(148, 163, 184, 0.1));
+}
+
+.footer-minimal__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  max-width: 64rem;
+  margin: 0 auto;
+}
+
+.footer-minimal__tagline {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.7;
+}
+
+.footer-minimal__nav {
+  display: flex;
+}
+
+.footer-minimal__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.footer-minimal__link {
+  font-size: 0.875rem;
+  color: var(--color-muted, #94a3b8);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footer-minimal__link:hover {
+  color: var(--color-foreground, #f8fafc);
+}
+
+.footer-minimal__copyright {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.5;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .footer-minimal {
+    padding: 2rem 1.5rem;
+  }
+
+  .footer-minimal__links {
+    gap: 1rem;
+    justify-content: center;
+  }
+}

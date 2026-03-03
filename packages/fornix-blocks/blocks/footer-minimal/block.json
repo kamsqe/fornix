@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "footer-minimal",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Clean, minimal footer with copyright, navigation links, and optional social icons",
+  "category": "footer",
+  "tags": ["footer", "navigation", "minimal", "bottom"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "centered", "two-column"],
+  "slots": ["social-icons"],
+  "files": [
+    {
+      "source": "footer-minimal.astro",
+      "destination": "src/components/sections/footer-minimal.astro"
+    },
+    {
+      "source": "footer-minimal.css",
+      "destination": "src/styles/sections/footer-minimal.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use as the site-wide footer on every page. Best for marketing sites, landing pages, and simple apps that need copyright info and basic navigation links.",
+    "whenNotToUse": "Don't use for complex footers with newsletter signup, multi-column link lists, or embedded widgets. Use a dedicated footer-mega block instead.",
+    "pairsWith": ["hero-gradient", "features-grid", "cta-simple"],
+    "contentSlots": {
+      "copyright": {
+        "type": "string",
+        "description": "Copyright text (e.g. '© 2026 Acme Inc.')",
+        "maxLength": 100,
+        "example": "© 2026 Acme Inc. All rights reserved."
+      },
+      "links": {
+        "type": "array",
+        "description": "Navigation links displayed in the footer",
+        "minItems": 0,
+        "maxItems": 8,
+        "items": {
+          "label": { "type": "string" },
+          "href": { "type": "string" }
+        },
+        "example": [
+          { "label": "Privacy", "href": "/privacy" },
+          { "label": "Terms", "href": "/terms" }
+        ]
+      },
+      "tagline": {
+        "type": "string",
+        "description": "Optional short tagline or description below the logo/brand",
+        "maxLength": 120,
+        "example": "Built with Fornix"
+      }
+    }
+  }
+}

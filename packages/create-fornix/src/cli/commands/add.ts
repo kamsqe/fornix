@@ -1,4 +1,36 @@
 import { defineCommand } from "citty";
+import pc from "picocolors";
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
+import { join, dirname } from "node:path";
+import type { BlockManifest } from "fornix-registry";
+import {
+  FIXTURE_MANIFESTS,
+  FIXTURE_BLOCK_SOURCES,
+} from "../fixture-registry.js";
+
+// ── Types ────────────────────────────────────────────────
+
+interface AddArgs {
+  readonly block: string;
+  readonly variant: string;
+  readonly "dry-run": boolean;
+  readonly verbose: boolean;
+}
+
+interface FornixManifest {
+  version: string;
+  createdAt: string;
+  renderMode: string;
+  blocks: Array<{
+    name: string;
+    version: string;
+    variant: string;
+    installedAt: string;
+  }>;
+  [key: string]: unknown;
+}
+
+// ── Command Definition ───────────────────────────────────
 
 export const addCommand = defineCommand({
   meta: {
@@ -28,9 +60,174 @@ export const addCommand = defineCommand({
     },
   },
   run({ args }) {
-    // TODO: Phase 18+ — wire to block placement logic
-    console.log("🚧 add command not yet implemented");
-    console.log("   block:", args.block);
-    console.log("   variant:", args.variant);
+    const typedArgs = args as unknown as AddArgs;
+    const cwd = process.cwd();
+
+    // 1. Read fornix.json
+    const manifestPath = join(cwd, "fornix.json");
+    if (!existsSync(manifestPath)) {
+      console.error(
+        pc.red("✗ No fornix.json found. Are you in a Fornix project?"),
+      );
+      process.exit(1);
+    }
+
+    const manifestRaw = readFileSync(manifestPath, "utf-8");
+    const manifest: FornixManifest = JSON.parse(manifestRaw);
+
+    // 2. Look up block
+    const blockName = typedArgs.block;
+    const blockManifest = FIXTURE_MANIFESTS[blockName];
+    if (!blockManifest) {
+      console.error(pc.red(`✗ Block '${blockName}' not found in registry.`));
+      console.error(
+        pc.dim(
+          `  Available: ${Object.keys(FIXTURE_MANIFESTS).join(", ")}`,
+        ),
+      );
+      process.exit(1);
+    }
+
+    // 3. Check if already installed
+    const installedNames = new Set(manifest.blocks.map((b) => b.name));
+    if (installedNames.has(blockName)) {
+      console.log(
+        pc.yellow(`⚠ Block '${blockName}' is already installed.`),
+      );
+      return;
+    }
+
+    // 4. Resolve dependencies
+    const blocksToAdd = resolveDependencies(blockName, installedNames);
+
+    // 5. Check mode compatibility
+    for (const name of blocksToAdd) {
+      const m = FIXTURE_MANIFESTS[name];
+      if (m?.requiredMode && manifest.renderMode !== m.requiredMode) {
+        console.error(
+          pc.red(
+            `✗ Block '${name}' requires '${m.requiredMode}' mode, but project uses '${manifest.renderMode}'.`,
+          ),
+        );
+        process.exit(1);
+      }
+    }
+
+    // 6. Place files
+    const filesToWrite: Array<{ path: string; content: string }> = [];
+
+    for (const name of blocksToAdd) {
+      const bManifest = FIXTURE_MANIFESTS[name];
+      const sources = FIXTURE_BLOCK_SOURCES[name];
+      if (!bManifest || !sources) {
+        console.error(pc.red(`✗ Source files not found for block '${name}'.`));
+        process.exit(1);
+      }
+
+      for (const file of bManifest.files) {
+        const content = sources[file.source];
+        if (content === undefined) {
+          console.error(
+            pc.red(
+              `✗ Source file '${file.source}' not found for block '${name}'.`,
+            ),
+          );
+          process.exit(1);
+        }
+
+        filesToWrite.push({
+          path: join(cwd, file.destination),
+          content,
+        });
+      }
+    }
+
+    // 7. Dry run check
+    if (typedArgs["dry-run"]) {
+      console.log(pc.bold("\n  Dry run — no files written\n"));
+      for (const name of blocksToAdd) {
+        const isDep = name !== blockName;
+        console.log(
+          `  ${isDep ? pc.dim("(dep)") : pc.green("+")} ${pc.bold(name)}`,
+        );
+      }
+      console.log();
+      for (const file of filesToWrite) {
+        console.log(`  ${pc.dim("→")} ${file.path}`);
+      }
+      console.log();
+      return;
+    }
+
+    // 8. Write files
+    for (const file of filesToWrite) {
+      mkdirSync(dirname(file.path), { recursive: true });
+      writeFileSync(file.path, file.content);
+      if (typedArgs.verbose) {
+        console.log(`  ${pc.dim("→")} ${file.path}`);
+      }
+    }
+
+    // 9. Update fornix.json
+    const now = new Date().toISOString();
+    for (const name of blocksToAdd) {
+      const bManifest = FIXTURE_MANIFESTS[name];
+      if (!bManifest) continue;
+      manifest.blocks.push({
+        name,
+        version: bManifest.version,
+        variant: name === blockName ? typedArgs.variant : "default",
+        installedAt: now,
+      });
+    }
+
+    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+
+    // 10. Print summary
+    console.log();
+    for (const name of blocksToAdd) {
+      const isDep = name !== blockName;
+      if (isDep) {
+        console.log(
+          `  ${pc.green("+")} ${pc.bold(name)} ${pc.dim("(auto-added dependency)")}`,
+        );
+      } else {
+        console.log(`  ${pc.green("+")} ${pc.bold(name)}`);
+      }
+    }
+    console.log(
+      pc.dim(
+        `\n  ${filesToWrite.length} files placed, fornix.json updated.`,
+      ),
+    );
+    console.log();
   },
 });
+
+// ── Dependency Resolution ────────────────────────────────
+
+function resolveDependencies(
+  blockName: string,
+  installedNames: ReadonlySet<string>,
+): ReadonlyArray<string> {
+  const result: string[] = [];
+  const visited = new Set<string>();
+
+  function walk(name: string): void {
+    if (visited.has(name) || installedNames.has(name)) return;
+    visited.add(name);
+
+    const manifest = FIXTURE_MANIFESTS[name];
+    if (!manifest) return;
+
+    // Walk dependencies first (depth-first)
+    for (const dep of manifest.requires) {
+      walk(dep);
+    }
+
+    result.push(name);
+  }
+
+  walk(blockName);
+  return result;
+}

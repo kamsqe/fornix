@@ -5,8 +5,8 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/create-fornix"><img src="https://img.shields.io/npm/v/create-fornix.svg?style=flat-square" alt="npm version"></a>
-  <a href="https://github.com/kamsqee/fornix/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="license"></a>
-  <a href="https://github.com/kamsqee/fornix"><img src="https://img.shields.io/github/stars/kamsqee/fornix?style=flat-square" alt="stars"></a>
+  <a href="https://github.com/kamsqe/fornix/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square" alt="license"></a>
+  <a href="https://github.com/kamsqe/fornix"><img src="https://img.shields.io/github/stars/kamsqe/fornix?style=flat-square" alt="stars"></a>
 </p>
 
 ---
@@ -178,7 +178,7 @@ fornix/
 ## Development
 
 ```bash
-git clone https://github.com/kamsqee/fornix.git
+git clone https://github.com/kamsqe/fornix.git
 cd fornix
 pnpm install
 pnpm --filter create-fornix build
@@ -188,4 +188,4 @@ pnpm --filter fornix-blocks test:unit     # 257 tests
 
 ## License
 
-MIT © [kamsqee](https://github.com/kamsqee)
+MIT © [kamsqe](https://github.com/kamsqe)

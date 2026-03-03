@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "name": "blog-mdx",
+  "version": "1.0.0",
+  "type": "feature",
+  "description": "Full blog feature with MDX processing, listing page, post page, and RSS feed.",
+  "category": "blog",
+  "tags": ["blog", "mdx", "content", "rss"],
+  "dependencies": {
+    "@astrojs/mdx": "^3.1.9",
+    "@astrojs/rss": "^4.0.9"
+  },
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "schema.ts",
+      "destination": "src/content/blog-schema.ts"
+    },
+    {
+      "source": "pages/index.astro",
+      "destination": "src/pages/blog/index.astro"
+    },
+    {
+      "source": "pages/[slug].astro",
+      "destination": "src/pages/blog/[slug].astro"
+    },
+    {
+      "source": "pages/rss.xml.ts",
+      "destination": "src/pages/rss.xml.ts"
+    }
+  ],
+  "collections": [
+    {
+      "name": "blog",
+      "type": "content",
+      "schemaSource": "./blog-schema.ts"
+    }
+  ],
+  "ai": {
+    "whenToUse": "User wants a blog powered by Markdown or MDX files. Generates a basic listing UI and dynamic slug routes for posts.",
+    "whenNotToUse": "User wants a headless CMS blog or doesn't need content features.",
+    "pairsWith": ["layout-marketing"]
+  }
+}

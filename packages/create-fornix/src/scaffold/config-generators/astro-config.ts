@@ -1,5 +1,6 @@
 import { parseModule, generateCode, builders } from "magicast";
 import type { ResolvedConfig } from "../../schemas/config.js";
+import type { BlockManifest } from "fornix-registry";
 import { ok, err, type Result } from "../../utils/result.js";
 
 // ── Adapter Map ──────────────────────────────────────────
@@ -14,6 +15,7 @@ const ADAPTER_MAP: Record<string, { package: string; identifier: string }> = {
 
 export function generateAstroConfig(
   config: ResolvedConfig,
+  blocks: ReadonlyArray<BlockManifest> = [],
 ): Result<string, Error> {
   try {
     const module = parseModule("export default defineConfig({});");
@@ -50,6 +52,18 @@ export function generateAstroConfig(
           prefixDefaultLocale: false,
         },
       };
+    }
+
+    const hasMdx = blocks.some((b) => b.dependencies && b.dependencies["@astrojs/mdx"]);
+    if (hasMdx) {
+      module.imports.$add({
+        from: "@astrojs/mdx",
+        imported: "default",
+        local: "mdx",
+      });
+      
+      configObject.integrations = configObject.integrations || [];
+      configObject.integrations.push(builders.functionCall("mdx"));
     }
 
     const { code } = generateCode(module);

@@ -65,8 +65,13 @@ export function scaffold(
   const structureFiles = generateStructure(config);
   Object.assign(files, structureFiles);
 
-  // 4. Generate astro.config.mjs
-  const astroConfigResult = generateAstroConfig(config);
+  // 4. Resolve block manifests
+  const resolvedManifests = resolvedBlockNames
+    .filter((name) => manifests[name] !== undefined)
+    .map((name) => manifests[name]);
+
+  // 5. Generate astro.config.mjs
+  const astroConfigResult = generateAstroConfig(config, resolvedManifests);
   if (!isOk(astroConfigResult)) {
     return err(astroConfigResult.error);
   }
@@ -96,9 +101,6 @@ export function scaffold(
   }
 
   // 7. Place block files
-  const resolvedManifests = resolvedBlockNames
-    .filter((name) => manifests[name] !== undefined)
-    .map((name) => manifests[name]);
 
   const blockPlaceResult = placeBlocks(resolvedManifests, blockSources, config);
   if (!isOk(blockPlaceResult)) {

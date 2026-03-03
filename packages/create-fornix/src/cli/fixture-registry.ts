@@ -101,6 +101,37 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
       { source: "migrations/.gitkeep", destination: "drizzle/migrations/.gitkeep" },
     ],
   }),
+  "blog-mdx": manifest("blog-mdx", {
+    type: "feature",
+    category: "blog",
+    dependencies: {
+      "@astrojs/mdx": "^3.1.9",
+      "@astrojs/rss": "^4.0.9",
+    },
+    files: [
+      { source: "schema.ts", destination: "src/content/blog-schema.ts" },
+      { source: "pages/index.astro", destination: "src/pages/blog/index.astro" },
+      { source: "pages/[slug].astro", destination: "src/pages/blog/[slug].astro" },
+      { source: "pages/rss.xml.ts", destination: "src/pages/rss.xml.ts" }
+    ],
+    collections: [
+      { name: "blog", type: "content", schemaSource: "./blog-schema.ts" }
+    ],
+  }),
+  "docs-collection": manifest("docs-collection", {
+    type: "feature",
+    category: "docs",
+    dependencies: {
+      "@astrojs/mdx": "^3.1.9",
+    },
+    files: [
+      { source: "schema.ts", destination: "src/content/docs-schema.ts" },
+      { source: "pages/[...slug].astro", destination: "src/pages/docs/[...slug].astro" }
+    ],
+    collections: [
+      { name: "docs", type: "content", schemaSource: "./docs-schema.ts" }
+    ],
+  }),
 };
 
 // ── Block Sources (stub file contents) ──────────────────
@@ -201,6 +232,24 @@ export default {
 `,
     "migrations/.gitkeep": "",
   },
+  "blog-mdx": {
+    "schema.ts": `import { z } from "astro:content";\nexport const schema = z.object({});\n`,
+    "pages/index.astro": `---
+---
+<h1>Blog</h1>`,
+    "pages/[slug].astro": `---
+export function getStaticPaths() { return []; }
+---
+<h1>Post</h1>`,
+    "pages/rss.xml.ts": `export const GET = () => new Response("");`
+  },
+  "docs-collection": {
+    "schema.ts": `import { z } from "astro:content";\nexport const schema = z.object({});\n`,
+    "pages/[...slug].astro": `---
+export function getStaticPaths() { return []; }
+---
+<h1>Docs</h1>`
+  }
 };
 
 // ── Block Default Content ───────────────────────────────

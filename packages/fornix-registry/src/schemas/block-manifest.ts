@@ -24,6 +24,12 @@ const ContentSlotSchema = z.object({
   maxItems: z.number().int().positive().optional(),
 });
 
+const BlockCollectionSchema = z.object({
+  name: z.string().min(1),
+  type: z.enum(["data", "content"]),
+  schemaSource: z.string().min(1),
+});
+
 const BlockAIMetadataSchema = z.object({
   whenToUse: z.string().min(1),
   whenNotToUse: z.string().min(1),
@@ -55,6 +61,7 @@ export const BlockManifestSchema = z.object({
   slots: z.array(z.string()),
 
   files: z.array(BlockFileSchema),
+  collections: z.array(BlockCollectionSchema).optional(),
 
   ai: BlockAIMetadataSchema.optional(),
 });
@@ -69,3 +76,4 @@ export type BlockFile = z.infer<typeof BlockFileSchema>;
 export type BlockEnvVar = z.infer<typeof EnvVarSchema>;
 export type BlockAIMetadata = z.infer<typeof BlockAIMetadataSchema>;
 export type ContentSlot = z.infer<typeof ContentSlotSchema>;
+export type BlockCollection = z.infer<typeof BlockCollectionSchema>;

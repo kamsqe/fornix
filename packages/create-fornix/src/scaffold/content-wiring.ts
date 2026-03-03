@@ -40,8 +40,9 @@ export function wireContent(
 
   const blocksWithContent = blocks.filter(
     (block) =>
-      block.ai?.contentSlots !== undefined &&
-      Object.keys(block.ai.contentSlots).length > 0,
+      (block.ai?.contentSlots !== undefined &&
+        Object.keys(block.ai.contentSlots).length > 0) ||
+      (block.collections !== undefined && block.collections.length > 0)
   );
 
   if (blocksWithContent.length === 0) {
@@ -51,8 +52,12 @@ export function wireContent(
   files["src/content/config.ts"] = generateContentConfig(blocksWithContent);
 
   for (const block of blocksWithContent) {
+    if (!block.ai?.contentSlots || Object.keys(block.ai.contentSlots).length === 0) {
+      continue;
+    }
+
     const subdirectory = TYPE_DIRECTORY[block.type] ?? block.type;
-    const content = defaultContent[block.name] ?? buildDefaultFromSlots(block.ai!.contentSlots!);
+    const content = defaultContent[block.name] ?? buildDefaultFromSlots(block.ai.contentSlots);
     const jsonContent = JSON.stringify(content, null, 2) + "\n";
 
     if (isMultiLocale) {
@@ -81,14 +86,30 @@ function generateContentConfig(
   const collections: string[] = [];
 
   for (const block of blocks) {
-    const slots = block.ai!.contentSlots!;
-    const schemaFields = Object.entries(slots)
-      .map(([name, slot]) => `    ${name}: ${zodTypeForSlot(slot)},`)
-      .join("\n");
+    // 1. Process custom collections
+    if (block.collections && block.collections.length > 0) {
+      for (const col of block.collections) {
+        const importName = `${block.name.replace(/-/g, "")}${col.name}Schema`;
+        const importPath = col.schemaSource.replace(/\.ts$/, "");
+        imports.push(`import { schema as ${importName} } from "${importPath}";`);
+        
+        collections.push(
+          `  "${col.name}": defineCollection({\n    type: "${col.type}",\n    schema: ${importName},\n  })`
+        );
+      }
+    }
 
-    collections.push(
-      `  "${block.name}": defineCollection({\n    type: "data",\n    schema: z.object({\n${schemaFields}\n    }),\n  })`,
-    );
+    // 2. Process data collections from AI slots
+    const slots = block.ai?.contentSlots;
+    if (slots && Object.keys(slots).length > 0) {
+      const schemaFields = Object.entries(slots)
+        .map(([name, slot]) => `    ${name}: ${zodTypeForSlot(slot)},`)
+        .join("\n");
+
+      collections.push(
+        `  "${block.name}": defineCollection({\n    type: "data",\n    schema: z.object({\n${schemaFields}\n    }),\n  })`,
+      );
+    }
   }
 
   const lines = [

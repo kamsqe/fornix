@@ -8,7 +8,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { IntentSchema, type Intent } from "../rules.js";
+import { IntentSchema, type Intent } from "../schemas.js";
 import { ok, err, type Result } from "../../utils/result.js";
 
 // ── Types ────────────────────────────────────────────────

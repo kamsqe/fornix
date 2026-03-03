@@ -3,7 +3,7 @@
  * This will be replaced by a real registry loader in a later phase.
  */
 
-import type { BlockManifest, Palette } from "fornix-registry";
+import { BUILTIN_PALETTES, type BlockManifest, type Palette } from "fornix-registry";
 import type { BlockSourceMap } from "../scaffold/block-placer.js";
 import type { BlockDefaultContent } from "../scaffold/content-wiring.js";
 import { readFileSync, readdirSync } from "node:fs";
@@ -321,12 +321,20 @@ export const FIXTURE_DEFAULT_CONTENT: BlockDefaultContent = {};
 // ── Palette Loader ──────────────────────────────────────
 
 /**
- * Loads all palette JSON files from the fornix-registry palettes/ directory.
- * Falls back to an empty array if the directory isn't found.
+ * Loads all palettes from the bundled registry data.
+ *
+ * Uses BUILTIN_PALETTES (compiled into the bundle at build time) as the
+ * primary source. Falls back to reading JSON files from the monorepo
+ * palettes/ directory during development.
  */
 export function loadAllPalettes(): Palette[] {
+  // Primary: use bundled palette data (works in npm-published CLI)
+  if (BUILTIN_PALETTES.length > 0) {
+    return [...BUILTIN_PALETTES];
+  }
+
+  // Fallback: read from monorepo filesystem (development only)
   try {
-    // Resolve the palettes directory relative to the fornix-registry package
     const registryPath = findRegistryPalettesDir();
     if (!registryPath) return [];
 
@@ -350,9 +358,7 @@ export function loadAllPalettes(): Palette[] {
 
 function findRegistryPalettesDir(): string | null {
   try {
-    // Try to resolve from the fornix-registry package
     const thisDir = dirname(fileURLToPath(import.meta.url));
-    // Walk up to find the monorepo root, then into fornix-registry
     const monorepoRoot = join(thisDir, "..", "..", "..");
     const palettesDir = join(monorepoRoot, "packages", "fornix-registry", "palettes");
     readdirSync(palettesDir); // Throws if not found

@@ -7,76 +7,9 @@
  * Rules are idempotent: applying the same rules twice produces the same result.
  */
 
-import { z } from "zod";
-
-// ── Intent Schema ────────────────────────────────────────
-
-export const IntentSchema = z.object({
-  siteType: z.enum([
-    "landing-page",
-    "saas",
-    "agency",
-    "portfolio",
-    "blog",
-    "docs",
-    "ecommerce",
-    "dashboard",
-    "community",
-    "other",
-  ]),
-  industry: z.string(),
-  brand: z.object({
-    name: z.string(),
-    tagline: z.string().optional(),
-    description: z.string(),
-    targetAudience: z.string().optional(),
-    tone: z.string(),
-  }),
-  needsAuth: z.boolean(),
-  needsPayments: z.boolean(),
-  needsBlog: z.boolean(),
-  needsDocs: z.boolean(),
-  needsDashboard: z.boolean(),
-  needsContactForm: z.boolean(),
-  needsNewsletter: z.boolean(),
-  hasDynamicContent: z.boolean(),
-  hasEcommerce: z.boolean(),
-  hasUserAccounts: z.boolean(),
-  prefersDarkMode: z.boolean(),
-  visualStyle: z.enum([
-    "minimal",
-    "bold",
-    "glassmorphism",
-    "gradient",
-    "flat",
-    "neo-brutalist",
-  ]),
-  languages: z.array(z.string()),
-  palettePreference: z.enum([
-    "custom",
-    "prebuilt",
-    "ai-generated",
-    "unspecified",
-  ]),
-  wantsThemeSwitcher: z.boolean(),
-  recommendedBlocks: z.array(
-    z.object({
-      blockName: z.string(),
-      reason: z.string(),
-      confidence: z.number(),
-    }),
-  ),
-  uncertainties: z.array(
-    z.object({
-      topic: z.string(),
-      question: z.string(),
-      defaultAssumption: z.string(),
-    }),
-  ),
-  overallConfidence: z.number().min(0).max(1),
-});
-
-export type Intent = z.infer<typeof IntentSchema>;
+// Re-export the canonical IntentSchema from schemas.ts — single source of truth.
+export { IntentSchema, type Intent } from "./schemas.js";
+import type { Intent } from "./schemas.js";
 
 // ── MutableConfig ────────────────────────────────────────
 

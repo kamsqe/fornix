@@ -165,8 +165,48 @@ You MUST only select blocks that exist in the catalog below. Never invent block 
 
 Select a palette that fits the brand, industry, and visual style.
 
+- **nature:** Arctic (light), Desert Sand (light), Forest (dark), Ocean Breeze (light)
+- **dark:** Charcoal (dark), Midnight (dark), Obsidian (dark), Void (dark)
+- **warm:** Copper (dark), Ember (dark), Golden Hour (light), Terracotta (light)
+- **professional:** Corporate Blue (light), Executive (dark), Slate Modern (light), Trust (light)
+- **light:** Cotton (light), Cream (light), Pearl (light), Snow (light)
+- **vibrant:** Cyber Punk (dark), Electric Violet (dark), Neon Tokyo (dark), Sunset Glow (dark)
+- **cool:** Deep Sea (dark), Frost (light), Glacier (light), Storm (dark)
+- **brand-inspired:** Fintech Dark (dark), Health Clean (light), Luxury Gold (dark), Startup Bold (light)
 
 Palette names (use these exact values):
+- \`arctic\` — Arctic (nature, light)
+- \`charcoal\` — Charcoal (dark, dark)
+- \`copper\` — Copper (warm, dark)
+- \`corporate-blue\` — Corporate Blue (professional, light)
+- \`cotton\` — Cotton (light, light)
+- \`cream\` — Cream (light, light)
+- \`cyber-punk\` — Cyber Punk (vibrant, dark)
+- \`deep-sea\` — Deep Sea (cool, dark)
+- \`desert-sand\` — Desert Sand (nature, light)
+- \`electric-violet\` — Electric Violet (vibrant, dark)
+- \`ember\` — Ember (warm, dark)
+- \`executive\` — Executive (professional, dark)
+- \`fintech-dark\` — Fintech Dark (brand-inspired, dark)
+- \`forest\` — Forest (nature, dark)
+- \`frost\` — Frost (cool, light)
+- \`glacier\` — Glacier (cool, light)
+- \`golden-hour\` — Golden Hour (warm, light)
+- \`health-clean\` — Health Clean (brand-inspired, light)
+- \`luxury-gold\` — Luxury Gold (brand-inspired, dark)
+- \`midnight\` — Midnight (dark, dark)
+- \`neon-tokyo\` — Neon Tokyo (vibrant, dark)
+- \`obsidian\` — Obsidian (dark, dark)
+- \`ocean-breeze\` — Ocean Breeze (nature, light)
+- \`pearl\` — Pearl (light, light)
+- \`slate-modern\` — Slate Modern (professional, light)
+- \`snow\` — Snow (light, light)
+- \`startup-bold\` — Startup Bold (brand-inspired, light)
+- \`storm\` — Storm (cool, dark)
+- \`sunset-glow\` — Sunset Glow (vibrant, dark)
+- \`terracotta\` — Terracotta (warm, light)
+- \`trust\` — Trust (professional, light)
+- \`void\` — Void (dark, dark)
 
 # Constraint Rules
 

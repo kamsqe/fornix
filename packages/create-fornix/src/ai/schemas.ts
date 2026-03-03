@@ -4,9 +4,9 @@ import { z } from "zod";
 
 const BrandSchema = z.object({
   name: z.string().min(1),
-  tagline: z.string().optional(),
+  tagline: z.string().nullable().default(null),
   description: z.string().min(1),
-  targetAudience: z.string().optional(),
+  targetAudience: z.string().nullable().default(null),
   tone: z.string().min(1),
 });
 

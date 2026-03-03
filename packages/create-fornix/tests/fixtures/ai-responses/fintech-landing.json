@@ -1,0 +1,36 @@
+{
+  "siteType": "landing-page",
+  "industry": "fintech",
+  "brand": {
+    "name": "FinVault",
+    "tagline": "Your finances, simplified",
+    "description": "A modern fintech platform that helps users manage personal finances with AI-powered insights and automated budgeting.",
+    "targetAudience": "Young professionals and millennials managing personal finances",
+    "tone": "professional"
+  },
+  "needsAuth": true,
+  "needsPayments": true,
+  "needsBlog": false,
+  "needsDocs": false,
+  "needsDashboard": true,
+  "needsContactForm": false,
+  "needsNewsletter": true,
+  "hasDynamicContent": true,
+  "hasEcommerce": false,
+  "hasUserAccounts": true,
+  "prefersDarkMode": true,
+  "visualStyle": "gradient",
+  "languages": ["en"],
+  "palettePreference": "prebuilt",
+  "wantsThemeSwitcher": false,
+  "recommendedBlocks": [
+    { "blockName": "hero-gradient", "reason": "Strong visual landing with gradient fits fintech branding", "confidence": 0.95 },
+    { "blockName": "features-grid", "reason": "Showcase platform capabilities in a scannable grid", "confidence": 0.9 },
+    { "blockName": "cta-simple", "reason": "Drive signups with a clear call-to-action", "confidence": 0.85 },
+    { "blockName": "footer-minimal", "reason": "Clean footer with legal links required for fintech", "confidence": 0.8 }
+  ],
+  "uncertainties": [
+    { "topic": "compliance", "question": "Do you need a dedicated compliance/legal page?", "defaultAssumption": "Basic privacy and terms pages only" }
+  ],
+  "overallConfidence": 0.88
+}

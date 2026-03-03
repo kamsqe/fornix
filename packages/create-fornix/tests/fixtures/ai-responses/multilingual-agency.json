@@ -1,0 +1,35 @@
+{
+  "siteType": "agency",
+  "industry": "design",
+  "brand": {
+    "name": "Pixel & Co",
+    "tagline": "Design sans frontières",
+    "description": "A boutique design agency serving international clients with branding, web design, and creative direction services.",
+    "targetAudience": "Enterprise clients and startups looking for premium design services",
+    "tone": "sophisticated"
+  },
+  "needsAuth": false,
+  "needsPayments": false,
+  "needsBlog": false,
+  "needsDocs": false,
+  "needsDashboard": false,
+  "needsContactForm": true,
+  "needsNewsletter": false,
+  "hasDynamicContent": false,
+  "hasEcommerce": false,
+  "hasUserAccounts": false,
+  "prefersDarkMode": true,
+  "visualStyle": "glassmorphism",
+  "languages": ["en", "fr", "ar"],
+  "palettePreference": "ai-generated",
+  "wantsThemeSwitcher": true,
+  "recommendedBlocks": [
+    { "blockName": "hero-gradient", "reason": "Stunning visual hero to showcase design expertise", "confidence": 0.95 },
+    { "blockName": "features-grid", "reason": "Display service offerings in a visual grid", "confidence": 0.85 },
+    { "blockName": "footer-minimal", "reason": "Elegant footer with contact info and social links", "confidence": 0.9 }
+  ],
+  "uncertainties": [
+    { "topic": "portfolio", "question": "Do you want a dedicated portfolio/case studies section?", "defaultAssumption": "Yes, with image gallery and project descriptions" }
+  ],
+  "overallConfidence": 0.85
+}

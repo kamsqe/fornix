@@ -8,7 +8,7 @@
   "tags": ["hero", "landing", "gradient", "above-fold"],
   "dependencies": {},
   "requires": [],
-  "conflicts": [],
+  "conflicts": ["hero-video"],
   "envVars": [],
   "variants": ["default", "centered", "split"],
   "slots": ["badge", "cta-secondary"],

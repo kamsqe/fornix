@@ -1,4 +1,5 @@
 import type { ResolvedConfig } from "../schemas/config.js";
+import type { BlockManifest } from "fornix-registry";
 
 export type FileMap = Record<string, string>;
 
@@ -6,7 +7,7 @@ export type FileMap = Record<string, string>;
  * Generates the base Astro project directory structure and core files.
  * Returns a map of relative file paths to string contents.
  */
-export function generateStructure(config: ResolvedConfig): FileMap {
+export function generateStructure(config: ResolvedConfig, manifests: ReadonlyArray<BlockManifest> = []): FileMap {
   const files: FileMap = {};
 
   // 1. package.json
@@ -78,16 +79,45 @@ Thumbs.db
 `.trim() + "\n";
 
   // 4. Base Astro file
-  files["src/pages/index.astro"] = `
+  const blockImports: string[] = [];
+  const blockComponents: string[] = [];
+  
+  if (manifests.length > 0) {
+    for (const manifest of manifests) {
+      if (manifest.type !== 'section') continue;
+
+      // Find the main component file logic: usually the first .astro or .tsx file
+      const mainFile = manifest.files.find(f => f.destination.endsWith('.astro') || f.destination.endsWith('.tsx'));
+      if (mainFile) {
+        const componentName = manifest.name
+          .split('-')
+          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+          .join('');
+        
+        let importPath = mainFile.destination;
+        if (importPath.startsWith('src/')) {
+          importPath = '../' + importPath.substring(4);
+        }
+        
+        blockImports.push(`import ${componentName} from '${importPath}';`);
+        blockComponents.push(`    <${componentName} />`);
+      }
+    }
+  }
+
+  const indexAstroContent = `
 ---
 import Layout from '../layouts/Layout.astro';
+${blockImports.join('\n')}
 ---
-<Layout title="Welcome to Astro.">
+<Layout title="Welcome to ${config.projectName}.">
   <main>
-    <h1>Welcome to <span class="text-gradient">${config.projectName}</span></h1>
+${blockComponents.length > 0 ? blockComponents.join('\n') : `    <h1>Welcome to <span class="text-gradient">${config.projectName}</span></h1>`}
   </main>
 </Layout>
-`.trim() + "\n";
+`.trim() + "\\n";
+
+  files["src/pages/index.astro"] = indexAstroContent;
 
   // 5. Base Layout (needed by index.astro)
   files["src/layouts/Layout.astro"] = `

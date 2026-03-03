@@ -1,7 +1,231 @@
 {
   "version": 1,
-  "generatedAt": "2026-03-03T05:08:29.560Z",
+  "generatedAt": "2026-03-03T21:59:28.043Z",
   "blocks": [
+    {
+      "schemaVersion": 1,
+      "name": "ai-chatbot",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "AI-powered chatbot using Cloudflare Workers AI for real-time conversational responses.",
+      "category": "ai",
+      "tags": [
+        "ai",
+        "chatbot",
+        "workers-ai",
+        "cloudflare",
+        "conversational"
+      ],
+      "dependencies": {
+        "ai": "^4.0.0",
+        "@ai-sdk/openai": "^1.0.0"
+      },
+      "requires": [],
+      "conflicts": [],
+      "requiredMode": "server",
+      "envVars": [
+        {
+          "name": "CLOUDFLARE_ACCOUNT_ID",
+          "description": "Your Cloudflare account ID for Workers AI",
+          "required": true
+        },
+        {
+          "name": "CLOUDFLARE_AI_TOKEN",
+          "description": "API token for Cloudflare Workers AI",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "ai-chat.ts",
+          "destination": "src/lib/ai-chat.ts"
+        },
+        {
+          "source": "chat-api.ts",
+          "destination": "src/pages/api/chat.ts"
+        },
+        {
+          "source": "AiChatbot.astro",
+          "destination": "src/components/AiChatbot.astro"
+        }
+      ],
+      "ai": {
+        "whenToUse": "When the user wants an AI chatbot or conversational assistant embedded in their site, powered by Cloudflare Workers AI.",
+        "whenNotToUse": "When the project is purely static with no server-side capabilities, or when the user does not need conversational AI.",
+        "pairsWith": [
+          "auth-better-auth",
+          "layout-dashboard",
+          "docs-collection"
+        ],
+        "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "ai-og-images",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "Dynamic Open Graph image generation using Cloudflare Workers AI for social sharing previews.",
+      "category": "ai",
+      "tags": [
+        "ai",
+        "og-images",
+        "workers-ai",
+        "cloudflare",
+        "social",
+        "seo"
+      ],
+      "dependencies": {
+        "ai": "^4.0.0"
+      },
+      "requires": [],
+      "conflicts": [],
+      "requiredMode": "hybrid",
+      "envVars": [
+        {
+          "name": "CLOUDFLARE_ACCOUNT_ID",
+          "description": "Your Cloudflare account ID for Workers AI",
+          "required": true
+        },
+        {
+          "name": "CLOUDFLARE_AI_TOKEN",
+          "description": "API token for Cloudflare Workers AI",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "og-generator.ts",
+          "destination": "src/lib/og-generator.ts"
+        },
+        {
+          "source": "og-api.ts",
+          "destination": "src/pages/api/og.ts"
+        }
+      ],
+      "ai": {
+        "whenToUse": "When the user wants dynamic, AI-generated Open Graph images for social sharing on blog posts, docs, or marketing pages.",
+        "whenNotToUse": "When the project uses static pre-made OG images, or for internal dashboards with no public sharing needs.",
+        "pairsWith": [
+          "blog-mdx",
+          "docs-collection"
+        ],
+        "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "ai-search",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "AI-powered semantic search using Cloudflare Workers AI and Vectorize for embedding-based retrieval.",
+      "category": "ai",
+      "tags": [
+        "ai",
+        "search",
+        "workers-ai",
+        "vectorize",
+        "cloudflare",
+        "semantic"
+      ],
+      "dependencies": {
+        "ai": "^4.0.0"
+      },
+      "requires": [],
+      "conflicts": [],
+      "requiredMode": "server",
+      "envVars": [
+        {
+          "name": "CLOUDFLARE_ACCOUNT_ID",
+          "description": "Your Cloudflare account ID for Workers AI",
+          "required": true
+        },
+        {
+          "name": "CLOUDFLARE_AI_TOKEN",
+          "description": "API token for Cloudflare Workers AI",
+          "required": true
+        },
+        {
+          "name": "VECTORIZE_INDEX_NAME",
+          "description": "Name of the Vectorize index for semantic search",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "ai-search.ts",
+          "destination": "src/lib/ai-search.ts"
+        },
+        {
+          "source": "search-api.ts",
+          "destination": "src/pages/api/search.ts"
+        },
+        {
+          "source": "AiSearch.astro",
+          "destination": "src/components/AiSearch.astro"
+        }
+      ],
+      "ai": {
+        "whenToUse": "When the user wants semantic or AI-powered search across documentation, blog posts, or other content using Cloudflare Vectorize.",
+        "whenNotToUse": "For simple text filtering or when the project has no searchable content. Not needed for static sites with client-side search.",
+        "pairsWith": [
+          "docs-collection",
+          "blog-mdx"
+        ],
+        "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "analytics-cf",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "Cloudflare Web Analytics integration for privacy-first analytics.",
+      "category": "analytics",
+      "tags": [
+        "analytics",
+        "cloudflare",
+        "tracking"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [
+        {
+          "name": "CF_ANALYTICS_TOKEN",
+          "description": "Your Cloudflare Web Analytics token",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "CfAnalytics.astro",
+          "destination": "src/components/CfAnalytics.astro"
+        }
+      ],
+      "ai": {
+        "whenToUse": "When the project is deploying to Cloudflare and the user wants to enable analytics.",
+        "whenNotToUse": "When the user is not deploying to Cloudflare or explicitly requests a different analytics provider.",
+        "pairsWith": [],
+        "contentSlots": {}
+      }
+    },
     {
       "schemaVersion": 1,
       "name": "auth-better-auth",
@@ -80,6 +304,311 @@
     },
     {
       "schemaVersion": 1,
+      "name": "blog-mdx",
+      "version": "1.0.0",
+      "type": "feature",
+      "description": "Full blog feature with MDX processing, listing page, post page, and RSS feed.",
+      "category": "blog",
+      "tags": [
+        "blog",
+        "mdx",
+        "content",
+        "rss"
+      ],
+      "dependencies": {
+        "@astrojs/mdx": "^3.1.9",
+        "@astrojs/rss": "^4.0.9"
+      },
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "schema.ts",
+          "destination": "src/content/blog-schema.ts"
+        },
+        {
+          "source": "pages/index.astro",
+          "destination": "src/pages/blog/index.astro"
+        },
+        {
+          "source": "pages/[slug].astro",
+          "destination": "src/pages/blog/[slug].astro"
+        },
+        {
+          "source": "pages/rss.xml.ts",
+          "destination": "src/pages/rss.xml.ts"
+        }
+      ],
+      "collections": [
+        {
+          "name": "blog",
+          "type": "content",
+          "schemaSource": "./blog-schema.ts"
+        }
+      ],
+      "ai": {
+        "whenToUse": "User wants a blog powered by Markdown or MDX files. Generates a basic listing UI and dynamic slug routes for posts.",
+        "whenNotToUse": "User wants a headless CMS blog or doesn't need content features.",
+        "pairsWith": [
+          "layout-marketing"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "contact-form",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Contact form section with name, email, subject, and message fields, powered by Astro Actions",
+      "category": "contact",
+      "tags": [
+        "contact",
+        "form",
+        "email",
+        "support",
+        "astro-actions"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "requiredMode": "hybrid",
+      "envVars": [],
+      "variants": [
+        "default",
+        "side-by-side",
+        "minimal"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "contact-form.astro",
+          "destination": "src/components/sections/contact-form.astro"
+        },
+        {
+          "source": "contact-form.css",
+          "destination": "src/styles/sections/contact-form.css"
+        },
+        {
+          "source": "contact-action.ts",
+          "destination": "src/actions/contact-action.ts",
+          "condition": "renderMode !== 'static'"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use on any page that needs a contact form — landing pages, about pages, support pages. The form uses Astro Actions for server-side processing without a separate API.",
+        "whenNotToUse": "Don't use on fully static sites without a server adapter. Avoid if you only need an email link — a simple mailto: would suffice.",
+        "pairsWith": [
+          "hero-split",
+          "faq-accordion",
+          "footer-rich",
+          "footer-minimal"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline",
+            "maxLength": 60,
+            "example": "Get in Touch"
+          },
+          "description": {
+            "type": "string",
+            "description": "Supporting text encouraging users to reach out",
+            "maxLength": 200,
+            "example": "Have a question or want to work together? Drop us a message and we'll get back to you within 24 hours."
+          },
+          "namePlaceholder": {
+            "type": "string",
+            "description": "Placeholder for the name field",
+            "maxLength": 30,
+            "example": "Your name"
+          },
+          "emailPlaceholder": {
+            "type": "string",
+            "description": "Placeholder for the email field",
+            "maxLength": 30,
+            "example": "Your email"
+          },
+          "subjectPlaceholder": {
+            "type": "string",
+            "description": "Placeholder for the subject field",
+            "maxLength": 40,
+            "example": "Subject"
+          },
+          "messagePlaceholder": {
+            "type": "string",
+            "description": "Placeholder for the message textarea",
+            "maxLength": 40,
+            "example": "Your message"
+          },
+          "buttonText": {
+            "type": "string",
+            "description": "Submit button label",
+            "maxLength": 20,
+            "example": "Send Message"
+          },
+          "successMessage": {
+            "type": "string",
+            "description": "Message shown after successful submission",
+            "maxLength": 100,
+            "example": "Thank you! We'll get back to you soon."
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "cta-banner",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Full-width call-to-action banner with headline, description, and prominent button for conversion",
+      "category": "cta",
+      "tags": [
+        "cta",
+        "banner",
+        "conversion",
+        "full-width"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "gradient",
+        "dark"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "cta-banner.astro",
+          "destination": "src/components/sections/cta-banner.astro"
+        },
+        {
+          "source": "cta-banner.css",
+          "destination": "src/styles/sections/cta-banner.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use between content sections or near the bottom of a page to drive a specific action. Best for trial signups, newsletter subscriptions, demo requests, or any page that needs a prominent conversion point.",
+        "whenNotToUse": "Don't use at the very top of a page (use a hero instead). Avoid stacking multiple CTA banners — one per page is ideal.",
+        "pairsWith": [
+          "hero-gradient",
+          "hero-split",
+          "features-grid",
+          "pricing-table",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Bold headline to grab attention",
+            "maxLength": 60,
+            "example": "Ready to Get Started?"
+          },
+          "description": {
+            "type": "string",
+            "description": "Supporting text that reinforces the value proposition",
+            "maxLength": 200,
+            "example": "Join thousands of teams who ship faster with our platform."
+          },
+          "ctaText": {
+            "type": "string",
+            "description": "Call-to-action button label",
+            "maxLength": 30,
+            "example": "Start Free Trial"
+          },
+          "ctaHref": {
+            "type": "string",
+            "description": "CTA button URL",
+            "example": "#signup"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "cta-newsletter",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Newsletter signup section with email input, headline, and description for building mailing lists",
+      "category": "cta",
+      "tags": [
+        "cta",
+        "newsletter",
+        "email",
+        "signup",
+        "mailing-list"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "inline",
+        "centered"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "cta-newsletter.astro",
+          "destination": "src/components/sections/cta-newsletter.astro"
+        },
+        {
+          "source": "cta-newsletter.css",
+          "destination": "src/styles/sections/cta-newsletter.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when the page needs a newsletter or email capture section. Great for blogs, product landing pages, and content sites where building an email list is a priority.",
+        "whenNotToUse": "Don't use when the primary conversion goal is a product signup or purchase — use cta-banner instead. Avoid on pages that already have a prominent embed form.",
+        "pairsWith": [
+          "hero-gradient",
+          "features-grid",
+          "footer-minimal",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline to motivate signups",
+            "maxLength": 60,
+            "example": "Stay in the Loop"
+          },
+          "description": {
+            "type": "string",
+            "description": "Supporting text explaining what subscribers get",
+            "maxLength": 200,
+            "example": "Get the latest updates, tips, and resources delivered to your inbox weekly."
+          },
+          "placeholder": {
+            "type": "string",
+            "description": "Placeholder text for the email input",
+            "maxLength": 40,
+            "example": "Enter your email"
+          },
+          "buttonText": {
+            "type": "string",
+            "description": "Submit button label",
+            "maxLength": 20,
+            "example": "Subscribe"
+          },
+          "privacyText": {
+            "type": "string",
+            "description": "Privacy notice below the form",
+            "maxLength": 100,
+            "example": "No spam. Unsubscribe anytime."
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
       "name": "db-d1",
       "version": "1.0.0",
       "type": "integration",
@@ -136,6 +665,311 @@
           "auth-better-auth"
         ],
         "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "docs-collection",
+      "version": "1.0.0",
+      "type": "feature",
+      "description": "Documentation feature with MDX processing and a generated sidebar navigation.",
+      "category": "docs",
+      "tags": [
+        "docs",
+        "mdx",
+        "content",
+        "navigation"
+      ],
+      "dependencies": {
+        "@astrojs/mdx": "^3.1.9"
+      },
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "schema.ts",
+          "destination": "src/content/docs-schema.ts"
+        },
+        {
+          "source": "pages/[...slug].astro",
+          "destination": "src/pages/docs/[...slug].astro"
+        }
+      ],
+      "collections": [
+        {
+          "name": "docs",
+          "type": "content",
+          "schemaSource": "./docs-schema.ts"
+        }
+      ],
+      "ai": {
+        "whenToUse": "User wants a documentation site powered by Markdown or MDX files with sidebar navigation.",
+        "whenNotToUse": "User wants a blog or headless CMS.",
+        "pairsWith": [
+          "header-sticky"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "email-resend",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "Email sending integration using Resend.",
+      "category": "email",
+      "tags": [
+        "email",
+        "resend",
+        "transactional"
+      ],
+      "dependencies": {
+        "resend": "^3.2.0"
+      },
+      "requires": [],
+      "conflicts": [],
+      "requiredMode": "hybrid",
+      "envVars": [
+        {
+          "name": "RESEND_API_KEY",
+          "description": "Your Resend API key",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "resend.ts",
+          "destination": "src/lib/resend.ts"
+        }
+      ],
+      "ai": {
+        "whenToUse": "When the project requires sending transactional emails, such as magic links, receipts, or notifications.",
+        "whenNotToUse": "For purely static sites with no backend, or when using a different email provider.",
+        "pairsWith": [
+          "auth-better-auth",
+          "contact-form"
+        ],
+        "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "faq-accordion",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Expandable FAQ accordion with questions and answers using native HTML details/summary elements",
+      "category": "faq",
+      "tags": [
+        "faq",
+        "accordion",
+        "questions",
+        "support",
+        "expandable"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "bordered",
+        "minimal"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "faq-accordion.astro",
+          "destination": "src/components/sections/faq-accordion.astro"
+        },
+        {
+          "source": "faq-accordion.css",
+          "destination": "src/styles/sections/faq-accordion.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use on pages that need an FAQ section — landing pages, pricing pages, product pages, or dedicated support pages. Best when you have 4-12 common questions to address.",
+        "whenNotToUse": "Don't use for long-form documentation or knowledge bases. Avoid when answers are very short (a simple list would work better).",
+        "pairsWith": [
+          "pricing-table",
+          "pricing-comparison",
+          "cta-banner",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline",
+            "maxLength": 60,
+            "example": "Frequently Asked Questions"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting text below the headline",
+            "maxLength": 200,
+            "example": "Everything you need to know to get started."
+          },
+          "items": {
+            "type": "array",
+            "description": "Array of question/answer pairs",
+            "example": [
+              {
+                "question": "How do I get started?",
+                "answer": "Install the CLI with npm, run the init command, and our AI will guide you through setup in under 2 minutes."
+              },
+              {
+                "question": "Can I use my own components?",
+                "answer": "Absolutely. Blocks are standard Astro components. You can customize them or create your own from scratch."
+              },
+              {
+                "question": "Is there a free tier?",
+                "answer": "Yes! The CLI and all blocks are free and open source. We offer paid plans for premium AI features and priority support."
+              },
+              {
+                "question": "What deployment targets are supported?",
+                "answer": "We support Cloudflare Workers, Pages, and Vercel out of the box. Custom adapters can be added for other platforms."
+              },
+              {
+                "question": "How does i18n work?",
+                "answer": "Content is organized by locale in content collections. Add a locale and the AI generates culturally appropriate content automatically."
+              }
+            ],
+            "items": {
+              "question": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string"
+              }
+            },
+            "minItems": 3,
+            "maxItems": 12
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "features-bento",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Bento grid layout showcasing features in asymmetric, visually interesting cards of varying sizes",
+      "category": "features",
+      "tags": [
+        "features",
+        "bento",
+        "grid",
+        "showcase",
+        "modern"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "compact",
+        "wide"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "features-bento.astro",
+          "destination": "src/components/sections/features-bento.astro"
+        },
+        {
+          "source": "features-bento.css",
+          "destination": "src/styles/sections/features-bento.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when you want a modern, magazine-style feature showcase with asymmetric card sizes. Great for SaaS products, creative agencies, and tech companies that want visual variety over uniform grids.",
+        "whenNotToUse": "Don't use when features need equal visual weight or when you have fewer than 4 features. Avoid for documentation or content-heavy pages where a simple list is more appropriate.",
+        "pairsWith": [
+          "hero-gradient",
+          "hero-split",
+          "cta-banner",
+          "pricing-table"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline above the bento grid",
+            "maxLength": 60,
+            "example": "Everything You Need, Nothing You Don't"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting text below the headline",
+            "maxLength": 200,
+            "example": "Powerful features designed to help you build faster and ship with confidence."
+          },
+          "items": {
+            "type": "array",
+            "description": "Array of feature items for the bento grid",
+            "example": [
+              {
+                "icon": "⚡",
+                "title": "Lightning Fast",
+                "description": "Zero JavaScript by default. Your site loads instantly on any device.",
+                "size": "large"
+              },
+              {
+                "icon": "🧩",
+                "title": "Modular Blocks",
+                "description": "Compose from pre-built, tested blocks.",
+                "size": "small"
+              },
+              {
+                "icon": "🎨",
+                "title": "Beautiful Themes",
+                "description": "Curated palettes that look stunning.",
+                "size": "small"
+              },
+              {
+                "icon": "🌍",
+                "title": "Global Ready",
+                "description": "Built-in i18n with locale-based content collections.",
+                "size": "medium"
+              },
+              {
+                "icon": "☁️",
+                "title": "Edge First",
+                "description": "Deploy to Cloudflare Workers for global edge performance.",
+                "size": "medium"
+              },
+              {
+                "icon": "🤖",
+                "title": "AI Powered",
+                "description": "Smart scaffolding that understands your project.",
+                "size": "large"
+              }
+            ],
+            "items": {
+              "icon": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "size": {
+                "type": "string"
+              }
+            },
+            "minItems": 4,
+            "maxItems": 8
+          }
+        }
       }
     },
     {
@@ -305,6 +1139,334 @@
     },
     {
       "schemaVersion": 1,
+      "name": "footer-rich",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Multi-column footer with navigation links, social icons, newsletter signup, and legal text",
+      "category": "footer",
+      "tags": [
+        "footer",
+        "navigation",
+        "social",
+        "newsletter",
+        "legal"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "dark",
+        "centered"
+      ],
+      "slots": [
+        "newsletter-form"
+      ],
+      "files": [
+        {
+          "source": "footer-rich.astro",
+          "destination": "src/components/sections/footer-rich.astro"
+        },
+        {
+          "source": "footer-rich.css",
+          "destination": "src/styles/sections/footer-rich.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use as the primary footer on marketing sites, SaaS pages, and agency sites that need organized navigation, social links, and legal information. Best when there are multiple page categories to link to.",
+        "whenNotToUse": "Don't use on single-page apps or minimal landing pages where footer-minimal is more appropriate. Avoid for documentation sites that use sidebar navigation.",
+        "pairsWith": [
+          "hero-gradient",
+          "hero-split",
+          "pricing-table",
+          "cta-banner"
+        ],
+        "contentSlots": {
+          "brandName": {
+            "type": "string",
+            "description": "Company or brand name in the footer",
+            "maxLength": 40,
+            "example": "Fornix"
+          },
+          "brandDescription": {
+            "type": "string",
+            "description": "Short brand description or tagline",
+            "maxLength": 200,
+            "example": "The CLI-first Astro framework for building modern websites."
+          },
+          "columns": {
+            "type": "array",
+            "description": "Array of link column objects for footer navigation",
+            "example": [
+              {
+                "title": "Product",
+                "links": [
+                  {
+                    "label": "Features",
+                    "href": "#features"
+                  },
+                  {
+                    "label": "Pricing",
+                    "href": "#pricing"
+                  },
+                  {
+                    "label": "Changelog",
+                    "href": "#changelog"
+                  }
+                ]
+              },
+              {
+                "title": "Company",
+                "links": [
+                  {
+                    "label": "About",
+                    "href": "#about"
+                  },
+                  {
+                    "label": "Blog",
+                    "href": "#blog"
+                  },
+                  {
+                    "label": "Careers",
+                    "href": "#careers"
+                  }
+                ]
+              },
+              {
+                "title": "Legal",
+                "links": [
+                  {
+                    "label": "Privacy",
+                    "href": "#privacy"
+                  },
+                  {
+                    "label": "Terms",
+                    "href": "#terms"
+                  }
+                ]
+              }
+            ],
+            "items": {
+              "title": {
+                "type": "string"
+              },
+              "links": {
+                "type": "array"
+              }
+            },
+            "minItems": 2,
+            "maxItems": 4
+          },
+          "copyright": {
+            "type": "string",
+            "description": "Copyright notice text",
+            "maxLength": 100,
+            "example": "© 2026 Fornix. All rights reserved."
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "header-sticky",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Sticky navigation header that remains fixed at the top on scroll with logo, nav links, and CTA",
+      "category": "header",
+      "tags": [
+        "header",
+        "navigation",
+        "sticky",
+        "fixed",
+        "nav"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [
+        "header-transparent"
+      ],
+      "envVars": [],
+      "variants": [
+        "default",
+        "compact",
+        "with-search"
+      ],
+      "slots": [
+        "logo",
+        "actions"
+      ],
+      "files": [
+        {
+          "source": "header-sticky.astro",
+          "destination": "src/components/sections/header-sticky.astro"
+        },
+        {
+          "source": "header-sticky.css",
+          "destination": "src/styles/sections/header-sticky.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use as the primary navigation header on marketing sites, SaaS applications, and any multi-page site that benefits from persistent navigation. Best when users need to access navigation at all times.",
+        "whenNotToUse": "Don't use on landing pages where a transparent header would be more visually impactful. Avoid on simple single-page sites without real navigation needs.",
+        "pairsWith": [
+          "hero-split",
+          "features-grid",
+          "pricing-table",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "brandName": {
+            "type": "string",
+            "description": "Brand or site name displayed in the header",
+            "maxLength": 30,
+            "example": "Fornix"
+          },
+          "navLinks": {
+            "type": "array",
+            "description": "Array of navigation link objects",
+            "example": [
+              {
+                "label": "Features",
+                "href": "#features"
+              },
+              {
+                "label": "Pricing",
+                "href": "#pricing"
+              },
+              {
+                "label": "Blog",
+                "href": "/blog"
+              },
+              {
+                "label": "Docs",
+                "href": "/docs"
+              }
+            ],
+            "items": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              }
+            },
+            "minItems": 2,
+            "maxItems": 8
+          },
+          "ctaText": {
+            "type": "string",
+            "description": "CTA button text in the header",
+            "maxLength": 20,
+            "example": "Get Started"
+          },
+          "ctaHref": {
+            "type": "string",
+            "description": "CTA button URL",
+            "example": "#signup"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "header-transparent",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Transparent overlay header that blends with hero sections, with logo, nav links, and CTA",
+      "category": "header",
+      "tags": [
+        "header",
+        "navigation",
+        "transparent",
+        "overlay",
+        "hero"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [
+        "header-sticky"
+      ],
+      "envVars": [],
+      "variants": [
+        "default",
+        "light-text",
+        "dark-text"
+      ],
+      "slots": [
+        "logo",
+        "actions"
+      ],
+      "files": [
+        {
+          "source": "header-transparent.astro",
+          "destination": "src/components/sections/header-transparent.astro"
+        },
+        {
+          "source": "header-transparent.css",
+          "destination": "src/styles/sections/header-transparent.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when the hero section has a strong visual (background image, video, or gradient) and you want the navigation to overlay it seamlessly. Perfect for creative agencies, portfolios, and brand-focused landing pages.",
+        "whenNotToUse": "Don't use on content-heavy sites where navigation needs clear visual separation. Avoid when the page background is white/light — text may not be readable.",
+        "pairsWith": [
+          "hero-gradient",
+          "hero-video",
+          "cta-banner",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "brandName": {
+            "type": "string",
+            "description": "Brand or site name displayed in the header",
+            "maxLength": 30,
+            "example": "Fornix"
+          },
+          "navLinks": {
+            "type": "array",
+            "description": "Array of navigation link objects",
+            "example": [
+              {
+                "label": "Work",
+                "href": "#work"
+              },
+              {
+                "label": "About",
+                "href": "#about"
+              },
+              {
+                "label": "Contact",
+                "href": "#contact"
+              }
+            ],
+            "items": {
+              "label": {
+                "type": "string"
+              },
+              "href": {
+                "type": "string"
+              }
+            },
+            "minItems": 2,
+            "maxItems": 8
+          },
+          "ctaText": {
+            "type": "string",
+            "description": "CTA button text",
+            "maxLength": 20,
+            "example": "Hire Us"
+          },
+          "ctaHref": {
+            "type": "string",
+            "description": "CTA button URL",
+            "example": "#contact"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
       "name": "hero-gradient",
       "version": "1.0.0",
       "type": "section",
@@ -318,7 +1480,9 @@
       ],
       "dependencies": {},
       "requires": [],
-      "conflicts": [],
+      "conflicts": [
+        "hero-video"
+      ],
       "envVars": [],
       "variants": [
         "default",
@@ -376,6 +1540,943 @@
             "description": "Optional small badge text above the headline (e.g. 'New', 'Beta')",
             "maxLength": 30,
             "example": "Now in Beta"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "hero-split",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Split-layout hero with text on one side and image/media on the other, ideal for product showcases",
+      "category": "hero",
+      "tags": [
+        "hero",
+        "landing",
+        "split",
+        "above-fold",
+        "product"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "reversed",
+        "centered"
+      ],
+      "slots": [
+        "media",
+        "badge"
+      ],
+      "files": [
+        {
+          "source": "hero-split.astro",
+          "destination": "src/components/sections/hero-split.astro"
+        },
+        {
+          "source": "hero-split.css",
+          "destination": "src/styles/sections/hero-split.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use for landing pages and product pages where you want a side-by-side layout with text and an image or illustration. Great for SaaS, agency, and portfolio sites that need to show a product screenshot or visual alongside the value proposition.",
+        "whenNotToUse": "Don't use when the hero needs a full-width background image or gradient. Avoid on mobile-first content sites where a stacked layout is better handled by hero-gradient.",
+        "pairsWith": [
+          "features-grid",
+          "cta-banner",
+          "pricing-table",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Primary headline displayed on the text side",
+            "maxLength": 80,
+            "example": "Ship Products That People Love"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting paragraph below the headline",
+            "maxLength": 250,
+            "example": "Build, launch, and scale your product with the tools that modern teams trust."
+          },
+          "ctaText": {
+            "type": "string",
+            "description": "Primary call-to-action button label",
+            "maxLength": 30,
+            "example": "Start Free Trial"
+          },
+          "ctaHref": {
+            "type": "string",
+            "description": "Primary CTA button URL",
+            "example": "#signup"
+          },
+          "secondaryCtaText": {
+            "type": "string",
+            "description": "Optional secondary CTA label",
+            "maxLength": 30,
+            "example": "Watch Demo"
+          },
+          "secondaryCtaHref": {
+            "type": "string",
+            "description": "Secondary CTA URL",
+            "example": "#demo"
+          },
+          "imageAlt": {
+            "type": "string",
+            "description": "Alt text for the hero image",
+            "maxLength": 120,
+            "example": "Product dashboard screenshot"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "hero-video",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Hero section with background video, overlay text, and call-to-action for immersive landing pages",
+      "category": "hero",
+      "tags": [
+        "hero",
+        "landing",
+        "video",
+        "above-fold",
+        "immersive"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "muted",
+        "autoplay"
+      ],
+      "slots": [
+        "video-fallback"
+      ],
+      "files": [
+        {
+          "source": "hero-video.astro",
+          "destination": "src/components/sections/hero-video.astro"
+        },
+        {
+          "source": "hero-video.css",
+          "destination": "src/styles/sections/hero-video.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use for immersive landing pages where a background video creates atmosphere and engagement. Best for creative agencies, product launches, event pages, and brand-heavy sites that need visual impact.",
+        "whenNotToUse": "Don't use for content-heavy pages, blogs, documentation, or sites where page load performance is critical. Avoid when users are likely on slow connections.",
+        "pairsWith": [
+          "cta-banner",
+          "features-grid",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Primary headline overlaid on the video",
+            "maxLength": 60,
+            "example": "Experience the Future"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting text below the headline",
+            "maxLength": 200,
+            "example": "Immersive experiences that captivate and convert."
+          },
+          "ctaText": {
+            "type": "string",
+            "description": "Call-to-action button label",
+            "maxLength": 30,
+            "example": "Get Started"
+          },
+          "ctaHref": {
+            "type": "string",
+            "description": "CTA button URL",
+            "example": "#start"
+          },
+          "videoUrl": {
+            "type": "string",
+            "description": "URL or path to the background video file",
+            "example": "/videos/hero-bg.mp4"
+          },
+          "posterUrl": {
+            "type": "string",
+            "description": "Poster image shown before video loads",
+            "example": "/images/hero-poster.jpg"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "layout-dashboard",
+      "version": "1.0.0",
+      "type": "layout",
+      "description": "A protected dashboard layout shell requiring authentication, with sidebar navigation and a user profile dropdown.",
+      "category": "dashboard",
+      "tags": [
+        "layout",
+        "dashboard",
+        "app",
+        "auth"
+      ],
+      "dependencies": {},
+      "requires": [
+        "auth-better-auth"
+      ],
+      "conflicts": [],
+      "requiredMode": "server",
+      "envVars": [],
+      "variants": [
+        "default"
+      ],
+      "slots": [
+        "main"
+      ],
+      "files": [
+        {
+          "source": "layout-dashboard.astro",
+          "destination": "src/layouts/layout-dashboard.astro"
+        },
+        {
+          "source": "default-content.json",
+          "destination": "src/content/layouts/layout-dashboard.json"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Inside SaaS web apps or protected routes where the user must be logged in.",
+        "whenNotToUse": "For public marketing pages or documentation.",
+        "pairsWith": [
+          "auth-better-auth"
+        ],
+        "contentSlots": {
+          "sidebarLinks": {
+            "type": "array",
+            "description": "Navigation links shown in the dashboard sidebar",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "href": {
+                  "type": "string"
+                },
+                "icon": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label",
+                "href"
+              ]
+            },
+            "minItems": 1
+          },
+          "logoutText": {
+            "type": "string",
+            "description": "Text for the logout button"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "layout-docs",
+      "version": "1.0.0",
+      "type": "layout",
+      "description": "A documentation site layout with a left sidebar for navigation and a main content area.",
+      "category": "docs",
+      "tags": [
+        "layout",
+        "docs",
+        "sidebar",
+        "navigation"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default"
+      ],
+      "slots": [
+        "main",
+        "sidebar"
+      ],
+      "files": [
+        {
+          "source": "layout-docs.astro",
+          "destination": "src/layouts/layout-docs.astro"
+        },
+        {
+          "source": "default-content.json",
+          "destination": "src/content/layouts/layout-docs.json"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Inside documentation sites or portals where a persistent sidebar is needed for navigation.",
+        "whenNotToUse": "For public marketing sites or landing pages.",
+        "pairsWith": [
+          "docs-collection"
+        ],
+        "contentSlots": {
+          "headerTitle": {
+            "type": "string",
+            "description": "The title text shown in the top header nav"
+          },
+          "footerText": {
+            "type": "string",
+            "description": "Copyright or small text shown in the bottom footer"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "layout-marketing",
+      "version": "1.0.0",
+      "type": "layout",
+      "description": "A standard marketing site layout shell with header navigation and footer.",
+      "category": "marketing",
+      "tags": [
+        "layout",
+        "marketing",
+        "shell",
+        "navigation"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default"
+      ],
+      "slots": [
+        "main"
+      ],
+      "files": [
+        {
+          "source": "layout-marketing.astro",
+          "destination": "src/layouts/layout-marketing.astro"
+        },
+        {
+          "source": "default-content.json",
+          "destination": "src/content/layouts/layout-marketing.json"
+        }
+      ],
+      "ai": {
+        "whenToUse": "The primary shell for public-facing marketing pages, landing pages, and content sites.",
+        "whenNotToUse": "Inside logged-in app dashboards or technical documentation portals.",
+        "pairsWith": [
+          "hero-gradient",
+          "footer-minimal",
+          "cta-simple"
+        ],
+        "contentSlots": {
+          "headerLinks": {
+            "type": "array",
+            "description": "Navigation links shown in the top header",
+            "items": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "href": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "label",
+                "href"
+              ]
+            },
+            "minItems": 1
+          },
+          "footerText": {
+            "type": "string",
+            "description": "Copyright or small text shown in the bottom footer"
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "payments-stripe",
+      "version": "1.0.0",
+      "type": "integration",
+      "description": "Stripe integration for processing payments and managing subscriptions.",
+      "category": "payments",
+      "tags": [
+        "stripe",
+        "payments",
+        "ecommerce"
+      ],
+      "dependencies": {
+        "stripe": "^14.20.0"
+      },
+      "requires": [],
+      "conflicts": [],
+      "requiredMode": "hybrid",
+      "envVars": [
+        {
+          "name": "STRIPE_SECRET_KEY",
+          "description": "Your Stripe secret API key",
+          "required": true
+        },
+        {
+          "name": "STRIPE_WEBHOOK_SECRET",
+          "description": "Your Stripe webhook signing secret",
+          "required": true
+        },
+        {
+          "name": "PUBLIC_STRIPE_KEY",
+          "description": "Your Stripe public API key",
+          "required": true
+        }
+      ],
+      "variants": [
+        "default"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "stripe.ts",
+          "destination": "src/lib/stripe.ts"
+        }
+      ],
+      "ai": {
+        "whenToUse": "When the project requires processing payments, subscriptions, checkout, or receiving money from users.",
+        "whenNotToUse": "When no monetary transactions handle.",
+        "pairsWith": [
+          "auth-better-auth",
+          "pricing-table"
+        ],
+        "contentSlots": {}
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "pricing-comparison",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Feature comparison table across pricing tiers with checkmarks and detailed feature rows",
+      "category": "pricing",
+      "tags": [
+        "pricing",
+        "comparison",
+        "table",
+        "features",
+        "enterprise"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "compact",
+        "sticky-header"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "pricing-comparison.astro",
+          "destination": "src/components/sections/pricing-comparison.astro"
+        },
+        {
+          "source": "pricing-comparison.css",
+          "destination": "src/styles/sections/pricing-comparison.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when you need a detailed feature-by-feature comparison across plans. Best for enterprise SaaS, complex products, or any page where users need to evaluate multiple options side-by-side.",
+        "whenNotToUse": "Don't use for simple 2-3 plan pricing — use pricing-table instead. Avoid when feature lists are short or plans differ only in limits.",
+        "pairsWith": [
+          "hero-split",
+          "cta-banner",
+          "faq-accordion",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline",
+            "maxLength": 60,
+            "example": "Compare Plans"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting text",
+            "maxLength": 200,
+            "example": "See which plan is right for your team."
+          },
+          "plans": {
+            "type": "array",
+            "description": "Array of plan column headers",
+            "example": [
+              {
+                "name": "Starter",
+                "price": "$9/mo",
+                "ctaText": "Get Started",
+                "ctaHref": "#starter",
+                "highlighted": false
+              },
+              {
+                "name": "Pro",
+                "price": "$29/mo",
+                "ctaText": "Start Trial",
+                "ctaHref": "#pro",
+                "highlighted": true
+              },
+              {
+                "name": "Enterprise",
+                "price": "Custom",
+                "ctaText": "Contact Us",
+                "ctaHref": "#enterprise",
+                "highlighted": false
+              }
+            ],
+            "items": {
+              "name": {
+                "type": "string"
+              },
+              "price": {
+                "type": "string"
+              },
+              "ctaText": {
+                "type": "string"
+              },
+              "ctaHref": {
+                "type": "string"
+              },
+              "highlighted": {
+                "type": "boolean"
+              }
+            },
+            "minItems": 2,
+            "maxItems": 4
+          },
+          "features": {
+            "type": "array",
+            "description": "Array of feature rows with availability per plan",
+            "example": [
+              {
+                "name": "Projects",
+                "values": [
+                  "3",
+                  "Unlimited",
+                  "Unlimited"
+                ]
+              },
+              {
+                "name": "Team Members",
+                "values": [
+                  "1",
+                  "10",
+                  "Unlimited"
+                ]
+              },
+              {
+                "name": "Analytics",
+                "values": [
+                  "Basic",
+                  "Advanced",
+                  "Custom"
+                ]
+              },
+              {
+                "name": "API Access",
+                "values": [
+                  "✗",
+                  "✓",
+                  "✓"
+                ]
+              },
+              {
+                "name": "SSO",
+                "values": [
+                  "✗",
+                  "✗",
+                  "✓"
+                ]
+              },
+              {
+                "name": "SLA",
+                "values": [
+                  "✗",
+                  "✗",
+                  "99.9%"
+                ]
+              }
+            ],
+            "items": {
+              "name": {
+                "type": "string"
+              },
+              "values": {
+                "type": "array"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "pricing-table",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Responsive pricing cards with tiered plans, feature lists, and CTA buttons for SaaS and product pages",
+      "category": "pricing",
+      "tags": [
+        "pricing",
+        "plans",
+        "saas",
+        "cards",
+        "conversion"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "highlighted",
+        "horizontal"
+      ],
+      "slots": [
+        "custom-badge"
+      ],
+      "files": [
+        {
+          "source": "pricing-table.astro",
+          "destination": "src/components/sections/pricing-table.astro"
+        },
+        {
+          "source": "pricing-table.css",
+          "destination": "src/styles/sections/pricing-table.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use on SaaS landing pages, product pages, or any site that needs to display pricing tiers. Best when there are 2-4 distinct plans with clear feature differentiation.",
+        "whenNotToUse": "Don't use for single-price products, free-only tools, or pages where pricing is negotiated. Avoid on portfolio or blog sites.",
+        "pairsWith": [
+          "hero-gradient",
+          "hero-split",
+          "cta-banner",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline above the pricing cards",
+            "maxLength": 60,
+            "example": "Simple, Transparent Pricing"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting text below the headline",
+            "maxLength": 200,
+            "example": "Choose the plan that fits your needs. Upgrade or downgrade anytime."
+          },
+          "plans": {
+            "type": "array",
+            "description": "Array of pricing plan objects",
+            "example": [
+              {
+                "name": "Free",
+                "price": "$0",
+                "period": "/month",
+                "description": "For individuals getting started",
+                "features": [
+                  "1 project",
+                  "Basic analytics",
+                  "Community support"
+                ],
+                "ctaText": "Get Started",
+                "ctaHref": "#signup",
+                "highlighted": false
+              },
+              {
+                "name": "Pro",
+                "price": "$29",
+                "period": "/month",
+                "description": "For growing teams",
+                "features": [
+                  "Unlimited projects",
+                  "Advanced analytics",
+                  "Priority support",
+                  "Custom domain"
+                ],
+                "ctaText": "Start Free Trial",
+                "ctaHref": "#trial",
+                "highlighted": true
+              },
+              {
+                "name": "Enterprise",
+                "price": "Custom",
+                "period": "",
+                "description": "For large organizations",
+                "features": [
+                  "Everything in Pro",
+                  "SSO",
+                  "Dedicated support",
+                  "SLA",
+                  "Custom integrations"
+                ],
+                "ctaText": "Contact Sales",
+                "ctaHref": "#contact",
+                "highlighted": false
+              }
+            ],
+            "items": {
+              "name": {
+                "type": "string"
+              },
+              "price": {
+                "type": "string"
+              },
+              "period": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "features": {
+                "type": "array"
+              },
+              "ctaText": {
+                "type": "string"
+              },
+              "ctaHref": {
+                "type": "string"
+              },
+              "highlighted": {
+                "type": "boolean"
+              }
+            },
+            "minItems": 2,
+            "maxItems": 4
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "testimonials-carousel",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Auto-scrolling testimonial carousel with avatar, quote, name, and role for social proof",
+      "category": "testimonials",
+      "tags": [
+        "testimonials",
+        "carousel",
+        "social-proof",
+        "reviews",
+        "slider"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "large-quote",
+        "minimal"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "testimonials-carousel.astro",
+          "destination": "src/components/sections/testimonials-carousel.astro"
+        },
+        {
+          "source": "testimonials-carousel.css",
+          "destination": "src/styles/sections/testimonials-carousel.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when you want to display customer testimonials one at a time in a scrolling carousel. Perfect for landing pages, product pages, and SaaS sites that need social proof prominently displayed.",
+        "whenNotToUse": "Don't use when you have fewer than 3 testimonials. Avoid when all testimonials need to be visible at once — use testimonials-wall instead.",
+        "pairsWith": [
+          "hero-gradient",
+          "pricing-table",
+          "cta-banner",
+          "features-grid"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline",
+            "maxLength": 60,
+            "example": "What Our Customers Say"
+          },
+          "testimonials": {
+            "type": "array",
+            "description": "Array of testimonial objects",
+            "example": [
+              {
+                "quote": "This tool completely changed how we build websites. Shipping is 10x faster now.",
+                "name": "Sarah Chen",
+                "role": "CTO at TechCorp",
+                "avatar": "/avatars/sarah.jpg"
+              },
+              {
+                "quote": "The block system is genius. We compose entire pages in minutes.",
+                "name": "Marcus Rivera",
+                "role": "Lead Developer at StartupXYZ",
+                "avatar": "/avatars/marcus.jpg"
+              },
+              {
+                "quote": "Best developer experience I've had in years. The AI suggestions are spot-on.",
+                "name": "Aisha Patel",
+                "role": "Freelance Developer",
+                "avatar": "/avatars/aisha.jpg"
+              }
+            ],
+            "items": {
+              "quote": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "avatar": {
+                "type": "string"
+              }
+            },
+            "minItems": 3,
+            "maxItems": 12
+          }
+        }
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "name": "testimonials-wall",
+      "version": "1.0.0",
+      "type": "section",
+      "description": "Masonry-style wall of testimonials showing all quotes at once for maximum social proof impact",
+      "category": "testimonials",
+      "tags": [
+        "testimonials",
+        "masonry",
+        "social-proof",
+        "wall",
+        "grid"
+      ],
+      "dependencies": {},
+      "requires": [],
+      "conflicts": [],
+      "envVars": [],
+      "variants": [
+        "default",
+        "two-column",
+        "three-column"
+      ],
+      "slots": [],
+      "files": [
+        {
+          "source": "testimonials-wall.astro",
+          "destination": "src/components/sections/testimonials-wall.astro"
+        },
+        {
+          "source": "testimonials-wall.css",
+          "destination": "src/styles/sections/testimonials-wall.css"
+        }
+      ],
+      "ai": {
+        "whenToUse": "Use when you want all testimonials visible at once in a masonry grid. Great for dedicated testimonial pages, or sections where quantity of social proof matters. Works best with 6+ testimonials of varying length.",
+        "whenNotToUse": "Don't use with fewer than 4 testimonials. Avoid when you need one prominent testimonial — use testimonials-carousel instead.",
+        "pairsWith": [
+          "hero-gradient",
+          "cta-banner",
+          "pricing-table",
+          "footer-rich"
+        ],
+        "contentSlots": {
+          "headline": {
+            "type": "string",
+            "description": "Section headline",
+            "maxLength": 60,
+            "example": "Loved by Teams Worldwide"
+          },
+          "subheadline": {
+            "type": "string",
+            "description": "Supporting text",
+            "maxLength": 200,
+            "example": "See why thousands of developers choose our platform."
+          },
+          "testimonials": {
+            "type": "array",
+            "description": "Array of testimonial objects",
+            "example": [
+              {
+                "quote": "Incredible DX. We migrated our entire marketing site in a weekend.",
+                "name": "James Wilson",
+                "role": "Engineering Manager",
+                "avatar": ""
+              },
+              {
+                "quote": "The AI-first approach saves hours of setup time.",
+                "name": "Lily Zhang",
+                "role": "Founder at Launchpad",
+                "avatar": ""
+              },
+              {
+                "quote": "Finally a framework that gets content management right.",
+                "name": "Omar Hassan",
+                "role": "Content Lead",
+                "avatar": ""
+              },
+              {
+                "quote": "Block composition is the future. This nails it.",
+                "name": "Eva Kowalski",
+                "role": "Senior Developer",
+                "avatar": ""
+              },
+              {
+                "quote": "We shipped 3 client projects in one month using this.",
+                "name": "David Park",
+                "role": "Agency Owner",
+                "avatar": ""
+              },
+              {
+                "quote": "Clean code, great patterns, easy to customize.",
+                "name": "Nina Sharma",
+                "role": "Full-Stack Developer",
+                "avatar": ""
+              }
+            ],
+            "items": {
+              "quote": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string"
+              },
+              "avatar": {
+                "type": "string"
+              }
+            },
+            "minItems": 4,
+            "maxItems": 20
           }
         }
       }

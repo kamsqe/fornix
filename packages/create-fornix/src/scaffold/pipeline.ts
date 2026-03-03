@@ -57,19 +57,22 @@ export function scaffold(
   const selectedBlockNames = config.blocks.map((block) => block.name);
   const dependencyResult = resolveDependencies(selectedBlockNames, manifests);
   if (!isOk(dependencyResult)) {
-    return err(new Error(`Dependency resolution failed: ${dependencyResult.error.message}`));
+    return err(Object.assign(new Error(dependencyResult.error.message), dependencyResult.error));
   }
   const resolvedBlockNames = dependencyResult.value;
 
   // 3. Generate base structure
   const files: FileMap = {};
-  const structureFiles = generateStructure(config);
-  Object.assign(files, structureFiles);
 
   // 4. Resolve block manifests
   const resolvedManifests = resolvedBlockNames
     .filter((name) => manifests[name] !== undefined)
     .map((name) => manifests[name]);
+
+  const structureFiles = generateStructure(config, resolvedManifests);
+  Object.assign(files, structureFiles);
+
+
 
   // 5. Generate astro.config.mjs
   const astroConfigResult = generateAstroConfig(config, resolvedManifests);

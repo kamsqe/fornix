@@ -44,7 +44,7 @@ describe("create (flag-driven)", { timeout: 60_000 }, () => {
     const projectDir = join(base, "tmp-test");
 
     const output = runCLI(
-      `${projectDir} --render static --deploy cloudflare --blocks hero-gradient --yes`
+      `${projectDir} --render static --deploy cloudflare --blocks hero-gradient --yes --no-install --no-git`
     );
 
     expect(output).toContain("Project created successfully");
@@ -70,7 +70,7 @@ describe("create (flag-driven)", { timeout: 60_000 }, () => {
     const projectDir = join(base, "i18n-project");
 
     runCLI(
-      `${projectDir} --render static --deploy static --locales en,es --yes`
+      `${projectDir} --render static --deploy static --locales en,es --yes --no-install --no-git`
     );
 
     // i18n utils file
@@ -89,7 +89,7 @@ describe("create (flag-driven)", { timeout: 60_000 }, () => {
     const projectDir = join(base, "palette-project");
 
     runCLI(
-      `${projectDir} --render static --deploy static --palette midnight --yes`
+      `${projectDir} --render static --deploy static --palette midnight --yes --no-install --no-git`
     );
 
     // Palette CSS created
@@ -108,7 +108,7 @@ describe("create (flag-driven)", { timeout: 60_000 }, () => {
     const projectDir = join(base, "theme-project");
 
     runCLI(
-      `${projectDir} --render static --deploy static --palette midnight --theme-switcher --yes`
+      `${projectDir} --render static --deploy static --palette midnight --theme-switcher --yes --no-install --no-git`
     );
 
     // Current palette
@@ -126,7 +126,7 @@ describe("create (flag-driven)", { timeout: 60_000 }, () => {
     const projectDir = join(base, "check-files");
 
     runCLI(
-      `${projectDir} --render static --deploy static --yes`
+      `${projectDir} --render static --deploy static --yes --no-install --no-git`
     );
 
     const requiredFiles = ["package.json", "astro.config.mjs", "fornix.json"];

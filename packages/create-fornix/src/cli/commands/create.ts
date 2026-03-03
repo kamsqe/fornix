@@ -12,6 +12,7 @@ import {
   loadAllPalettes,
 } from "../fixture-registry.js";
 import { runManualFlow } from "../../prompts/manual-flow.js";
+import { runPostScaffold } from "../../scaffold/post-scaffold.js";
 import pc from "picocolors";
 
 // ── Default Palette Colors ──────────────────────────────
@@ -91,6 +92,16 @@ export const createCommand = defineCommand({
       description: "Show what would be generated without writing",
       default: false,
     },
+    install: {
+      type: "boolean",
+      description: "Install dependencies after scaffold (use --no-install to skip)",
+      default: true,
+    },
+    git: {
+      type: "boolean",
+      description: "Initialize git repo (use --no-git to skip)",
+      default: true,
+    },
     provider: {
       type: "string",
       description: "Force a specific AI provider",
@@ -128,7 +139,7 @@ export const createCommand = defineCommand({
       const projectDir = args.dir ? resolve(args.dir) : resolve(config.projectDir);
       const finalConfig = { ...config, projectDir } as ResolvedConfig;
 
-      return runScaffold(finalConfig, allPalettes, args["dry-run"] ?? false, args.verbose ?? false);
+      return runScaffold(finalConfig, allPalettes, args["dry-run"] ?? false, args.verbose ?? false, !(args.install ?? true), !(args.git ?? true));
     }
 
     // ── Flag-driven mode ──
@@ -186,7 +197,7 @@ export const createCommand = defineCommand({
       createdWith: "manual",
     } as ResolvedConfig;
 
-    return runScaffold(config, allPalettes, args["dry-run"] ?? false, args.verbose ?? false);
+    return runScaffold(config, allPalettes, args["dry-run"] ?? false, args.verbose ?? false, !(args.install ?? true), !(args.git ?? true));
   },
 });
 
@@ -197,6 +208,8 @@ function runScaffold(
   allPalettes: ReadonlyArray<import("fornix-registry").Palette>,
   dryRun: boolean,
   verbose: boolean,
+  skipInstall: boolean,
+  skipGit: boolean,
 ): void {
   const input: ScaffoldInput = {
     config,
@@ -241,30 +254,13 @@ function runScaffold(
     }
   }
 
-  // ── Success message ──
-  const projectName = basename(config.projectDir);
-  console.log("");
-  console.log(pc.green(pc.bold("✔ Project created successfully!")));
-  console.log("");
-  console.log(`  ${pc.bold("Project:")}  ${config.projectName}`);
-  console.log(`  ${pc.bold("Dir:")}      ${config.projectDir}`);
-  console.log(`  ${pc.bold("Render:")}   ${config.renderMode}`);
-  console.log(`  ${pc.bold("Deploy:")}   ${config.deployTarget}`);
-  console.log(`  ${pc.bold("CSS:")}      ${config.cssEngine}`);
-  if (config.blocks.length > 0) {
-    console.log(`  ${pc.bold("Blocks:")}   ${result.value.resolvedBlockNames.join(", ")}`);
-  }
-  if (config.locales.length > 1) {
-    console.log(`  ${pc.bold("Locales:")}  ${config.locales.join(", ")} (default: ${config.defaultLocale})`);
-  }
-  if (config.palette.preset) {
-    console.log(`  ${pc.bold("Palette:")}  ${config.palette.preset}`);
-  }
-  console.log(`  ${pc.bold("Files:")}    ${filesWritten} files written`);
-  console.log("");
-  console.log(pc.dim("  Next steps:"));
-  console.log(pc.dim(`    cd ${projectName}`));
-  console.log(pc.dim("    pnpm install"));
-  console.log(pc.dim("    pnpm dev"));
-  console.log("");
+  // ── Post-scaffold hooks: deps, git, CLAUDE.md, success message ──
+  runPostScaffold({
+    config,
+    resolvedBlockNames: result.value.resolvedBlockNames,
+    filesWritten,
+    verbose,
+    skipInstall,
+    skipGit,
+  });
 }

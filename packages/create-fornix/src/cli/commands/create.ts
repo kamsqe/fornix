@@ -2,9 +2,13 @@ import { defineCommand } from "citty";
 import { resolve, basename } from "node:path";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { z } from "zod";
+import * as p from "@clack/prompts";
+import pc from "picocolors";
 import { scaffold, type ScaffoldInput } from "../../scaffold/pipeline.js";
 import { isOk } from "../../utils/result.js";
 import type { ResolvedConfig } from "../../schemas/config.js";
+import type { Palette } from "fornix-registry";
 import {
   FIXTURE_MANIFESTS,
   FIXTURE_BLOCK_SOURCES,
@@ -13,9 +17,13 @@ import {
 } from "../fixture-registry.js";
 import { runManualFlow } from "../../prompts/manual-flow.js";
 import { runPostScaffold } from "../../scaffold/post-scaffold.js";
-import pc from "picocolors";
+import { runAIConversation } from "../../ai/conversation.js";
+import type { BlockRegistry } from "../../ai/prompt-builder.js";
+import type { AIProvider } from "../../ai/provider.js";
+import { resolveProvider, type ProviderName } from "../../ai/resolve-provider.js";
+import type { AIProvider as LegacyAIProvider } from "../../ai/providers/mock-provider.js";
 
-// ── Default Palette Colors ──────────────────────────────
+// ── Constants ───────────────────────────────────────────
 
 const DEFAULT_COLORS = {
   primary: "#6366f1",
@@ -24,6 +32,10 @@ const DEFAULT_COLORS = {
   background: "#0f172a",
   foreground: "#f8fafc",
 };
+
+const DEFAULT_AI_DESCRIPTION = "Build a fintech landing page with user authentication and a modern dark theme";
+
+const VALID_PROVIDER_NAMES: ReadonlyArray<string> = ["openai", "ollama", "cloudflare", "mock"];
 
 // ── Create Command ──────────────────────────────────────
 
@@ -53,6 +65,10 @@ export const createCommand = defineCommand({
       alias: "y",
       description: "Accept defaults, non-interactive",
       default: false,
+    },
+    description: {
+      type: "string",
+      description: "Project description for AI mode (used when --yes skips the prompt)",
     },
     render: {
       type: "string",
@@ -119,8 +135,14 @@ export const createCommand = defineCommand({
   async run({ args }) {
     const allPalettes = loadAllPalettes();
 
-    // ── Manual mode: interactive prompts ──
-    if (args.manual) {
+    // Detect if explicit config flags were provided (for backwards compatibility)
+    const hasExplicitFlags = !!(
+      args.render || args.deploy || args.blocks || args.database ||
+      args.css || args.locales || args.palette
+    );
+
+    // ── Interactive manual prompts (--manual without --yes) ──
+    if (args.manual && !args.yes) {
       const defaultProjectName = args.dir ? basename(resolve(args.dir)) : "my-project";
 
       const config = await runManualFlow({
@@ -130,82 +152,191 @@ export const createCommand = defineCommand({
       });
 
       if (!config) {
-        // User cancelled
         process.exitCode = 0;
         return;
       }
 
-      // Override projectDir if dir arg was provided
       const projectDir = args.dir ? resolve(args.dir) : resolve(config.projectDir);
       const finalConfig = { ...config, projectDir } as ResolvedConfig;
 
       return runScaffold(finalConfig, allPalettes, args["dry-run"] ?? false, args.verbose ?? false, !(args.install ?? true), !(args.git ?? true));
     }
 
-    // ── Flag-driven mode ──
-    const projectDir = resolve(args.dir ?? ".");
-    const projectName = basename(projectDir);
-
-    const renderMode = (args.render ?? "static") as "static" | "hybrid" | "server";
-    const deployTarget = (args.deploy ?? "cloudflare") as "cloudflare" | "vercel" | "netlify" | "static";
-    const database = (args.database ?? "none") as "none" | "d1" | "turso" | "astro-db" | "postgres";
-    const cssEngine = (args.css ?? "tailwind") as "tailwind" | "vanilla";
-    const localesRaw = args.locales ?? "en";
-    const locales = localesRaw.split(",").map((l) => l.trim()).filter(Boolean);
-    const defaultLocale = locales[0] ?? "en";
-    const themeSwitcher = args["theme-switcher"] ?? false;
-
-    // Parse blocks
-    const blockNames = args.blocks
-      ? args.blocks.split(",").map((b) => b.trim()).filter(Boolean)
-      : [];
-    const blocks = blockNames.map((name) => ({ name, variant: "default" }));
-
-    // Resolve palette
-    let paletteColors = { ...DEFAULT_COLORS };
-    let palettePreset: string | undefined;
-
-    if (args.palette) {
-      const found = allPalettes.find((p) => p.name === args.palette);
-      if (found) {
-        paletteColors = { ...found.colors };
-        palettePreset = found.name;
-      } else {
-        console.error(pc.red(`✖ Palette "${args.palette}" not found in registry.`));
-        console.error(pc.dim(`  Available: ${allPalettes.map((p) => p.name).join(", ")}`));
-        process.exitCode = 1;
-        return;
-      }
+    // ── Flag-driven mode (--manual --yes, or explicit config flags) ──
+    if (args.manual || hasExplicitFlags) {
+      return runFlagDrivenMode(args, allPalettes);
     }
 
-    const config: ResolvedConfig = {
-      projectName,
-      projectDir,
-      renderMode,
-      deployTarget,
-      database,
-      cssEngine,
-      packageManager: "pnpm",
-      blocks,
-      locales,
-      defaultLocale,
-      palette: {
-        ...(palettePreset ? { preset: palettePreset } : {}),
-        colors: paletteColors,
-      },
-      themeSwitcher,
-      createdWith: "manual",
-    } as ResolvedConfig;
-
-    return runScaffold(config, allPalettes, args["dry-run"] ?? false, args.verbose ?? false, !(args.install ?? true), !(args.git ?? true));
+    // ── AI mode (default — no --manual, no explicit config flags) ──
+    return runAIMode(args, allPalettes);
   },
 });
+
+// ── AI Mode ─────────────────────────────────────────────
+
+async function runAIMode(
+  args: Record<string, unknown>,
+  allPalettes: ReadonlyArray<Palette>,
+): Promise<void> {
+  // 1. Validate and resolve provider
+  const providerName = parseProviderName(args.provider);
+  if (args.provider && !providerName) {
+    console.error(pc.red(`\u2716 Unknown provider: ${String(args.provider)}`));
+    console.error(pc.dim(`  Available: ${VALID_PROVIDER_NAMES.join(", ")}`));
+    process.exitCode = 1;
+    return;
+  }
+
+  const legacyProvider = await resolveProvider({
+    provider: providerName,
+    skipOllamaDetect: false,
+  });
+
+  if (!legacyProvider) {
+    showNoProviderGuide();
+    process.exitCode = 1;
+    return;
+  }
+
+  // 2. Adapt legacy provider to conversation interface
+  const provider = adaptProvider(legacyProvider);
+
+  // 3. Get project description
+  const description = await getDescription(args);
+  if (!description) {
+    process.exitCode = 0;
+    return;
+  }
+
+  // 4. Build registry
+  const registry: BlockRegistry = {
+    blocks: Object.values(FIXTURE_MANIFESTS),
+    palettes: [...allPalettes],
+  };
+
+  // 5. Determine project directory and name
+  const projectDir = resolve(String(args.dir ?? "."));
+  const projectName = basename(projectDir);
+
+  // 6. Run AI conversation
+  const result = await runAIConversation({
+    provider,
+    registry,
+    description,
+    projectName,
+    projectDir,
+  });
+
+  if (!result.ok) {
+    console.error(pc.red(`\u2716 AI conversation failed: ${result.error.message}`));
+    process.exitCode = 1;
+    return;
+  }
+
+  const config = result.value;
+
+  // 7. Show summary and confirm (skip with --yes)
+  if (!args.yes) {
+    showAISummary(config);
+    const confirmed = await p.confirm({
+      message: "Create this project?",
+      initialValue: true,
+    });
+    if (p.isCancel(confirmed) || !confirmed) {
+      p.cancel("Operation cancelled.");
+      process.exitCode = 0;
+      return;
+    }
+  }
+
+  // 8. Scaffold
+  return runScaffold(
+    config,
+    allPalettes,
+    (args["dry-run"] ?? false) === true,
+    (args.verbose ?? false) === true,
+    !((args.install ?? true) === true),
+    !((args.git ?? true) === true),
+  );
+}
+
+// ── Flag-Driven Mode ────────────────────────────────────
+
+function runFlagDrivenMode(
+  args: Record<string, unknown>,
+  allPalettes: ReadonlyArray<Palette>,
+): void {
+  const projectDir = resolve(String(args.dir ?? "."));
+  const projectName = basename(projectDir);
+
+  const renderMode = (String(args.render ?? "static")) as "static" | "hybrid" | "server";
+  const deployTarget = (String(args.deploy ?? "cloudflare")) as "cloudflare" | "vercel" | "netlify" | "static";
+  const database = (String(args.database ?? "none")) as "none" | "d1" | "turso" | "astro-db" | "postgres";
+  const cssEngine = (String(args.css ?? "tailwind")) as "tailwind" | "vanilla";
+  const localesRaw = String(args.locales ?? "en");
+  const locales = localesRaw.split(",").map((l) => l.trim()).filter(Boolean);
+  const defaultLocale = locales[0] ?? "en";
+  const themeSwitcher = (args["theme-switcher"] ?? false) === true;
+
+  // Parse blocks
+  const blocksString = args.blocks ? String(args.blocks) : "";
+  const blockNames = blocksString
+    ? blocksString.split(",").map((b) => b.trim()).filter(Boolean)
+    : [];
+  const blocks = blockNames.map((name) => ({ name, variant: "default" }));
+
+  // Resolve palette
+  let paletteColors = { ...DEFAULT_COLORS };
+  let palettePreset: string | undefined;
+
+  if (args.palette) {
+    const paletteName = String(args.palette);
+    const found = allPalettes.find((palette) => palette.name === paletteName);
+    if (found) {
+      paletteColors = { ...found.colors };
+      palettePreset = found.name;
+    } else {
+      console.error(pc.red(`\u2716 Palette "${paletteName}" not found in registry.`));
+      console.error(pc.dim(`  Available: ${allPalettes.map((palette) => palette.name).join(", ")}`));
+      process.exitCode = 1;
+      return;
+    }
+  }
+
+  const config: ResolvedConfig = {
+    projectName,
+    projectDir,
+    renderMode,
+    deployTarget,
+    database,
+    cssEngine,
+    packageManager: "pnpm",
+    blocks,
+    locales,
+    defaultLocale,
+    palette: {
+      ...(palettePreset ? { preset: palettePreset } : {}),
+      colors: paletteColors,
+    },
+    themeSwitcher,
+    createdWith: "manual",
+  } as ResolvedConfig;
+
+  return runScaffold(
+    config,
+    allPalettes,
+    (args["dry-run"] ?? false) === true,
+    (args.verbose ?? false) === true,
+    !((args.install ?? true) === true),
+    !((args.git ?? true) === true),
+  );
+}
 
 // ── Shared Scaffold Execution ───────────────────────────
 
 function runScaffold(
   config: ResolvedConfig,
-  allPalettes: ReadonlyArray<import("fornix-registry").Palette>,
+  allPalettes: ReadonlyArray<Palette>,
   dryRun: boolean,
   verbose: boolean,
   skipInstall: boolean,
@@ -222,14 +353,14 @@ function runScaffold(
   const result = scaffold(input);
 
   if (!isOk(result)) {
-    console.error(pc.red(`✖ Scaffold failed: ${result.error.message}`));
+    console.error(pc.red(`\u2716 Scaffold failed: ${result.error.message}`));
     process.exitCode = 1;
     return;
   }
 
   // ── Dry run: show file tree ──
   if (dryRun) {
-    console.log(pc.bold("\n📋 Dry run — files that would be created:\n"));
+    console.log(pc.bold("\n\ud83d\udccb Dry run \u2014 files that would be created:\n"));
     const sortedFiles = Object.keys(result.value.files).sort();
     for (const file of sortedFiles) {
       console.log(pc.dim("  ") + file);
@@ -263,4 +394,104 @@ function runScaffold(
     skipInstall,
     skipGit,
   });
+}
+
+// ── Provider Adapter ────────────────────────────────────
+
+/**
+ * Adapt a legacy provider (with Result-returning generate) to the
+ * conversation module's AIProvider interface (with throwing generate).
+ */
+function adaptProvider(legacy: LegacyAIProvider): AIProvider {
+  return {
+    name: legacy.name,
+    async generate<T extends z.ZodType>(options: {
+      system: string;
+      prompt: string;
+      schema: T;
+      maxTokens?: number;
+    }): Promise<z.infer<T>> {
+      const result = await legacy.generate(options.prompt);
+      if (!result.ok) {
+        throw new Error(result.error.message);
+      }
+      return options.schema.parse(result.value) as z.infer<T>;
+    },
+    async *stream(): AsyncIterable<string> {
+      yield "";
+    },
+  };
+}
+
+// ── Helpers ──────────────────────────────────────────────
+
+function parseProviderName(value: unknown): ProviderName | undefined {
+  if (!value || typeof value !== "string") return undefined;
+  if (VALID_PROVIDER_NAMES.includes(value)) {
+    return value as ProviderName;
+  }
+  return undefined;
+}
+
+async function getDescription(args: Record<string, unknown>): Promise<string | null> {
+  if (args.yes) {
+    return typeof args.description === "string" && args.description.length > 0
+      ? args.description
+      : DEFAULT_AI_DESCRIPTION;
+  }
+
+  p.intro(pc.bgCyan(pc.black(" Fornix \u2014 AI Mode ")));
+
+  const input = await p.text({
+    message: "Describe the website you want to build:",
+    placeholder: "e.g., A fintech landing page with user authentication and a modern dark theme",
+    validate(value) {
+      if (!value.trim()) return "Please describe what you want to build";
+      return undefined;
+    },
+  });
+
+  if (p.isCancel(input)) {
+    p.cancel("Operation cancelled.");
+    return null;
+  }
+
+  return String(input);
+}
+
+function showAISummary(config: ResolvedConfig): void {
+  const lines: string[] = [];
+
+  lines.push(`${pc.bold("Project:")}      ${config.projectName}`);
+  lines.push(`${pc.bold("Render mode:")}  ${config.renderMode}`);
+  lines.push(`${pc.bold("Deploy to:")}    ${config.deployTarget}`);
+  lines.push(`${pc.bold("CSS engine:")}   ${config.cssEngine}`);
+
+  const blockNames = config.blocks.map((b) => b.name);
+  lines.push(`${pc.bold("Blocks:")}       ${blockNames.length > 0 ? blockNames.join(", ") : pc.dim("(none)")}`);
+  lines.push(`${pc.bold("Locales:")}      ${config.locales.join(", ")} (default: ${config.defaultLocale})`);
+
+  if (config.palette.preset) {
+    lines.push(`${pc.bold("Palette:")}      ${config.palette.preset}`);
+  }
+
+  if (config.themeSwitcher) {
+    lines.push(`${pc.bold("Theme switcher:")} ${pc.green("yes")}`);
+  }
+
+  lines.push(`${pc.bold("Created with:")} ${pc.cyan("AI")}`);
+
+  p.note(lines.join("\n"), "AI-Generated Configuration");
+}
+
+function showNoProviderGuide(): void {
+  console.error(pc.red("\n\u2716 No AI provider found.\n"));
+  console.error("To use AI mode, set up one of the following:\n");
+  console.error(pc.bold("  Option 1: OpenAI"));
+  console.error("    export OPENAI_API_KEY=sk-...\n");
+  console.error(pc.bold("  Option 2: Ollama (free, local)"));
+  console.error("    Install from https://ollama.com and run: ollama pull llama3.1\n");
+  console.error(pc.bold("  Option 3: Cloudflare Workers AI"));
+  console.error("    export CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=...\n");
+  console.error(pc.dim("  Or use manual mode: npx create-fornix --manual\n"));
 }

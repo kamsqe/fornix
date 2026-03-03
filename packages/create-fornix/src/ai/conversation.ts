@@ -90,16 +90,19 @@ export async function runAIConversation(
   const mutableConfig = intentToMutableConfig(intent);
   applyRules(intent, mutableConfig);
 
-  // ── Step 4: Add AI-recommended blocks ────────────────
+  // ── Step 4: Filter rules-added blocks to registry ────
+  filterBlocksToRegistry(mutableConfig, registry);
+
+  // ── Step 5: Add AI-recommended blocks ────────────────
   addRecommendedBlocks(intent, mutableConfig, registry);
 
-  // ── Step 5: Palette selection ────────────────────────
+  // ── Step 6: Palette selection ────────────────────────
   const palette = selectPalette(intent, registry);
 
-  // ── Step 6: Content generation ───────────────────────
+  // ── Step 7: Content generation ───────────────────────
   const content = generateContent(intent, mutableConfig, registry);
 
-  // ── Step 7: Assemble ResolvedConfig ──────────────────
+  // ── Step 8: Assemble ResolvedConfig ──────────────────
   return assembleConfig({
     projectName,
     projectDir,
@@ -249,7 +252,22 @@ function intentToMutableConfig(intent: Intent): MutableConfig {
   });
 }
 
-// ── Step 4: Recommended Blocks ───────────────────────────
+// ── Step 4: Filter to Registry ───────────────────────────
+
+/**
+ * Remove blocks added by the rules engine that don't exist in the registry.
+ * The rules engine adds blocks like analytics-cf, payments-stripe, etc.
+ * which may not be available in the current block registry.
+ */
+function filterBlocksToRegistry(
+  config: MutableConfig,
+  registry: BlockRegistry,
+): void {
+  const registryBlockNames = new Set(registry.blocks.map((b) => b.name));
+  config.blocks = config.blocks.filter((b) => registryBlockNames.has(b.name));
+}
+
+// ── Step 5: Recommended Blocks ───────────────────────────
 
 function addRecommendedBlocks(
   intent: Intent,

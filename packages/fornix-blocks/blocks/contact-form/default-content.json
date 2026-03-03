@@ -1,0 +1,10 @@
+{
+  "headline": "Get in Touch",
+  "description": "Have a question or want to work together? Drop us a message and we'll get back to you within 24 hours.",
+  "namePlaceholder": "Your name",
+  "emailPlaceholder": "Your email",
+  "subjectPlaceholder": "Subject",
+  "messagePlaceholder": "Your message",
+  "buttonText": "Send Message",
+  "successMessage": "Thank you! We'll get back to you soon."
+}

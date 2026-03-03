@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "name": "header-sticky",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Sticky navigation header that remains fixed at the top on scroll with logo, nav links, and CTA",
+  "category": "header",
+  "tags": ["header", "navigation", "sticky", "fixed", "nav"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": ["header-transparent"],
+  "envVars": [],
+  "variants": ["default", "compact", "with-search"],
+  "slots": ["logo", "actions"],
+  "files": [
+    {
+      "source": "header-sticky.astro",
+      "destination": "src/components/sections/header-sticky.astro"
+    },
+    {
+      "source": "header-sticky.css",
+      "destination": "src/styles/sections/header-sticky.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use as the primary navigation header on marketing sites, SaaS applications, and any multi-page site that benefits from persistent navigation. Best when users need to access navigation at all times.",
+    "whenNotToUse": "Don't use on landing pages where a transparent header would be more visually impactful. Avoid on simple single-page sites without real navigation needs.",
+    "pairsWith": ["hero-split", "features-grid", "pricing-table", "footer-rich"],
+    "contentSlots": {
+      "brandName": {
+        "type": "string",
+        "description": "Brand or site name displayed in the header",
+        "maxLength": 30,
+        "example": "Fornix"
+      },
+      "navLinks": {
+        "type": "array",
+        "description": "Array of navigation link objects",
+        "minItems": 2,
+        "maxItems": 8,
+        "items": {
+          "label": { "type": "string" },
+          "href": { "type": "string" }
+        },
+        "example": [
+          { "label": "Features", "href": "#features" },
+          { "label": "Pricing", "href": "#pricing" },
+          { "label": "Blog", "href": "/blog" },
+          { "label": "Docs", "href": "/docs" }
+        ]
+      },
+      "ctaText": {
+        "type": "string",
+        "description": "CTA button text in the header",
+        "maxLength": 20,
+        "example": "Get Started"
+      },
+      "ctaHref": {
+        "type": "string",
+        "description": "CTA button URL",
+        "example": "#signup"
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "name": "contact-form",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Contact form section with name, email, subject, and message fields, powered by Astro Actions",
+  "category": "contact",
+  "tags": ["contact", "form", "email", "support", "astro-actions"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "requiredMode": "hybrid",
+  "envVars": [],
+  "variants": ["default", "side-by-side", "minimal"],
+  "slots": [],
+  "files": [
+    {
+      "source": "contact-form.astro",
+      "destination": "src/components/sections/contact-form.astro"
+    },
+    {
+      "source": "contact-form.css",
+      "destination": "src/styles/sections/contact-form.css"
+    },
+    {
+      "source": "contact-action.ts",
+      "destination": "src/actions/contact-action.ts",
+      "condition": "renderMode !== 'static'"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use on any page that needs a contact form — landing pages, about pages, support pages. The form uses Astro Actions for server-side processing without a separate API.",
+    "whenNotToUse": "Don't use on fully static sites without a server adapter. Avoid if you only need an email link — a simple mailto: would suffice.",
+    "pairsWith": ["hero-split", "faq-accordion", "footer-rich", "footer-minimal"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Section headline",
+        "maxLength": 60,
+        "example": "Get in Touch"
+      },
+      "description": {
+        "type": "string",
+        "description": "Supporting text encouraging users to reach out",
+        "maxLength": 200,
+        "example": "Have a question or want to work together? Drop us a message and we'll get back to you within 24 hours."
+      },
+      "namePlaceholder": {
+        "type": "string",
+        "description": "Placeholder for the name field",
+        "maxLength": 30,
+        "example": "Your name"
+      },
+      "emailPlaceholder": {
+        "type": "string",
+        "description": "Placeholder for the email field",
+        "maxLength": 30,
+        "example": "Your email"
+      },
+      "subjectPlaceholder": {
+        "type": "string",
+        "description": "Placeholder for the subject field",
+        "maxLength": 40,
+        "example": "Subject"
+      },
+      "messagePlaceholder": {
+        "type": "string",
+        "description": "Placeholder for the message textarea",
+        "maxLength": 40,
+        "example": "Your message"
+      },
+      "buttonText": {
+        "type": "string",
+        "description": "Submit button label",
+        "maxLength": 20,
+        "example": "Send Message"
+      },
+      "successMessage": {
+        "type": "string",
+        "description": "Message shown after successful submission",
+        "maxLength": 100,
+        "example": "Thank you! We'll get back to you soon."
+      }
+    }
+  }
+}

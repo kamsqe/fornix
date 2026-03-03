@@ -1,0 +1,45 @@
+---
+/**
+ * Header Sticky — fixed navigation header that stays at the top on scroll.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "header-sticky");
+const { brandName, navLinks, ctaText, ctaHref } = entry?.data ?? {
+  brandName: "",
+  navLinks: [],
+  ctaText: "",
+  ctaHref: "#",
+};
+---
+
+<header class="header-sticky">
+  <div class="header-sticky__inner">
+    <a href="/" class="header-sticky__brand">{brandName}</a>
+    <nav class="header-sticky__nav" aria-label="primary">
+      <ul class="header-sticky__links">
+        {(navLinks as Array<{ label: string; href: string }>).map((link) => (
+          <li>
+            <a href={link.href} class="header-sticky__link">{link.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="header-sticky__actions">
+      <slot name="actions">
+        {ctaText && (
+          <a href={ctaHref} class="header-sticky__cta">{ctaText}</a>
+        )}
+      </slot>
+    </div>
+    <button class="header-sticky__mobile-toggle" aria-label="menu" aria-expanded="false">
+      <span class="header-sticky__hamburger"></span>
+    </button>
+  </div>
+</header>
+
+<style>
+  @import "../../styles/sections/header-sticky.css";
+</style>

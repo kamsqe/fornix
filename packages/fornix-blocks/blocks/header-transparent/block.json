@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "name": "header-transparent",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Transparent overlay header that blends with hero sections, with logo, nav links, and CTA",
+  "category": "header",
+  "tags": ["header", "navigation", "transparent", "overlay", "hero"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": ["header-sticky"],
+  "envVars": [],
+  "variants": ["default", "light-text", "dark-text"],
+  "slots": ["logo", "actions"],
+  "files": [
+    {
+      "source": "header-transparent.astro",
+      "destination": "src/components/sections/header-transparent.astro"
+    },
+    {
+      "source": "header-transparent.css",
+      "destination": "src/styles/sections/header-transparent.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when the hero section has a strong visual (background image, video, or gradient) and you want the navigation to overlay it seamlessly. Perfect for creative agencies, portfolios, and brand-focused landing pages.",
+    "whenNotToUse": "Don't use on content-heavy sites where navigation needs clear visual separation. Avoid when the page background is white/light — text may not be readable.",
+    "pairsWith": ["hero-gradient", "hero-video", "cta-banner", "footer-rich"],
+    "contentSlots": {
+      "brandName": {
+        "type": "string",
+        "description": "Brand or site name displayed in the header",
+        "maxLength": 30,
+        "example": "Fornix"
+      },
+      "navLinks": {
+        "type": "array",
+        "description": "Array of navigation link objects",
+        "minItems": 2,
+        "maxItems": 8,
+        "items": {
+          "label": { "type": "string" },
+          "href": { "type": "string" }
+        },
+        "example": [
+          { "label": "Work", "href": "#work" },
+          { "label": "About", "href": "#about" },
+          { "label": "Contact", "href": "#contact" }
+        ]
+      },
+      "ctaText": {
+        "type": "string",
+        "description": "CTA button text",
+        "maxLength": 20,
+        "example": "Hire Us"
+      },
+      "ctaHref": {
+        "type": "string",
+        "description": "CTA button URL",
+        "example": "#contact"
+      }
+    }
+  }
+}

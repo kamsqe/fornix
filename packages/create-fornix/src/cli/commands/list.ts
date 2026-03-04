@@ -1,9 +1,8 @@
 import { defineCommand } from "citty";
 import pc from "picocolors";
 import type { BlockManifest } from "fornix-registry";
-import {
-  FIXTURE_MANIFESTS,
-} from "../fixture-registry.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { isOk } from "../../utils/result.js";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -41,9 +40,19 @@ export const listCommand = defineCommand({
       default: false,
     },
   },
-  run({ args }) {
+  async run({ args }) {
     const typedArgs = args as unknown as ListArgs;
-    const blocks = getFilteredBlocks(typedArgs);
+    
+    // Fetch real registry
+    const registryResult = await fetchRegistryIndex();
+    if (!isOk(registryResult)) {
+      console.error(pc.red(`\u2716 Failed to fetch block registry: ${registryResult.error.message}`));
+      process.exitCode = 1;
+      return;
+    }
+    const manifests = registryResult.value.blocks;
+    
+    const blocks = getFilteredBlocks(typedArgs, manifests);
 
     if (blocks.length === 0) {
       console.log(pc.yellow("No blocks found matching your filters."));
@@ -60,8 +69,8 @@ export const listCommand = defineCommand({
 
 // ── Helpers ──────────────────────────────────────────────
 
-function getFilteredBlocks(args: ListArgs): ReadonlyArray<BlockManifest> {
-  let blocks = Object.values(FIXTURE_MANIFESTS);
+function getFilteredBlocks(args: ListArgs, manifests: Readonly<Record<string, BlockManifest>>): ReadonlyArray<BlockManifest> {
+  let blocks = Object.values(manifests);
 
   if (args.type) {
     const filterType = args.type.toLowerCase();

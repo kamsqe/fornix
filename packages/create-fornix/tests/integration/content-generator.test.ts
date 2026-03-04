@@ -1,24 +1,47 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import {
   generateMultiLocaleContent,
   type ContentGenerationOptions,
 } from "../../src/ai/content-generator.js";
 import { createMockProvider } from "../../src/ai/providers/mock-provider.js";
 import { FIXTURE_MANIFESTS } from "../../src/cli/fixture-registry.js";
+import type { BlockManifest } from "fornix-registry";
+
+// Mock the network fetchers before we import the tools
+vi.mock("../../src/registry/registry-fetcher.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../src/registry/registry-fetcher.js")>();
+  const fixtures = await import("../../src/cli/fixture-registry.js");
+  
+  return {
+    ...actual,
+    fetchRegistryIndex: vi.fn().mockImplementation(async () => {
+      // Return a successful Result containing our mapped fixtures
+      return {
+        ok: true,
+        value: {
+          blocks: fixtures.FIXTURE_MANIFESTS,
+          palettes: [],
+        },
+      };
+    }),
+  };
+});
 
 // ── Helpers ──────────────────────────────────────────────
 
-function blocksWithContentSlots() {
-  return Object.values(FIXTURE_MANIFESTS).filter(
-    (b) =>
-      b.ai?.contentSlots !== undefined &&
-      Object.keys(b.ai.contentSlots).length > 0,
-  );
+function blocksWithContentSlots(): Record<string, BlockManifest> {
+  const result: Record<string, BlockManifest> = {};
+  for (const [name, b] of Object.entries(FIXTURE_MANIFESTS)) {
+    if (b.ai?.contentSlots !== undefined && Object.keys(b.ai.contentSlots).length > 0) {
+      result[name] = b;
+    }
+  }
+  return result;
 }
 
 function baseOptions(
   overrides: Partial<ContentGenerationOptions> = {},
-): ContentGenerationOptions {
+): Omit<ContentGenerationOptions, "blocks"> & { blocks: Record<string, BlockManifest> } {
   return {
     blocks: blocksWithContentSlots(),
     locales: ["en", "es"],
@@ -32,7 +55,7 @@ function baseOptions(
     },
     industry: "technology",
     ...overrides,
-  };
+  } as Omit<ContentGenerationOptions, "blocks"> & { blocks: Record<string, BlockManifest> };
 }
 
 // ── Tests ────────────────────────────────────────────────
@@ -148,7 +171,7 @@ describe("multi-locale content generation", () => {
     expect(dbBlock).toBeDefined();
 
     const options = baseOptions({
-      blocks: [dbBlock!],
+      blocks: { "db-d1": dbBlock! },
       locales: ["en", "es"],
     });
     const result = await generateMultiLocaleContent(provider, options);
@@ -165,7 +188,7 @@ describe("multi-locale content generation", () => {
     expect(heroBlock!.ai?.contentSlots).toBeDefined();
 
     const options = baseOptions({
-      blocks: [heroBlock!],
+      blocks: { "hero-gradient": heroBlock! },
       locales: ["en"],
     });
     const result = await generateMultiLocaleContent(provider, options);
@@ -189,7 +212,7 @@ describe("multi-locale content generation", () => {
     expect(heroBlock).toBeDefined();
 
     const options = baseOptions({
-      blocks: [heroBlock!],
+      blocks: { "hero-gradient": heroBlock! },
       locales: ["en"],
       brand: {
         name: "SuperApp",

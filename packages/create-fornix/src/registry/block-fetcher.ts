@@ -23,6 +23,7 @@ import { homedir } from "node:os";
 import { BlockManifestSchema } from "fornix-registry";
 import type { BlockManifest } from "fornix-registry";
 import { ok, err, type Result } from "../utils/result.js";
+import { FIXTURE_MANIFESTS, FIXTURE_BLOCK_SOURCES } from "../cli/fixture-registry.js";
 
 // ── Config ───────────────────────────────────────────────
 
@@ -42,11 +43,11 @@ export interface FetcherConfig {
 }
 
 const DEFAULT_CONFIG: FetcherConfig = {
-  repo: "kamsqee/fornix",
+  repo: "kamsqe/fornix",
   ref: "main",
   cacheDir: join(homedir(), ".cache", "fornix", "blocks"),
   blocksPrefix: "packages/fornix-blocks/blocks",
-  force: false,
+  force: process.env.FORNIX_NO_CACHE === "true",
   maxCacheAge: 24 * 60 * 60 * 1000, // 24 hours
 };
 
@@ -77,6 +78,19 @@ export async function fetchBlock(
   blockName: string,
   config: Partial<FetcherConfig> = {},
 ): Promise<Result<FetchedBlock, FetchError>> {
+  if (process.env.FORNIX_E2E_MOCK === "true") {
+    const manifest = FIXTURE_MANIFESTS[blockName];
+    const files = FIXTURE_BLOCK_SOURCES[blockName];
+    if (!manifest || !files) {
+      return err({
+        kind: "FetchError" as const,
+        blockName,
+        message: `Mock block not found: ${blockName}`,
+      });
+    }
+    return ok({ manifest, files, fromCache: true });
+  }
+
   const cfg: FetcherConfig = { ...DEFAULT_CONFIG, ...config };
 
   const blockCacheDir = join(cfg.cacheDir, blockName);

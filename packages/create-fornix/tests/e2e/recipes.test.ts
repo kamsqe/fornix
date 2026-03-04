@@ -12,6 +12,7 @@ const CLI_PATH = join(__dirname, "../../dist/index.js");
 function runCLI(args: string, cwd?: string): string {
   return execSync(`node ${CLI_PATH} create ${args}`, {
     cwd: cwd ?? process.cwd(),
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
     encoding: "utf-8",
     stdio: ["pipe", "pipe", "pipe"],
   });

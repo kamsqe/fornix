@@ -14,7 +14,7 @@ import { ok, err, type Result } from "../utils/result.js";
 // ── Types ────────────────────────────────────────────────
 
 export interface ContentGenerationOptions {
-  readonly blocks: ReadonlyArray<BlockManifest>;
+  readonly blocks: Readonly<Record<string, BlockManifest>>;
   readonly locales: ReadonlyArray<string>;
   readonly defaultLocale: string;
   readonly brand: Intent["brand"];
@@ -68,7 +68,7 @@ export async function generateMultiLocaleContent(
   const { blocks, locales, brand, industry } = options;
   const isMultiLocale = locales.length >= 2;
 
-  const blocksWithSlots = blocks.filter(
+  const blocksWithSlots = Object.values(blocks).filter(
     (block) =>
       block.ai?.contentSlots !== undefined &&
       Object.keys(block.ai.contentSlots).length > 0,

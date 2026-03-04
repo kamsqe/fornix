@@ -1,65 +1,43 @@
-import type { BlockManifest } from "fornix-registry";
-import { FIXTURE_MANIFESTS } from "../../cli/fixture-registry.js";
-import { ok, type Result } from "../../utils/result.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { isOk } from "../../utils/result.js";
 
-// ── Input ───────────────────────────────────────────────────
+export async function listBlocksHandler(args: unknown) {
+  const result = await fetchRegistryIndex();
+  if (!isOk(result)) {
+    throw new Error(`Failed to fetch block registry: ${result.error.message}`);
+  }
+  const manifests = result.value.blocks;
+  const typedArgs = args as { category?: string; type?: string };
 
-export interface ListBlocksInput {
-  readonly type?: string;
-  readonly category?: string;
-  readonly search?: string;
-}
+  let blocks = Object.values(manifests);
 
-// ── Output ──────────────────────────────────────────────────
-
-export interface ListBlocksEntry {
-  readonly name: string;
-  readonly type: string;
-  readonly category: string;
-  readonly description: string;
-  readonly tags: ReadonlyArray<string>;
-  readonly requiredMode?: string;
-  readonly requires: ReadonlyArray<string>;
-}
-
-// ── Implementation ──────────────────────────────────────────
-
-export function listBlocks(
-  input: ListBlocksInput,
-): Result<ReadonlyArray<ListBlocksEntry>, Error> {
-  let blocks: ReadonlyArray<BlockManifest> = Object.values(FIXTURE_MANIFESTS);
-
-  if (input.type) {
-    const filterType = input.type.toLowerCase();
-    blocks = blocks.filter((block) => block.type === filterType);
+  if (typedArgs?.type) {
+    blocks = blocks.filter((b) => b.type === typedArgs.type);
   }
 
-  if (input.category) {
-    const filterCategory = input.category.toLowerCase();
-    blocks = blocks.filter((block) => block.category === filterCategory);
+  if (typedArgs?.category) {
+    blocks = blocks.filter((b) => b.category === typedArgs.category);
   }
 
-  if (input.search) {
-    const searchTerm = input.search.toLowerCase();
-    blocks = blocks.filter(
-      (block) =>
-        block.name.includes(searchTerm) ||
-        block.description.toLowerCase().includes(searchTerm) ||
-        block.tags.some((tag) => tag.includes(searchTerm)),
-    );
-  }
-
-  const entries: ListBlocksEntry[] = blocks
-    .map((block) => ({
-      name: block.name,
-      type: block.type,
-      category: block.category,
-      description: block.description,
-      tags: block.tags,
-      requiredMode: block.requiredMode,
-      requires: block.requires,
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  return ok(entries);
+  return {
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(
+          blocks.map((b) => ({
+            name: b.name,
+            description: b.description,
+            type: b.type,
+            category: b.category,
+            requiredMode: b.requiredMode,
+            requires: b.requires,
+            conflicts: b.conflicts,
+            envVars: b.envVars,
+          })),
+          null,
+          2,
+        ),
+      },
+    ],
+  };
 }

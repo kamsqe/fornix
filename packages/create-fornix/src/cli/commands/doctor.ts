@@ -3,7 +3,8 @@ import pc from "picocolors";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import type { BlockManifest } from "fornix-registry";
-import { FIXTURE_MANIFESTS } from "../fixture-registry.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { isOk } from "../../utils/result.js";
 
 interface FornixManifest {
   readonly version: string;
@@ -36,7 +37,7 @@ export const doctorCommand = defineCommand({
       default: false,
     },
   },
-  run({ args }) {
+  async run({ args }) {
     const cwd = process.cwd();
     const manifestPath = join(cwd, "fornix.json");
     let hasErrors = false;
@@ -71,6 +72,18 @@ export const doctorCommand = defineCommand({
       process.exit(1);
     }
 
+    // 1b. Fetch real registry
+    const registryResult = await fetchRegistryIndex();
+    if (!isOk(registryResult)) {
+      reportError(`Failed to fetch block registry: ${registryResult.error.message}`);
+      if (args.json) {
+        console.log(JSON.stringify({ healthy: false, errors }));
+      }
+      process.exitCode = 1;
+      return;
+    }
+    const manifests = registryResult.value.blocks;
+
     const isMultiLocale = manifest.locales && manifest.locales.length >= 2;
     const locales = isMultiLocale ? manifest.locales! : [""];
 
@@ -78,7 +91,7 @@ export const doctorCommand = defineCommand({
 
     // ── Check 2: Missing installed block files ──────────────
     for (const block of manifest.blocks) {
-      const bManifest = FIXTURE_MANIFESTS[block.name];
+      const bManifest = manifests[block.name];
       if (bManifest) {
         for (const file of bManifest.files) {
           const filePath = join(cwd, file.destination);
@@ -90,7 +103,7 @@ export const doctorCommand = defineCommand({
     }
 
     // ── Check 3: Orphaned block files ──────────────
-    for (const [name, bManifest] of Object.entries(FIXTURE_MANIFESTS)) {
+    for (const [name, bManifest] of Object.entries(manifests)) {
       if (!installedBlocks.has(name)) {
         // Block is not installed, but do its files exist?
         const foundOrphaned = bManifest.files.some((file) => {
@@ -108,7 +121,7 @@ export const doctorCommand = defineCommand({
     const missingContentFiles: string[] = [];
 
     for (const block of manifest.blocks) {
-      const bManifest = FIXTURE_MANIFESTS[block.name];
+      const bManifest = manifests[block.name];
       if (!bManifest) continue;
 
       const hasContentSlots = bManifest.ai?.contentSlots && Object.keys(bManifest.ai.contentSlots).length > 0;

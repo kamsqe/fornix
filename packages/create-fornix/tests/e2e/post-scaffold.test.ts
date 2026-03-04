@@ -15,6 +15,7 @@ function runCLI(args: string): string {
     stdio: ["pipe", "pipe", "pipe"],
     env: {
       ...process.env,
+      FORNIX_E2E_MOCK: "true",
       // Use npm mirror for faster installs in CI/test
       npm_config_registry: "https://registry.npmmirror.com",
     },
@@ -61,6 +62,7 @@ describe("post-scaffold hooks", { timeout: 300_000 }, () => {
     // Verify there's at least one commit mentioning Fornix
     const log = execSync("git log --oneline -1", {
       cwd: projectDir,
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
       encoding: "utf-8",
     });
     expect(log).toContain("Fornix");

@@ -1,45 +1,41 @@
-import type { ContentSlot } from "fornix-registry";
-import { FIXTURE_MANIFESTS } from "../../cli/fixture-registry.js";
-import { ok, err, type Result } from "../../utils/result.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { isOk } from "../../utils/result.js";
 
-// ── Input ───────────────────────────────────────────────────
+export async function getContentSchemaHandler(args: unknown) {
+  const typedArgs = args as { block: string };
+  if (!typedArgs?.block) {
+    throw new Error("Missing required argument: block");
+  }
 
-export interface GetContentSchemaInput {
-  readonly collection: string;
-}
+  const result = await fetchRegistryIndex();
+  if (!isOk(result)) {
+    throw new Error(`Failed to fetch block registry: ${result.error.message}`);
+  }
+  const manifests = result.value.blocks;
 
-// ── Output ──────────────────────────────────────────────────
-
-export interface GetContentSchemaOutput {
-  readonly collection: string;
-  readonly slots: Readonly<Record<string, ContentSlot>>;
-}
-
-// ── Implementation ──────────────────────────────────────────
-
-export function getContentSchema(
-  input: GetContentSchemaInput,
-): Result<GetContentSchemaOutput, Error> {
-  const { collection } = input;
-
-  const manifest = FIXTURE_MANIFESTS[collection];
+  const manifest = manifests[typedArgs.block];
   if (!manifest) {
-    return err(
-      new Error(`Collection '${collection}' not found in registry.`),
-    );
+    throw new Error(`Block '${typedArgs.block}' not found in registry`);
   }
 
-  const contentSlots = manifest.ai?.contentSlots;
-  if (!contentSlots || Object.keys(contentSlots).length === 0) {
-    return err(
-      new Error(
-        `Block '${collection}' does not define content slots.`,
-      ),
-    );
+  const slots = manifest.ai?.contentSlots ?? {};
+  if (Object.keys(slots).length === 0) {
+    return {
+      content: [
+        {
+          type: "text",
+          text: `Block '${typedArgs.block}' does not have any AI-configurable content slots.`,
+        },
+      ],
+    };
   }
 
-  return ok({
-    collection,
-    slots: contentSlots,
-  });
+  return {
+    content: [
+      {
+        type: "text",
+        text: JSON.stringify(slots, null, 2),
+      },
+    ],
+  };
 }

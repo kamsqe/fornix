@@ -9,12 +9,11 @@ import { scaffold, type ScaffoldInput } from "../../scaffold/pipeline.js";
 import { isOk } from "../../utils/result.js";
 import type { ResolvedConfig } from "../../schemas/config.js";
 import type { Palette } from "fornix-registry";
-import {
-  FIXTURE_MANIFESTS,
-  FIXTURE_BLOCK_SOURCES,
-  FIXTURE_DEFAULT_CONTENT,
-  loadAllPalettes,
-} from "../fixture-registry.js";
+import { loadAllPalettes } from "../fixture-registry.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { fetchBlocks } from "../../registry/block-fetcher.js";
+import type { BlockSourceMap } from "../../scaffold/block-placer.js";
+import type { BlockDefaultContent } from "../../scaffold/content-wiring.js";
 import { runManualFlow } from "../../prompts/manual-flow.js";
 import { runPostScaffold } from "../../scaffold/post-scaffold.js";
 import { runAIConversation } from "../../ai/conversation.js";
@@ -135,7 +134,15 @@ export const createCommand = defineCommand({
     },
   },
   async run({ args }) {
-    const allPalettes = loadAllPalettes();
+    // 1. Fetch real registry
+    const registryResult = await fetchRegistryIndex();
+    if (!isOk(registryResult)) {
+      console.error(pc.red(`\u2716 Failed to fetch block registry: ${registryResult.error.message}`));
+      process.exitCode = 1;
+      return;
+    }
+    const manifests = registryResult.value.blocks;
+    const allPalettes = registryResult.value.palettes.length > 0 ? registryResult.value.palettes : loadAllPalettes();
 
     // Detect if explicit config flags were provided (for backwards compatibility)
     const hasExplicitFlags = !!(
@@ -149,7 +156,7 @@ export const createCommand = defineCommand({
 
       const config = await runManualFlow({
         defaultProjectName,
-        manifests: FIXTURE_MANIFESTS,
+        manifests,
         allPalettes,
       });
 
@@ -161,16 +168,16 @@ export const createCommand = defineCommand({
       const projectDir = args.dir ? resolve(args.dir) : resolve(config.projectDir);
       const finalConfig = { ...config, projectDir } as ResolvedConfig;
 
-      return runScaffold(finalConfig, allPalettes, args["dry-run"] ?? false, args.verbose ?? false, !(args.install ?? true), !(args.git ?? true));
+      return runScaffold(finalConfig, manifests, allPalettes, args["dry-run"] ?? false, args.verbose ?? false, !(args.install ?? true), !(args.git ?? true));
     }
 
     // ── Flag-driven mode (--manual --yes, or explicit config flags) ──
     if (args.manual || hasExplicitFlags) {
-      return runFlagDrivenMode(args, allPalettes);
+      return runFlagDrivenMode(args, manifests, allPalettes);
     }
 
     // ── AI mode (default — no --manual, no explicit config flags) ──
-    return runAIMode(args, allPalettes);
+    return runAIMode(args, manifests, allPalettes);
   },
 });
 
@@ -178,6 +185,7 @@ export const createCommand = defineCommand({
 
 async function runAIMode(
   args: Record<string, unknown>,
+  manifests: Record<string, import("fornix-registry").BlockManifest>,
   allPalettes: ReadonlyArray<Palette>,
 ): Promise<void> {
   // 1. Validate and resolve provider
@@ -212,7 +220,7 @@ async function runAIMode(
 
   // 4. Build registry
   const registry: BlockRegistry = {
-    blocks: Object.values(FIXTURE_MANIFESTS),
+    blocks: Object.values(manifests),
     palettes: [...allPalettes],
   };
 
@@ -262,6 +270,7 @@ async function runAIMode(
   // 8. Scaffold
   return runScaffold(
     config,
+    manifests,
     allPalettes,
     (args["dry-run"] ?? false) === true,
     (args.verbose ?? false) === true,
@@ -274,6 +283,7 @@ async function runAIMode(
 
 function runFlagDrivenMode(
   args: Record<string, unknown>,
+  manifests: Record<string, import("fornix-registry").BlockManifest>,
   allPalettes: ReadonlyArray<Palette>,
 ): void {
   const projectDir = resolve(String(args.dir ?? "."));
@@ -376,6 +386,7 @@ function runFlagDrivenMode(
 
   return runScaffold(
     config,
+    manifests,
     allPalettes,
     (args["dry-run"] ?? false) === true,
     (args.verbose ?? false) === true,
@@ -386,19 +397,53 @@ function runFlagDrivenMode(
 
 // ── Shared Scaffold Execution ───────────────────────────
 
-function runScaffold(
+async function runScaffold(
   config: ResolvedConfig,
+  manifests: Record<string, import("fornix-registry").BlockManifest>,
   allPalettes: ReadonlyArray<Palette>,
   dryRun: boolean,
   verbose: boolean,
   skipInstall: boolean,
   skipGit: boolean,
-): void {
+): Promise<void> {
+  const spinner = p.spinner();
+  spinner.start("Fetching blocks from registry...");
+
+  // Actually download the real blocks for the project
+  const blockNames = config.blocks.map((b) => b.name);
+  const blockResults = await fetchBlocks(blockNames);
+  
+  const blockSources: Record<string, Record<string, string>> = {};
+  const blockDefaultContent: Record<string, Record<string, unknown>> = {};
+
+  for (const result of blockResults) {
+    if (!isOk(result)) {
+      spinner.stop(`Failed to fetch block '${result.error.blockName}'`, 1);
+      console.error(pc.red(`\u2716 ${result.error.message}`));
+      process.exitCode = 1;
+      return;
+    }
+
+    const { manifest, files } = result.value;
+    blockSources[manifest.name] = files;
+
+    // Load default content if available
+    try {
+      if (files["default-content.json"]) {
+        blockDefaultContent[manifest.name] = JSON.parse(files["default-content.json"]);
+      }
+    } catch (e) {
+      console.error(pc.yellow(`⚠ Warning: Failed to parse default-content.json for block '${manifest.name}'`));
+    }
+  }
+
+  spinner.stop("Blocks fetched successfully.");
+
   const input: ScaffoldInput = {
     config,
-    manifests: FIXTURE_MANIFESTS,
-    blockSources: FIXTURE_BLOCK_SOURCES,
-    blockDefaultContent: FIXTURE_DEFAULT_CONTENT,
+    manifests,
+    blockSources: Object.freeze(blockSources) as BlockSourceMap,
+    blockDefaultContent: Object.freeze(blockDefaultContent) as BlockDefaultContent,
     allPalettes,
   };
 

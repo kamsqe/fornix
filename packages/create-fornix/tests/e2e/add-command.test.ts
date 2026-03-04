@@ -47,6 +47,7 @@ function createTestProject(
 function runAdd(args: string): string {
   return execSync(`${CLI} add ${args}`, {
     cwd: TEST_DIR,
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
     encoding: "utf-8",
     timeout: 10000,
   });
@@ -56,6 +57,7 @@ function runAddSafe(args: string): { stdout: string; exitCode: number } {
   try {
     const stdout = execSync(`${CLI} add ${args}`, {
       cwd: TEST_DIR,
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
       encoding: "utf-8",
       timeout: 10000,
       stdio: ["pipe", "pipe", "pipe"],

@@ -33,7 +33,8 @@ function createTestProject(): void {
 }
 
 function runStatus(args = ""): string {
-  return execSync(`node ${join(__dirname, "../../dist/index.js")} status ${args}`, { cwd: TEST_DIR, encoding: "utf-8", timeout: 10000 });
+  return execSync(`node ${join(__dirname, "../../dist/index.js")} status ${args}`, { cwd: TEST_DIR,
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" }, encoding: "utf-8", timeout: 10000 });
 }
 
 function runStatusSafe(cwd: string): { stdout: string; stderr: string; exitCode: number } {

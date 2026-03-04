@@ -3,7 +3,7 @@ import { execSync } from "node:child_process";
 import { join, dirname } from "node:path";
 import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { FIXTURE_MANIFESTS } from "../../src/cli/fixture-registry";
+import { FIXTURE_MANIFESTS, FIXTURE_BLOCK_SOURCES } from "../../src/cli/fixture-registry";
 
 function createTempDir(): string {
   return mkdtempSync(join(tmpdir(), "fornix-doctor-e2e-"));
@@ -15,6 +15,7 @@ function runDoctor(cwd: string): { stdout: string; stderr: string; code: number 
       cwd,
       encoding: "utf-8",
       stdio: "pipe",
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
     });
     return { stdout: output, stderr: "", code: 0 };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,10 +29,6 @@ function runDoctor(cwd: string): { stdout: string; stderr: string; code: number 
 }
 
 describe("doctor command e2e", () => {
-  beforeAll(() => {
-    // Ensure CLI is built
-    execSync("pnpm run build", { cwd: join(__dirname, "../..") });
-  });
 
   it("detects missing fornix.json", () => {
     const dir = createTempDir();
@@ -63,13 +60,14 @@ describe("doctor command e2e", () => {
     };
     writeFileSync(join(dir, "fornix.json"), JSON.stringify(manifest, null, 2));
 
-    // Create block files
+    // Create block files using manifest for destinations, sources for content
     const bManifest = FIXTURE_MANIFESTS["hero-gradient"];
-    if (bManifest) {
+    const sources = FIXTURE_BLOCK_SOURCES["hero-gradient"];
+    if (bManifest && sources) {
       for (const file of bManifest.files) {
         const fullPath = join(dir, file.destination);
         mkdirSync(dirname(fullPath), { recursive: true });
-        writeFileSync(fullPath, "dummy content");
+        writeFileSync(fullPath, sources[file.source] || "dummy content");
       }
     }
     
@@ -104,7 +102,7 @@ describe("doctor command e2e", () => {
     };
     writeFileSync(join(dir, "fornix.json"), JSON.stringify(manifest, null, 2));
 
-    // Create orphaned file for "hero-video"
+    // Create orphaned file for "hero-video" using its manifest for destinations
     const orphanedManifest = FIXTURE_MANIFESTS["hero-video"];
     if (orphanedManifest && orphanedManifest.files.length > 0) {
       const file = orphanedManifest.files[0]!;
@@ -143,12 +141,13 @@ describe("doctor command e2e", () => {
     writeFileSync(join(dir, "fornix.json"), JSON.stringify(manifest, null, 2));
 
     // Create the files for hero-gradient
-    const bManifest = FIXTURE_MANIFESTS["hero-gradient"];
-    if (bManifest) {
-      for (const file of bManifest.files) {
+    const bManifest2 = FIXTURE_MANIFESTS["hero-gradient"];
+    const sources2 = FIXTURE_BLOCK_SOURCES["hero-gradient"];
+    if (bManifest2 && sources2) {
+      for (const file of bManifest2.files) {
         const fullPath = join(dir, file.destination);
         mkdirSync(dirname(fullPath), { recursive: true });
-        writeFileSync(fullPath, "dummy content");
+        writeFileSync(fullPath, sources2[file.source] || "dummy content");
       }
     }
     
@@ -186,12 +185,13 @@ describe("doctor command e2e", () => {
     writeFileSync(join(dir, "fornix.json"), JSON.stringify(manifest, null, 2));
 
     // Create the files for hero-gradient
-    const bManifest = FIXTURE_MANIFESTS["hero-gradient"];
-    if (bManifest) {
-      for (const file of bManifest.files) {
+    const bManifest3 = FIXTURE_MANIFESTS["hero-gradient"];
+    const sources3 = FIXTURE_BLOCK_SOURCES["hero-gradient"];
+    if (bManifest3 && sources3) {
+      for (const file of bManifest3.files) {
         const fullPath = join(dir, file.destination);
         mkdirSync(dirname(fullPath), { recursive: true });
-        writeFileSync(fullPath, "dummy content");
+        writeFileSync(fullPath, sources3[file.source] || "dummy content");
       }
     }
     

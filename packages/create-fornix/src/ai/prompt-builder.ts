@@ -10,7 +10,7 @@ import type { BlockManifest, Palette } from "fornix-registry";
 // ── Types ────────────────────────────────────────────────
 
 export interface BlockRegistry {
-  readonly blocks: ReadonlyArray<BlockManifest>;
+  readonly blocks: Readonly<Record<string, BlockManifest>>;
   readonly palettes: ReadonlyArray<Palette>;
 }
 
@@ -50,8 +50,9 @@ You MUST only select blocks that exist in the catalog below. Never invent block 
 }
 
 function buildBlocksCatalog(
-  blocks: ReadonlyArray<BlockManifest>,
+  blocksRecord: Readonly<Record<string, BlockManifest>>,
 ): string {
+  const blocks = Object.values(blocksRecord);
   const lines: string[] = ["# Available Blocks\n"];
 
   // Group by type
@@ -153,8 +154,9 @@ function buildPalettesCatalog(
 }
 
 function buildConstraintRules(
-  blocks: ReadonlyArray<BlockManifest>,
+  blocksRecord: Readonly<Record<string, BlockManifest>>,
 ): string {
+  const blocks = Object.values(blocksRecord);
   const lines: string[] = ["# Constraint Rules\n"];
 
   lines.push("## Render Modes");

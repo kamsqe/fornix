@@ -13,6 +13,7 @@ function runCLI(args: string, cwd: string): { stdout: string; stderr: string; co
       encoding: "utf-8",
       stdio: "pipe",
       timeout: 15000,
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
     });
     return { stdout: output, stderr: "", code: 0 };
   } catch (error: unknown) {
@@ -30,9 +31,6 @@ function createTempDir(): string {
 }
 
 describe("error polish e2e", () => {
-  beforeAll(() => {
-    execSync("pnpm run build", { cwd: join(__dirname, "../..") });
-  });
 
   it("invalid project name → helpful message with valid name suggestion", () => {
     const dir = createTempDir();

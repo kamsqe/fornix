@@ -6,15 +6,15 @@ import {
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { listBlocks } from "./tools/list-blocks.js";
+import { fetchRegistryIndex } from "../registry/registry-fetcher.js";
+import { listBlocksHandler } from "./tools/list-blocks.js";
 import { addBlock } from "./tools/add-block.js";
 import { removeBlock } from "./tools/remove-block.js";
-import { getContentSchema } from "./tools/get-content-schema.js";
+import { getContentSchemaHandler } from "./tools/get-content-schema.js";
 import { validateContent } from "./tools/validate-content.js";
 import { getProjectStatus } from "./tools/get-project-status.js";
 import { scaffoldProject } from "./tools/scaffold-project.js";
-import { FIXTURE_MANIFESTS } from "../cli/fixture-registry.js";
-import { ok, err, type Result } from "../utils/result.js";
+import { ok, err, isOk, type Result } from "../utils/result.js";
 
 // ── Tool Metadata ───────────────────────────────────────────
 
@@ -233,7 +233,12 @@ export class FornixMCPServer {
         const uri = request.params.uri;
 
         if (uri === "fornix://registry") {
-          const blocks = Object.values(FIXTURE_MANIFESTS).map((manifest) => ({
+          const registryResult = await fetchRegistryIndex();
+          if (!isOk(registryResult)) {
+            throw new Error(`Failed to fetch block registry: ${registryResult.error.message}`);
+          }
+          
+          const blocks = Object.values(registryResult.value.blocks).map((manifest) => ({
             name: manifest.name,
             type: manifest.type,
             category: manifest.category,
@@ -288,17 +293,20 @@ export class FornixMCPServer {
   ): Promise<Result<string, Error>> {
     switch (toolName) {
       case "list_blocks": {
-        const result = listBlocks({
-          type: args.type as string | undefined,
-          category: args.category as string | undefined,
-          search: args.search as string | undefined,
-        });
-        if (!result.ok) return err(result.error);
-        return ok(JSON.stringify(result.value, null, 2));
+        try {
+          const response = await listBlocksHandler({
+            type: args.type as string | undefined,
+            category: args.category as string | undefined,
+            search: args.search as string | undefined,
+          });
+          return ok(response.content[0].text);
+        } catch (e) {
+          return err(e instanceof Error ? e : new Error(String(e)));
+        }
       }
 
       case "add_block": {
-        const result = addBlock({
+        const result = await addBlock({
           name: args.name as string,
           variant: args.variant as string | undefined,
           projectDirectory: args.projectDirectory as string,
@@ -308,7 +316,7 @@ export class FornixMCPServer {
       }
 
       case "remove_block": {
-        const result = removeBlock({
+        const result = await removeBlock({
           name: args.name as string,
           force: args.force as boolean | undefined,
           projectDirectory: args.projectDirectory as string,
@@ -318,18 +326,18 @@ export class FornixMCPServer {
       }
 
       case "get_content_schema": {
-        const result = getContentSchema({
-          collection: args.collection as string,
-        });
-        if (!result.ok) return err(result.error);
-        return ok(JSON.stringify(result.value, null, 2));
+        try {
+          const response = await getContentSchemaHandler({
+            block: args.collection as string,
+          });
+          return ok(response.content[0].text);
+        } catch (e) {
+          return err(e instanceof Error ? e : new Error(String(e)));
+        }
       }
 
       case "update_content": {
-        // update_content validates then returns the data as-is for now.
-        // Full content update requires filesystem writes to content files,
-        // which is deferred to a later phase.
-        const validationResult = validateContent({
+        const validationResult = await validateContent({
           collection: args.collection as string,
           data: args.data as Record<string, unknown>,
         });
@@ -352,7 +360,7 @@ export class FornixMCPServer {
       }
 
       case "validate_content": {
-        const result = validateContent({
+        const result = await validateContent({
           collection: args.collection as string,
           data: args.data as Record<string, unknown>,
         });
@@ -361,6 +369,7 @@ export class FornixMCPServer {
       }
 
       case "get_project_status": {
+        // Did not need to change to async because it only reads local files
         const result = getProjectStatus({
           projectDirectory: args.projectDirectory as string,
         });
@@ -369,7 +378,7 @@ export class FornixMCPServer {
       }
 
       case "scaffold_project": {
-        const result = scaffoldProject({
+        const result = await scaffoldProject({
           description: args.description as string,
           projectDirectory: args.projectDirectory as string,
           renderMode: args.renderMode as

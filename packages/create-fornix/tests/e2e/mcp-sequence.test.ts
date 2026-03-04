@@ -11,6 +11,8 @@ import { tmpdir } from "node:os";
 import { FornixMCPServer } from "../../src/mcp/server.js";
 import type { Result } from "../../src/utils/result.js";
 
+process.env.FORNIX_E2E_MOCK = "true";
+
 // ── Helpers ─────────────────────────────────────────────────
 
 const TEST_DIR = join(tmpdir(), "fornix-mcp-e2e-" + Date.now());

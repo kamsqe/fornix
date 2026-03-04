@@ -1,11 +1,9 @@
 import type { BlockManifest } from "fornix-registry";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
-import {
-  FIXTURE_MANIFESTS,
-  FIXTURE_BLOCK_SOURCES,
-} from "../../cli/fixture-registry.js";
-import { ok, err, type Result } from "../../utils/result.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { fetchBlocks } from "../../registry/block-fetcher.js";
+import { ok, err, isOk, type Result } from "../../utils/result.js";
 
 // ── Input ───────────────────────────────────────────────────
 
@@ -38,9 +36,9 @@ interface FornixManifest {
 
 // ── Implementation ──────────────────────────────────────────
 
-export function addBlock(
+export async function addBlock(
   input: AddBlockInput,
-): Result<AddBlockOutput, Error> {
+): Promise<Result<AddBlockOutput, Error>> {
   const { name, variant = "default", projectDirectory } = input;
 
   // 1. Read fornix.json
@@ -59,12 +57,19 @@ export function addBlock(
     return err(new Error("Failed to parse fornix.json."));
   }
 
+  // 1b. Fetch real registry
+  const registryResult = await fetchRegistryIndex();
+  if (!isOk(registryResult)) {
+    return err(new Error(`Failed to fetch block registry: ${registryResult.error.message}`));
+  }
+  const manifests = registryResult.value.blocks;
+
   // 2. Look up block
-  const blockManifest = FIXTURE_MANIFESTS[name];
+  const blockManifest = manifests[name];
   if (!blockManifest) {
     return err(
       new Error(
-        `Block '${name}' not found in registry. Available: ${Object.keys(FIXTURE_MANIFESTS).join(", ")}`,
+        `Block '${name}' not found in registry. Available: ${Object.keys(manifests).join(", ")}`,
       ),
     );
   }
@@ -76,11 +81,11 @@ export function addBlock(
   }
 
   // 4. Resolve dependencies
-  const blocksToAdd = resolveDependencies(name, installedNames);
+  const blocksToAdd = resolveDependencies(name, installedNames, manifests);
 
   // 5. Check mode compatibility
   for (const blockName of blocksToAdd) {
-    const dependencyManifest = FIXTURE_MANIFESTS[blockName];
+    const dependencyManifest = manifests[blockName];
     if (
       dependencyManifest?.requiredMode &&
       manifest.renderMode !== dependencyManifest.requiredMode
@@ -93,16 +98,21 @@ export function addBlock(
     }
   }
 
-  // 6. Place files
+  // 6. Fetch blocks and place files
   let filesCreated = 0;
-  for (const blockName of blocksToAdd) {
-    const blockDef = FIXTURE_MANIFESTS[blockName];
-    const sources = FIXTURE_BLOCK_SOURCES[blockName];
-    if (!blockDef || !sources) {
-      return err(
-        new Error(`Source files not found for block '${blockName}'.`),
-      );
+  
+  const blockResults = await fetchBlocks(blocksToAdd);
+
+  for (let i = 0; i < blocksToAdd.length; i++) {
+    const blockName = blocksToAdd[i];
+    const result = blockResults[i];
+
+    if (!result || !isOk(result)) {
+      return err(new Error(`Failed to fetch files for block '${blockName}'.`));
     }
+
+    const blockDef = result.value.manifest;
+    const sources = result.value.files;
 
     for (const file of blockDef.files) {
       const content = sources[file.source];
@@ -124,7 +134,7 @@ export function addBlock(
   // 7. Update fornix.json
   const now = new Date().toISOString();
   for (const blockName of blocksToAdd) {
-    const blockDef = FIXTURE_MANIFESTS[blockName];
+    const blockDef = manifests[blockName];
     if (!blockDef) continue;
     manifest.blocks.push({
       name: blockName,
@@ -144,6 +154,7 @@ export function addBlock(
 function resolveDependencies(
   blockName: string,
   installedNames: ReadonlySet<string>,
+  manifests: Readonly<Record<string, BlockManifest>>
 ): ReadonlyArray<string> {
   const result: string[] = [];
   const visited = new Set<string>();
@@ -152,7 +163,7 @@ function resolveDependencies(
     if (visited.has(currentName) || installedNames.has(currentName)) return;
     visited.add(currentName);
 
-    const manifest = FIXTURE_MANIFESTS[currentName];
+    const manifest = manifests[currentName];
     if (!manifest) return;
 
     for (const dependency of manifest.requires) {

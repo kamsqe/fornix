@@ -8,6 +8,7 @@ const CLI = `node ${join(PKG_DIR, "dist/index.js")}`;
 function run(args: string): string {
   return execSync(`${CLI} ${args}`, {
     cwd: PKG_DIR,
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
     encoding: "utf-8",
     timeout: 10000,
   });

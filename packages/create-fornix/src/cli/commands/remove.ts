@@ -3,7 +3,8 @@ import pc from "picocolors";
 import { readFileSync, writeFileSync, existsSync, unlinkSync, readdirSync, rmdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import type { BlockManifest } from "fornix-registry";
-import { FIXTURE_MANIFESTS } from "../fixture-registry.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { isOk } from "../../utils/result.js";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -54,7 +55,7 @@ export const removeCommand = defineCommand({
       default: false,
     },
   },
-  run({ args }) {
+  async run({ args }) {
     const typedArgs = args as unknown as RemoveArgs;
     const cwd = process.cwd();
 
@@ -70,6 +71,15 @@ export const removeCommand = defineCommand({
     const manifestRaw = readFileSync(manifestPath, "utf-8");
     const manifest: FornixManifest = JSON.parse(manifestRaw);
 
+    // 1b. Fetch real registry
+    const registryResult = await fetchRegistryIndex();
+    if (!isOk(registryResult)) {
+      console.error(pc.red(`\u2716 Failed to fetch block registry: ${registryResult.error.message}`));
+      process.exitCode = 1;
+      return;
+    }
+    const manifests = registryResult.value.blocks;
+
     // 2. Check if block is installed
     const blockName = typedArgs.block;
     const installedNames = new Set(manifest.blocks.map((b) => b.name));
@@ -82,7 +92,7 @@ export const removeCommand = defineCommand({
     }
 
     // 3. Check for dependents
-    const dependents = findDependents(blockName, installedNames);
+    const dependents = findDependents(blockName, installedNames, manifests);
     if (dependents.length > 0 && !typedArgs.force) {
       console.log(
         pc.yellow(
@@ -96,7 +106,7 @@ export const removeCommand = defineCommand({
     }
 
     // 4. Get files to remove
-    const blockManifest = FIXTURE_MANIFESTS[blockName];
+    const blockManifest = manifests[blockName];
     const filesToRemove: string[] = [];
 
     if (blockManifest) {
@@ -158,11 +168,12 @@ export const removeCommand = defineCommand({
 function findDependents(
   blockName: string,
   installedNames: ReadonlySet<string>,
+  manifests: Readonly<Record<string, BlockManifest>>,
 ): ReadonlyArray<string> {
   const dependents: string[] = [];
 
   for (const name of installedNames) {
-    const manifest = FIXTURE_MANIFESTS[name];
+    const manifest = manifests[name];
     if (manifest && manifest.requires.includes(blockName)) {
       dependents.push(name);
     }

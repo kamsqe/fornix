@@ -2,12 +2,11 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import { scaffold, type ScaffoldInput } from "../../scaffold/pipeline.js";
 import type { ResolvedConfig } from "../../schemas/config.js";
-import {
-  FIXTURE_MANIFESTS,
-  FIXTURE_BLOCK_SOURCES,
-  FIXTURE_DEFAULT_CONTENT,
-  loadAllPalettes,
-} from "../../cli/fixture-registry.js";
+import { loadAllPalettes } from "../../cli/fixture-registry.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { fetchBlocks } from "../../registry/block-fetcher.js";
+import type { BlockSourceMap } from "../../scaffold/block-placer.js";
+import type { BlockDefaultContent } from "../../scaffold/content-wiring.js";
 import { ok, err, isOk, type Result } from "../../utils/result.js";
 
 // ── Constants ───────────────────────────────────────────────
@@ -41,9 +40,9 @@ export interface ScaffoldProjectOutput {
 
 // ── Implementation ──────────────────────────────────────────
 
-export function scaffoldProject(
+export async function scaffoldProject(
   input: ScaffoldProjectInput,
-): Result<ScaffoldProjectOutput, Error> {
+): Promise<Result<ScaffoldProjectOutput, Error>> {
   const {
     projectDirectory,
     renderMode = "static",
@@ -52,9 +51,15 @@ export function scaffoldProject(
     locales = ["en"],
   } = input;
 
+  const registryResult = await fetchRegistryIndex();
+  if (!isOk(registryResult)) {
+    return err(new Error(`Failed to fetch block registry: ${registryResult.error.message}`));
+  }
+  const manifests = registryResult.value.blocks;
+  const allPalettes = registryResult.value.palettes.length > 0 ? registryResult.value.palettes : loadAllPalettes();
+
   const projectName = basename(projectDirectory);
   const blockSelections = blocks.map((name) => ({ name, variant: "default" }));
-  const allPalettes = loadAllPalettes();
 
   const config: ResolvedConfig = {
     projectName,
@@ -74,11 +79,31 @@ export function scaffoldProject(
     createdWith: "mcp",
   };
 
+  // Fetch blocks
+  const blockResults = await fetchBlocks([...blocks]);
+  const blockSources: Record<string, Record<string, string>> = {};
+  const blockDefaultContent: Record<string, Record<string, unknown>> = {};
+
+  for (const result of blockResults) {
+    if (!isOk(result)) {
+      return err(new Error(`Failed to fetch block '${result.error.blockName}': ${result.error.message}`));
+    }
+    const { manifest, files } = result.value;
+    blockSources[manifest.name] = files;
+    try {
+      if (files["default-content.json"]) {
+        blockDefaultContent[manifest.name] = JSON.parse(files["default-content.json"]);
+      }
+    } catch {
+      // Ignored
+    }
+  }
+
   const scaffoldInput: ScaffoldInput = {
     config,
-    manifests: FIXTURE_MANIFESTS,
-    blockSources: FIXTURE_BLOCK_SOURCES,
-    blockDefaultContent: FIXTURE_DEFAULT_CONTENT,
+    manifests,
+    blockSources: blockSources as BlockSourceMap,
+    blockDefaultContent: blockDefaultContent as BlockDefaultContent,
     allPalettes,
   };
 

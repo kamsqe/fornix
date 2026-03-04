@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { FIXTURE_MANIFESTS } from "../../cli/fixture-registry.js";
-import { ok, err, type Result } from "../../utils/result.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { ok, err, isOk, type Result } from "../../utils/result.js";
 
 // ── Input ───────────────────────────────────────────────────
 
@@ -18,13 +18,19 @@ export interface ValidateContentOutput {
 
 // ── Implementation ──────────────────────────────────────────
 
-export function validateContent(
+export async function validateContent(
   input: ValidateContentInput,
-): Result<ValidateContentOutput, Error> {
+): Promise<Result<ValidateContentOutput, Error>> {
   const { collection, data } = input;
 
+  const registryResult = await fetchRegistryIndex();
+  if (!isOk(registryResult)) {
+    return err(new Error(`Failed to fetch block registry: ${registryResult.error.message}`));
+  }
+  const manifests = registryResult.value.blocks;
+
   // Find the block manifest
-  const manifest = FIXTURE_MANIFESTS[collection];
+  const manifest = manifests[collection];
   if (!manifest) {
     return err(
       new Error(

@@ -12,9 +12,6 @@ function createTempDir(): string {
 }
 
 describe("performance benchmarks (phase 52)", () => {
-  beforeAll(() => {
-    execSync("pnpm run build", { cwd: join(__dirname, "../..") });
-  });
 
   it("create --recipe saas --yes completes in < 10s (excluding install)", () => {
     const dir = createTempDir();
@@ -29,6 +26,7 @@ describe("performance benchmarks (phase 52)", () => {
         encoding: "utf-8",
         timeout: 15000,
         stdio: "pipe",
+        env: { ...process.env, FORNIX_E2E_MOCK: "true" },
       },
     );
 
@@ -86,6 +84,7 @@ describe("performance benchmarks (phase 52)", () => {
       `node ${CLI_PATH} add pricing-table --no-install`,
       {
         cwd: projectDir,
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
         encoding: "utf-8",
         timeout: 10000,
         stdio: "pipe",

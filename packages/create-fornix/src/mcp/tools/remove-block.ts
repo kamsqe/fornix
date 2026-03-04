@@ -1,3 +1,4 @@
+import type { BlockManifest } from "fornix-registry";
 import {
   readFileSync,
   writeFileSync,
@@ -7,8 +8,8 @@ import {
   rmdirSync,
 } from "node:fs";
 import { join, dirname } from "node:path";
-import { FIXTURE_MANIFESTS } from "../../cli/fixture-registry.js";
-import { ok, err, type Result } from "../../utils/result.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { ok, err, isOk, type Result } from "../../utils/result.js";
 
 // ── Input ───────────────────────────────────────────────────
 
@@ -41,9 +42,9 @@ interface FornixManifest {
 
 // ── Implementation ──────────────────────────────────────────
 
-export function removeBlock(
+export async function removeBlock(
   input: RemoveBlockInput,
-): Result<RemoveBlockOutput, Error> {
+): Promise<Result<RemoveBlockOutput, Error>> {
   const { name, force = false, projectDirectory } = input;
 
   // 1. Read fornix.json
@@ -62,6 +63,13 @@ export function removeBlock(
     return err(new Error("Failed to parse fornix.json."));
   }
 
+  // 1b. Fetch real registry
+  const registryResult = await fetchRegistryIndex();
+  if (!isOk(registryResult)) {
+    return err(new Error(`Failed to fetch block registry: ${registryResult.error.message}`));
+  }
+  const manifests = registryResult.value.blocks;
+
   // 2. Check if block is installed
   const installedNames = new Set(manifest.blocks.map((block) => block.name));
   if (!installedNames.has(name)) {
@@ -69,7 +77,7 @@ export function removeBlock(
   }
 
   // 3. Check for dependents
-  const dependents = findDependents(name, installedNames);
+  const dependents = findDependents(name, installedNames, manifests);
   if (dependents.length > 0 && !force) {
     return err(
       new Error(
@@ -79,7 +87,7 @@ export function removeBlock(
   }
 
   // 4. Get files to remove
-  const blockManifest = FIXTURE_MANIFESTS[name];
+  const blockManifest = manifests[name];
   const filesToRemove: string[] = [];
 
   if (blockManifest) {
@@ -113,11 +121,12 @@ export function removeBlock(
 function findDependents(
   blockName: string,
   installedNames: ReadonlySet<string>,
+  manifests: Readonly<Record<string, BlockManifest>>
 ): ReadonlyArray<string> {
   const dependents: string[] = [];
 
   for (const installedName of installedNames) {
-    const manifest = FIXTURE_MANIFESTS[installedName];
+    const manifest = manifests[installedName];
     if (manifest && manifest.requires.includes(blockName)) {
       dependents.push(installedName);
     }

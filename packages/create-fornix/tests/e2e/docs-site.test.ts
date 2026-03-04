@@ -11,9 +11,6 @@ function createTempDir(): string {
 }
 
 describe("documentation site (phase 53)", () => {
-  beforeAll(() => {
-    execSync("pnpm run build", { cwd: join(__dirname, "../..") });
-  });
 
   it("scaffolds a docs site with --recipe docs", () => {
     const dir = createTempDir();
@@ -22,7 +19,7 @@ describe("documentation site (phase 53)", () => {
 
     const result = execSync(
       `node ${CLI_PATH} create "${projectDir}" --recipe docs --yes --no-install --no-git`,
-      { encoding: "utf-8", timeout: 15000, stdio: "pipe" },
+      { encoding: "utf-8", timeout: 15000, stdio: "pipe", env: { ...process.env, FORNIX_E2E_MOCK: "true" } },
     );
 
     // Verify key files exist

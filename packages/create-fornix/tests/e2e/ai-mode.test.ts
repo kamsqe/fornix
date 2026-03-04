@@ -21,6 +21,7 @@ function runCLI(args: string): string {
     encoding: "utf-8",
     timeout: 30_000,
     stdio: ["pipe", "pipe", "pipe"],
+    env: { ...process.env, FORNIX_E2E_MOCK: "true" },
   });
 }
 
@@ -77,7 +78,7 @@ describe("create (AI mode)", { timeout: 60_000 }, () => {
     const projectDir = join(base, "manual-test");
 
     const output = runCLI(
-      `${projectDir} --manual --render static --deploy static --yes --no-install --no-git`,
+      `${projectDir} --manual --render static --deploy static --blocks hero-gradient --yes --no-install --no-git`,
     );
 
     expect(output).toContain("Project created successfully");

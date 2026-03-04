@@ -26,6 +26,7 @@ const EXEC_OPTIONS: ExecSyncOptionsWithStringEncoding = {
   encoding: "utf-8",
   timeout: 30_000,
   stdio: ["pipe", "pipe", "pipe"],
+  env: { ...process.env, FORNIX_E2E_MOCK: "true" },
 };
 
 /**
@@ -36,6 +37,7 @@ function runCLI(args: string, cwd?: string): string {
   return execSync(`node ${CLI_PATH} create ${args}`, {
     ...EXEC_OPTIONS,
     cwd: cwd ?? process.cwd(),
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
   });
 }
 
@@ -50,6 +52,7 @@ function runCLIRaw(
     const stdout = execSync(`node ${CLI_PATH} ${args}`, {
       ...EXEC_OPTIONS,
       cwd: cwd ?? process.cwd(),
+      env: { ...process.env, FORNIX_E2E_MOCK: "true" },
     });
     return { stdout, stderr: "", code: 0 };
   } catch (error: unknown) {

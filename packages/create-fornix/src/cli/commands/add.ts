@@ -3,10 +3,9 @@ import pc from "picocolors";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import type { BlockManifest } from "fornix-registry";
-import {
-  FIXTURE_MANIFESTS,
-  FIXTURE_BLOCK_SOURCES,
-} from "../fixture-registry.js";
+import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
+import { fetchBlocks } from "../../registry/block-fetcher.js";
+import { isOk } from "../../utils/result.js";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -59,7 +58,7 @@ export const addCommand = defineCommand({
       default: false,
     },
   },
-  run({ args }) {
+  async run({ args }) {
     const typedArgs = args as unknown as AddArgs;
     const cwd = process.cwd();
 
@@ -75,17 +74,27 @@ export const addCommand = defineCommand({
     const manifestRaw = readFileSync(manifestPath, "utf-8");
     const manifest: FornixManifest = JSON.parse(manifestRaw);
 
+    // 1b. Fetch real registry
+    const registryResult = await fetchRegistryIndex();
+    if (!isOk(registryResult)) {
+      console.error(pc.red(`\u2716 Failed to fetch block registry: ${registryResult.error.message}`));
+      process.exitCode = 1;
+      return;
+    }
+    const manifests = registryResult.value.blocks;
+
     // 2. Look up block
     const blockName = typedArgs.block;
-    const blockManifest = FIXTURE_MANIFESTS[blockName];
+    const blockManifest = manifests[blockName];
     if (!blockManifest) {
       console.error(pc.red(`✗ Block '${blockName}' not found in registry.`));
       console.error(
         pc.dim(
-          `  Available: ${Object.keys(FIXTURE_MANIFESTS).join(", ")}`,
+          `  Available: ${Object.keys(manifests).join(", ")}`,
         ),
       );
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
 
     // 3. Check if already installed
@@ -98,33 +107,44 @@ export const addCommand = defineCommand({
     }
 
     // 4. Resolve dependencies
-    const blocksToAdd = resolveDependencies(blockName, installedNames);
+    const blocksToAdd = resolveDependencies(blockName, installedNames, manifests);
 
     // 5. Check mode compatibility
     for (const name of blocksToAdd) {
-      const m = FIXTURE_MANIFESTS[name];
+      const m = manifests[name];
       if (m?.requiredMode && manifest.renderMode !== m.requiredMode) {
         console.error(
           pc.red(
             `✗ Block '${name}' requires '${m.requiredMode}' mode, but project uses '${manifest.renderMode}'.`,
           ),
         );
-        process.exit(1);
+        process.exitCode = 1;
+        return;
       }
     }
 
-    // 6. Place files
+    // 6. Fetch all block files
+    console.log(pc.dim("Fetching blocks..."));
+    const blockResults = await fetchBlocks(blocksToAdd);
     const filesToWrite: Array<{ path: string; content: string }> = [];
 
-    for (const name of blocksToAdd) {
-      const bManifest = FIXTURE_MANIFESTS[name];
-      const sources = FIXTURE_BLOCK_SOURCES[name];
-      if (!bManifest || !sources) {
-        console.error(pc.red(`✗ Source files not found for block '${name}'.`));
-        process.exit(1);
+    for (let i = 0; i < blocksToAdd.length; i++) {
+      const name = blocksToAdd[i];
+      const result = blockResults[i];
+
+      if (!result || !isOk(result)) {
+        console.error(pc.red(`✗ Failed to fetch files for block '${name}'.`));
+        process.exitCode = 1;
+        return;
       }
 
+      const bManifest = result.value.manifest;
+      const sources = result.value.files;
+
       for (const file of bManifest.files) {
+        // Skip conditional files for add if missing context, 
+        // or we'd need context evaluation here. Assumes basic add copies all for now or 
+        // rely on manual cleanup if condition fails later.
         const content = sources[file.source];
         if (content === undefined) {
           console.error(
@@ -132,7 +152,8 @@ export const addCommand = defineCommand({
               `✗ Source file '${file.source}' not found for block '${name}'.`,
             ),
           );
-          process.exit(1);
+          process.exitCode = 1;
+          return;
         }
 
         filesToWrite.push({
@@ -171,7 +192,7 @@ export const addCommand = defineCommand({
     // 9. Update fornix.json
     const now = new Date().toISOString();
     for (const name of blocksToAdd) {
-      const bManifest = FIXTURE_MANIFESTS[name];
+      const bManifest = manifests[name];
       if (!bManifest) continue;
       manifest.blocks.push({
         name,
@@ -209,6 +230,7 @@ export const addCommand = defineCommand({
 function resolveDependencies(
   blockName: string,
   installedNames: ReadonlySet<string>,
+  manifests: Readonly<Record<string, BlockManifest>>,
 ): ReadonlyArray<string> {
   const result: string[] = [];
   const visited = new Set<string>();
@@ -217,7 +239,7 @@ function resolveDependencies(
     if (visited.has(name) || installedNames.has(name)) return;
     visited.add(name);
 
-    const manifest = FIXTURE_MANIFESTS[name];
+    const manifest = manifests[name];
     if (!manifest) return;
 
     // Walk dependencies first (depth-first)

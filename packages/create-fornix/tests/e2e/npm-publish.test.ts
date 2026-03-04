@@ -11,9 +11,6 @@ function createTempDir(): string {
 }
 
 describe("npm publish readiness (phase 54)", () => {
-  beforeAll(() => {
-    execSync("pnpm run build", { cwd: join(__dirname, "../..") });
-  });
 
   it("dist/index.js has Node shebang for bin execution", () => {
     const content = readFileSync(CLI_PATH, "utf-8");

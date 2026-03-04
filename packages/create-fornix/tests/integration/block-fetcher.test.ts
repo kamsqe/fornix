@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { mkdirSync, writeFileSync, rmSync, existsSync, utimesSync } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync, existsSync, utimesSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import type { FetcherConfig } from "../../src/registry/block-fetcher.js";
@@ -17,6 +17,10 @@ const { fetchBlock, fetchBlocks, resetCacheVersionCheck } = await import(
 );
 
 // ── Test Fixtures ────────────────────────────────────────
+
+const CLI_VERSION = JSON.parse(
+  readFileSync(new URL("../../package.json", import.meta.url), "utf-8"),
+).version;
 
 const TEST_CACHE_DIR = join(tmpdir(), "fornix-test-cache-" + Date.now());
 
@@ -62,7 +66,7 @@ function seedCache(blockName: string): void {
   writeFileSync(join(blockDir, "block.json"), MOCK_MANIFEST);
   writeFileSync(join(blockDir, "hero-gradient.astro"), MOCK_ASTRO);
   // Write version marker so ensureCacheVersion doesn't clear seeded cache
-  writeFileSync(join(TEST_CACHE_DIR, ".version"), "0.0.9");
+  writeFileSync(join(TEST_CACHE_DIR, ".version"), CLI_VERSION);
 }
 
 function seedStaleCache(blockName: string): void {
@@ -117,7 +121,7 @@ describe("block-fetcher", () => {
 
     it("validates manifest from cache against schema", async () => {
       // Write version marker so ensureCacheVersion doesn't clear cache
-      writeFileSync(join(TEST_CACHE_DIR, ".version"), "0.0.9");
+      writeFileSync(join(TEST_CACHE_DIR, ".version"), CLI_VERSION);
       const blockDir = join(TEST_CACHE_DIR, "bad-block");
       mkdirSync(blockDir, { recursive: true });
       writeFileSync(

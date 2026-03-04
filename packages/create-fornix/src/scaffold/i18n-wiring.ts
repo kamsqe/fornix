@@ -1,4 +1,5 @@
 import type { ResolvedConfig } from "../schemas/config.js";
+import type { BlockManifest } from "fornix-registry";
 import type { FileMap } from "./structure-generator.js";
 import { ok, type Result } from "../utils/result.js";
 
@@ -13,6 +14,7 @@ import { ok, type Result } from "../utils/result.js";
  */
 export function wireI18n(
   config: ResolvedConfig,
+  manifests?: ReadonlyArray<BlockManifest>,
 ): Result<FileMap, Error> {
   const files: FileMap = {};
 
@@ -21,7 +23,7 @@ export function wireI18n(
   }
 
   files["src/i18n/utils.ts"] = generateI18nUtils(config);
-  files["src/pages/[locale]/index.astro"] = generateLocaleIndexPage(config);
+  files["src/pages/[locale]/index.astro"] = generateLocaleIndexPage(config, manifests ?? []);
 
   return ok(files);
 }
@@ -66,11 +68,37 @@ export function t<T>(
 
 // ── Locale Index Page Generator ──────────────────────────
 
-function generateLocaleIndexPage(config: ResolvedConfig): string {
-  return `---
-import { locales } from "../../i18n/utils";
-import Layout from "../../layouts/Layout.astro";
+function generateLocaleIndexPage(
+  config: ResolvedConfig,
+  manifests: ReadonlyArray<BlockManifest>,
+): string {
+  // Include section blocks the same way structure-generator does
+  const sectionBlocks = manifests.filter((m) => m.type === "section");
 
+  const imports: string[] = [];
+  const tags: string[] = [];
+
+  for (const block of sectionBlocks) {
+    const componentName = block.name
+      .split("-")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join("");
+    imports.push(`import ${componentName} from '../../../components/sections/${block.name}.astro';`);
+    tags.push(`    <${componentName} />`);
+  }
+
+  const importSection = imports.length > 0
+    ? imports.join("\n") + "\n"
+    : "";
+
+  const blockSection = tags.length > 0
+    ? "\n" + tags.join("\n") + "\n  "
+    : "\n    <h1>" + config.projectName + "</h1>\n    <p>Locale: {locale}</p>\n  ";
+
+  return `---
+import { locales } from "../../../i18n/utils";
+import Layout from "../../../layouts/Layout.astro";
+${importSection}
 export function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale } }));
 }
@@ -78,10 +106,8 @@ export function getStaticPaths() {
 const { locale } = Astro.params;
 ---
 <Layout title="${config.projectName}">
-  <main>
-    <h1>${config.projectName}</h1>
-    <p>Locale: {locale}</p>
-  </main>
+  <main>${blockSection}</main>
 </Layout>
 `;
 }
+

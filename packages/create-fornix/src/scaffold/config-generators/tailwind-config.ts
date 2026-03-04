@@ -14,23 +14,11 @@ export function generateTailwindConfig(
     return ok(null);
   }
 
-  const themeBlock = [
-    "@theme {",
-    "  --color-primary: var(--color-primary);",
-    "  --color-secondary: var(--color-secondary);",
-    "  --color-accent: var(--color-accent);",
-    "  --color-background: var(--color-background);",
-    "  --color-foreground: var(--color-foreground);",
-    "}",
-  ].join("\n");
-
   const lines = [
     '@import "tailwindcss";',
     '@import "./src/styles/palettes/_current.css";',
     "",
     `@source "./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}";`,
-    "",
-    themeBlock,
     "",
   ];
 

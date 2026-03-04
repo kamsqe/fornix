@@ -63,11 +63,11 @@ describe("generateAstroConfig", () => {
     }
   });
 
-  it("does not set output for hybrid renderMode (Astro v5 merged into static)", () => {
+  it("maps hybrid renderMode to output 'server' (Astro v5 hybrid→server)", () => {
     const result = generateAstroConfig(baseConfig({ renderMode: "hybrid" }));
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
-      expect(result.value).not.toContain("output:");
+      expect(result.value).toContain("output: \"server\"");
     }
   });
 

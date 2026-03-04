@@ -1,6 +1,6 @@
 {
   "name": "fornix-blocks",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Curated Astro block source files for Fornix",
   "type": "module",
   "license": "MIT",

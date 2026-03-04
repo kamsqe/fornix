@@ -5,6 +5,7 @@ import { join, dirname } from "node:path";
 import type { BlockManifest } from "fornix-registry";
 import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
 import { isOk } from "../../utils/result.js";
+import { removeBlockFromPage } from "../../scaffold/page-updater.js";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -143,6 +144,19 @@ export const removeCommand = defineCommand({
     // 7. Update fornix.json
     manifest.blocks = manifest.blocks.filter((b) => b.name !== blockName);
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+
+    // 7b. Update index.astro — remove import and component tag
+    const indexPath = join(cwd, "src/pages/index.astro");
+    if (existsSync(indexPath)) {
+      const original = readFileSync(indexPath, "utf-8");
+      const updated = removeBlockFromPage(original, blockName);
+      if (updated !== original) {
+        writeFileSync(indexPath, updated);
+        if (typedArgs.verbose) {
+          console.log(`  ${pc.dim("✎")} updated index.astro`);
+        }
+      }
+    }
 
     // 8. Print summary
     console.log();

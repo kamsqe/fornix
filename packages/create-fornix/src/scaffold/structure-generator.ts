@@ -145,6 +145,39 @@ const { title } = Astro.props;${tailwindImport}
     <slot />
   </body>
 </html>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--color-background, #0f172a);
+    color: var(--color-foreground, #f8fafc);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+</style>
 `.trim() + "\n";
 
   // 6. Wrangler config if cloudflare

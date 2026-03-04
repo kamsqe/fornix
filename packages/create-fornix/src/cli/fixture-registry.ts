@@ -43,7 +43,7 @@ function manifest(
 export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
   "hero-gradient": manifest("hero-gradient", {
     category: "hero",
-    conflicts: ["hero-video"],
+    conflicts: ["hero-video", "hero-split"],
     ai: {
       whenToUse: "Landing page hero with gradient background",
       whenNotToUse: "Internal pages",
@@ -56,6 +56,7 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
   }),
   "footer-minimal": manifest("footer-minimal", {
     category: "footer",
+    conflicts: ["footer-rich"],
   }),
   "cta-simple": manifest("cta-simple", {
     category: "cta",
@@ -166,17 +167,96 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
       }
     }
   }),
-  "hero-video": manifest("hero-video"),
-  "features-bento": manifest("features-bento"),
-  "pricing-table": manifest("pricing-table"),
-  "faq-accordion": manifest("faq-accordion"),
-  "footer-rich": manifest("footer-rich"),
+  "hero-video": manifest("hero-video", {
+    category: "hero",
+    conflicts: ["hero-gradient", "hero-split"],
+    files: [
+      { source: "hero-video.astro", destination: "src/components/sections/hero-video.astro" },
+      { source: "hero-video.css", destination: "src/styles/sections/hero-video.css" },
+    ],
+    ai: {
+      whenToUse: "Hero with background video",
+      whenNotToUse: "Static sites",
+      pairsWith: [],
+      contentSlots: {
+        headline: { type: "string" },
+        subheadline: { type: "string" },
+        ctaText: { type: "string" },
+        ctaHref: { type: "string" },
+        videoUrl: { type: "string" },
+        posterUrl: { type: "string" },
+      },
+    },
+  }),
+  "features-bento": manifest("features-bento", {
+    category: "features",
+    ai: {
+      whenToUse: "Feature showcase in bento grid",
+      whenNotToUse: "Simple pages",
+      pairsWith: [],
+      contentSlots: {
+        headline: { type: "string" },
+        subheadline: { type: "string" },
+        items: { type: "array" },
+      },
+    },
+  }),
+  "pricing-table": manifest("pricing-table", {
+    category: "pricing",
+    conflicts: ["pricing-comparison"],
+    ai: {
+      whenToUse: "Pricing plans display",
+      whenNotToUse: "Free products",
+      pairsWith: [],
+      contentSlots: {
+        headline: { type: "string" },
+        subheadline: { type: "string" },
+        plans: { type: "array" },
+      },
+    },
+  }),
+  "faq-accordion": manifest("faq-accordion", {
+    category: "faq",
+    ai: {
+      whenToUse: "Frequently asked questions",
+      whenNotToUse: "Simple pages",
+      pairsWith: [],
+      contentSlots: {
+        headline: { type: "string" },
+        items: { type: "array" },
+      },
+    },
+  }),
+  "footer-rich": manifest("footer-rich", {
+    category: "footer",
+    conflicts: ["footer-minimal"],
+    ai: {
+      whenToUse: "Multi-column footer with links",
+      whenNotToUse: "Minimal sites",
+      pairsWith: [],
+      contentSlots: {
+        brand: { type: "string" },
+        description: { type: "string" },
+        columns: { type: "array" },
+        copyright: { type: "string" },
+      },
+    },
+  }),
   "testimonials-carousel": manifest("testimonials-carousel"),
   "contact-form": manifest("contact-form"),
-  "hero-split": manifest("hero-split"),
-  "header-transparent": manifest("header-transparent"),
+  "hero-split": manifest("hero-split", {
+    category: "hero",
+    conflicts: ["hero-gradient", "hero-video"],
+  }),
+  "header-transparent": manifest("header-transparent", {
+    category: "header",
+    conflicts: ["header-sticky"],
+  }),
   "cta-newsletter": manifest("cta-newsletter"),
-  "header-sticky": manifest("header-sticky"),
+  "header-sticky": manifest("header-sticky", {
+    category: "header",
+    conflicts: ["header-transparent"],
+  }),
 };
 
 // ── Block Sources (stub file contents) ──────────────────
@@ -302,11 +382,31 @@ export function getStaticPaths() { return [{ params: { slug: '1' } }]; }
 <slot />`,
     "default-content.json": `{ "sidebarLinks": [], "logoutText": "" }`
   },
-  "hero-video": { "hero-video.astro": "<section>Hero Video</section>\n", },
-  "features-bento": { "features-bento.astro": "<section>Features Bento</section>\n", },
-  "pricing-table": { "pricing-table.astro": "<section>Pricing</section>\n", },
-  "faq-accordion": { "faq-accordion.astro": "<section>FAQ</section>\n", },
-  "footer-rich": { "footer-rich.astro": "<section>Footer</section>\n", },
+  "hero-video": {
+    "hero-video.astro": "<section>Hero Video</section>\n",
+    "hero-video.css": ".hero-video { min-height: 80vh; }\n",
+    "default-content.json": '{"headline":"Experience the Future","subheadline":"Immersive experiences.","ctaText":"Get Started","ctaHref":"#","videoUrl":"","posterUrl":""}',
+  },
+  "features-bento": {
+    "features-bento.astro": "<section>Features Bento</section>\n",
+    "features-bento.css": ".features-bento { padding: 4rem 2rem; }\n",
+    "default-content.json": '{"headline":"Features","subheadline":"Everything you need.","items":[{"title":"Fast","description":"Lightning speed."}]}',
+  },
+  "pricing-table": {
+    "pricing-table.astro": "<section>Pricing</section>\n",
+    "pricing-table.css": ".pricing-table { padding: 4rem 2rem; }\n",
+    "default-content.json": '{"headline":"Pricing","subheadline":"Simple pricing.","plans":[{"name":"Free","price":"$0","features":["Basic"]}]}',
+  },
+  "faq-accordion": {
+    "faq-accordion.astro": "<section>FAQ</section>\n",
+    "faq-accordion.css": ".faq-accordion { padding: 4rem 2rem; }\n",
+    "default-content.json": '{"headline":"FAQ","items":[{"question":"How does it work?","answer":"It just works."}]}',
+  },
+  "footer-rich": {
+    "footer-rich.astro": "<section>Footer</section>\n",
+    "footer-rich.css": ".footer-rich { padding: 3rem 2rem; }\n",
+    "default-content.json": '{"brand":"Acme","description":"Building the future.","columns":[],"copyright":"© 2025"}',
+  },
   "testimonials-carousel": { "testimonials-carousel.astro": "<section>Testimonials</section>\n", },
   "contact-form": { "contact-form.astro": "<section>Contact</section>\n", },
   "hero-split": { "hero-split.astro": "<section>Hero Split</section>\n", },

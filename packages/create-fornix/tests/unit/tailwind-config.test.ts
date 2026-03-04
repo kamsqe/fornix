@@ -52,19 +52,16 @@ describe("generateTailwindConfig", () => {
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
       expect(result.value).not.toBeNull();
-      expect(result.value).toContain("@theme");
+      expect(result.value).toContain('@import "tailwindcss"');
     }
   });
 
-  it("maps palette colors to Tailwind theme tokens", () => {
+  it("imports palette CSS for color variable access", () => {
     const result = generateTailwindConfig(baseConfig({ cssEngine: "tailwind" }));
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
-      expect(result.value).toContain("--color-primary");
-      expect(result.value).toContain("--color-secondary");
-      expect(result.value).toContain("--color-accent");
-      expect(result.value).toContain("--color-background");
-      expect(result.value).toContain("--color-foreground");
+      expect(result.value).toContain("_current.css");
+      expect(result.value).toContain("palettes");
     }
   });
 
@@ -80,9 +77,9 @@ describe("generateTailwindConfig", () => {
     const result = generateTailwindConfig(baseConfig({ cssEngine: "tailwind" }));
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
-      // Tailwind v4 CSS-based config should have @theme directive
-      expect(result.value).toMatch(/@theme\s*\{/);
-      expect(result.value).toContain("}");
+      // Tailwind v4 CSS-based config with imports and source directive
+      expect(result.value).toMatch(/@import/);
+      expect(result.value).toMatch(/@source/);
     }
   });
 });

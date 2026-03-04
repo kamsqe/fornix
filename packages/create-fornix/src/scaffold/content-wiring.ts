@@ -84,10 +84,10 @@ function generateContentConfig(
   ];
 
   const collections: string[] = [];
-  const dataCollections = new Map<string, string[]>();
+  const dataCollectionNames = new Set<string>();
 
   for (const block of blocks) {
-    // 1. Process custom collections
+    // 1. Process custom collections (e.g. blog, docs)
     if (block.collections && block.collections.length > 0) {
       for (const col of block.collections) {
         const importName = `${block.name.replace(/-/g, "")}${col.name}Schema`;
@@ -100,31 +100,20 @@ function generateContentConfig(
       }
     }
 
-    // 2. Process data collections from AI slots
+    // 2. Track data collection names from AI slots
     const slots = block.ai?.contentSlots;
     if (slots && Object.keys(slots).length > 0) {
-      const schemaFields = Object.entries(slots)
-        .map(([name, slot]) => `      ${name}: ${zodTypeForSlot(slot)}.optional(),`)
-        .join("\n");
-
       const subdirectory = TYPE_DIRECTORY[block.type] ?? block.type;
-      if (!dataCollections.has(subdirectory)) {
-        dataCollections.set(subdirectory, []);
-      }
-      
-      dataCollections.get(subdirectory)!.push(
-        `    // ${block.name}\n    z.object({\n${schemaFields}\n    })`
-      );
+      dataCollectionNames.add(subdirectory);
     }
   }
 
-  for (const [colName, schemas] of dataCollections.entries()) {
-    const schemaStr = schemas.length === 1 
-      ? schemas[0] 
-      : `z.union([\n${schemas.join(",\n")}\n    ])`;
-      
+  // Generate a single loose schema per data collection.
+  // Using z.record(z.unknown()) instead of z.union() avoids schema
+  // conflicts when multiple blocks share one collection (e.g. "sections").
+  for (const colName of dataCollectionNames) {
     collections.push(
-      `  "${colName}": defineCollection({\n    type: "data",\n    schema: ${schemaStr},\n  })`
+      `  "${colName}": defineCollection({\n    type: "data",\n    schema: z.record(z.unknown()),\n  })`
     );
   }
 

@@ -120,7 +120,7 @@ export function scaffold(
   Object.assign(files, contentResult.value);
 
   // 9. Wire i18n
-  const i18nResult = wireI18n(config);
+  const i18nResult = wireI18n(config, resolvedManifests);
   if (!isOk(i18nResult)) {
     return err(i18nResult.error);
   }

@@ -440,9 +440,15 @@ async function runScaffold(
   const spinner = p.spinner();
   spinner.start("Fetching blocks from registry...");
 
-  // Actually download the real blocks for the project
-  const blockNames = config.blocks.map((b) => b.name);
-  const blockResults = await fetchBlocks(blockNames);
+  // Actually download the real blocks for the project.
+  // IMPORTANT: resolve dependencies FIRST so transitive deps (e.g. db-d1
+  // required by auth-better-auth) are included in the fetch list.
+  const selectedBlockNames = config.blocks.map((b) => b.name);
+
+  // Pre-resolve to get the full list including transitive deps
+  const allBlockNames = preResolveDependencies(selectedBlockNames, manifests);
+
+  const blockResults = await fetchBlocks(allBlockNames);
   
   const blockSources: Record<string, Record<string, string>> = {};
   const blockDefaultContent: Record<string, Record<string, unknown>> = {};
@@ -639,4 +645,39 @@ function showNoProviderGuide(): void {
   console.error(pc.bold("  Option 3: Cloudflare Workers AI"));
   console.error("    export CLOUDFLARE_ACCOUNT_ID=... CLOUDFLARE_API_TOKEN=...\n");
   console.error(pc.dim("  Or use manual mode: npx create-fornix --manual\n"));
+}
+
+// ── Pre-resolve Dependencies ────────────────────────────
+
+/**
+ * Lightweight dependency walk to build the full block list BEFORE fetching.
+ * This ensures transitive deps (e.g. db-d1 required by auth-better-auth)
+ * are included in the fetch list.
+ */
+function preResolveDependencies(
+  selected: ReadonlyArray<string>,
+  manifests: Readonly<Record<string, import("fornix-registry").BlockManifest>>,
+): string[] {
+  const result = new Set<string>();
+
+  function walk(name: string): void {
+    if (result.has(name)) return;
+    const manifest = manifests[name];
+    if (!manifest) {
+      // Unknown block — include it so the pipeline can produce
+      // a proper error later.
+      result.add(name);
+      return;
+    }
+    for (const dep of manifest.requires) {
+      walk(dep);
+    }
+    result.add(name);
+  }
+
+  for (const name of selected) {
+    walk(name);
+  }
+
+  return [...result];
 }

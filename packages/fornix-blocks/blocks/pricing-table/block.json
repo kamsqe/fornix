@@ -5,13 +5,27 @@
   "type": "section",
   "description": "Responsive pricing cards with tiered plans, feature lists, and CTA buttons for SaaS and product pages",
   "category": "pricing",
-  "tags": ["pricing", "plans", "saas", "cards", "conversion"],
+  "tags": [
+    "pricing",
+    "plans",
+    "saas",
+    "cards",
+    "conversion"
+  ],
   "dependencies": {},
   "requires": [],
-  "conflicts": [],
+  "conflicts": [
+    "pricing-comparison"
+  ],
   "envVars": [],
-  "variants": ["default", "highlighted", "horizontal"],
-  "slots": ["custom-badge"],
+  "variants": [
+    "default",
+    "highlighted",
+    "horizontal"
+  ],
+  "slots": [
+    "custom-badge"
+  ],
   "files": [
     {
       "source": "pricing-table.astro",
@@ -25,7 +39,12 @@
   "ai": {
     "whenToUse": "Use on SaaS landing pages, product pages, or any site that needs to display pricing tiers. Best when there are 2-4 distinct plans with clear feature differentiation.",
     "whenNotToUse": "Don't use for single-price products, free-only tools, or pages where pricing is negotiated. Avoid on portfolio or blog sites.",
-    "pairsWith": ["hero-gradient", "hero-split", "cta-banner", "footer-rich"],
+    "pairsWith": [
+      "hero-gradient",
+      "hero-split",
+      "cta-banner",
+      "footer-rich"
+    ],
     "contentSlots": {
       "headline": {
         "type": "string",
@@ -45,14 +64,30 @@
         "minItems": 2,
         "maxItems": 4,
         "items": {
-          "name": { "type": "string" },
-          "price": { "type": "string" },
-          "period": { "type": "string" },
-          "description": { "type": "string" },
-          "features": { "type": "array" },
-          "ctaText": { "type": "string" },
-          "ctaHref": { "type": "string" },
-          "highlighted": { "type": "boolean" }
+          "name": {
+            "type": "string"
+          },
+          "price": {
+            "type": "string"
+          },
+          "period": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array"
+          },
+          "ctaText": {
+            "type": "string"
+          },
+          "ctaHref": {
+            "type": "string"
+          },
+          "highlighted": {
+            "type": "boolean"
+          }
         },
         "example": [
           {
@@ -60,7 +95,11 @@
             "price": "$0",
             "period": "/month",
             "description": "For individuals getting started",
-            "features": ["1 project", "Basic analytics", "Community support"],
+            "features": [
+              "1 project",
+              "Basic analytics",
+              "Community support"
+            ],
             "ctaText": "Get Started",
             "ctaHref": "#signup",
             "highlighted": false
@@ -70,7 +109,12 @@
             "price": "$29",
             "period": "/month",
             "description": "For growing teams",
-            "features": ["Unlimited projects", "Advanced analytics", "Priority support", "Custom domain"],
+            "features": [
+              "Unlimited projects",
+              "Advanced analytics",
+              "Priority support",
+              "Custom domain"
+            ],
             "ctaText": "Start Free Trial",
             "ctaHref": "#trial",
             "highlighted": true
@@ -80,7 +124,13 @@
             "price": "Custom",
             "period": "",
             "description": "For large organizations",
-            "features": ["Everything in Pro", "SSO", "Dedicated support", "SLA", "Custom integrations"],
+            "features": [
+              "Everything in Pro",
+              "SSO",
+              "Dedicated support",
+              "SLA",
+              "Custom integrations"
+            ],
             "ctaText": "Contact Sales",
             "ctaHref": "#contact",
             "highlighted": false

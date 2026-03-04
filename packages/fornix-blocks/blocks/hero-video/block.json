@@ -5,13 +5,28 @@
   "type": "section",
   "description": "Hero section with background video, overlay text, and call-to-action for immersive landing pages",
   "category": "hero",
-  "tags": ["hero", "landing", "video", "above-fold", "immersive"],
+  "tags": [
+    "hero",
+    "landing",
+    "video",
+    "above-fold",
+    "immersive"
+  ],
   "dependencies": {},
   "requires": [],
-  "conflicts": [],
+  "conflicts": [
+    "hero-gradient",
+    "hero-split"
+  ],
   "envVars": [],
-  "variants": ["default", "muted", "autoplay"],
-  "slots": ["video-fallback"],
+  "variants": [
+    "default",
+    "muted",
+    "autoplay"
+  ],
+  "slots": [
+    "video-fallback"
+  ],
   "files": [
     {
       "source": "hero-video.astro",
@@ -25,7 +40,11 @@
   "ai": {
     "whenToUse": "Use for immersive landing pages where a background video creates atmosphere and engagement. Best for creative agencies, product launches, event pages, and brand-heavy sites that need visual impact.",
     "whenNotToUse": "Don't use for content-heavy pages, blogs, documentation, or sites where page load performance is critical. Avoid when users are likely on slow connections.",
-    "pairsWith": ["cta-banner", "features-grid", "footer-rich"],
+    "pairsWith": [
+      "cta-banner",
+      "features-grid",
+      "footer-rich"
+    ],
     "contentSlots": {
       "headline": {
         "type": "string",

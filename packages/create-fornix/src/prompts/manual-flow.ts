@@ -55,7 +55,7 @@ export async function runManualFlow(
     message: "Choose a render mode",
     options: [
       { value: "static", label: "Static (SSG)", hint: "Pre-built HTML, fastest" },
-      { value: "hybrid", label: "Hybrid", hint: "Static by default, opt into SSR per page" },
+      { value: "hybrid", label: "Hybrid", hint: "Static + per-page SSR opt-in" },
       { value: "server", label: "Server (SSR)", hint: "Server-rendered on every request" },
     ],
   });

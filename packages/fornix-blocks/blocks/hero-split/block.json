@@ -5,13 +5,29 @@
   "type": "section",
   "description": "Split-layout hero with text on one side and image/media on the other, ideal for product showcases",
   "category": "hero",
-  "tags": ["hero", "landing", "split", "above-fold", "product"],
+  "tags": [
+    "hero",
+    "landing",
+    "split",
+    "above-fold",
+    "product"
+  ],
   "dependencies": {},
   "requires": [],
-  "conflicts": [],
+  "conflicts": [
+    "hero-gradient",
+    "hero-video"
+  ],
   "envVars": [],
-  "variants": ["default", "reversed", "centered"],
-  "slots": ["media", "badge"],
+  "variants": [
+    "default",
+    "reversed",
+    "centered"
+  ],
+  "slots": [
+    "media",
+    "badge"
+  ],
   "files": [
     {
       "source": "hero-split.astro",
@@ -25,7 +41,12 @@
   "ai": {
     "whenToUse": "Use for landing pages and product pages where you want a side-by-side layout with text and an image or illustration. Great for SaaS, agency, and portfolio sites that need to show a product screenshot or visual alongside the value proposition.",
     "whenNotToUse": "Don't use when the hero needs a full-width background image or gradient. Avoid on mobile-first content sites where a stacked layout is better handled by hero-gradient.",
-    "pairsWith": ["features-grid", "cta-banner", "pricing-table", "footer-rich"],
+    "pairsWith": [
+      "features-grid",
+      "cta-banner",
+      "pricing-table",
+      "footer-rich"
+    ],
     "contentSlots": {
       "headline": {
         "type": "string",

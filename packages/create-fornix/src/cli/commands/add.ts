@@ -6,6 +6,7 @@ import type { BlockManifest } from "fornix-registry";
 import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
 import { fetchBlocks } from "../../registry/block-fetcher.js";
 import { isOk } from "../../utils/result.js";
+import { addBlockToPage } from "../../scaffold/page-updater.js";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -203,6 +204,22 @@ export const addCommand = defineCommand({
     }
 
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+
+    // 9b. Update index.astro — add import and component tag for section blocks
+    const indexPath = join(cwd, "src/pages/index.astro");
+    if (existsSync(indexPath)) {
+      let pageContent = readFileSync(indexPath, "utf-8");
+      for (const name of blocksToAdd) {
+        const bManifest = manifests[name];
+        if (bManifest && bManifest.type === "section") {
+          pageContent = addBlockToPage(pageContent, name);
+        }
+      }
+      writeFileSync(indexPath, pageContent);
+      if (typedArgs.verbose) {
+        console.log(`  ${pc.dim("✎")} updated index.astro`);
+      }
+    }
 
     // 10. Print summary
     console.log();

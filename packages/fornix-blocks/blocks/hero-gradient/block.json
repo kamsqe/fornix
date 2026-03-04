@@ -5,13 +5,28 @@
   "type": "section",
   "description": "Full-width hero section with gradient background, headline, subheadline, and CTA button",
   "category": "hero",
-  "tags": ["hero", "landing", "gradient", "above-fold"],
+  "tags": [
+    "hero",
+    "landing",
+    "gradient",
+    "above-fold"
+  ],
   "dependencies": {},
   "requires": [],
-  "conflicts": ["hero-video"],
+  "conflicts": [
+    "hero-video",
+    "hero-split"
+  ],
   "envVars": [],
-  "variants": ["default", "centered", "split"],
-  "slots": ["badge", "cta-secondary"],
+  "variants": [
+    "default",
+    "centered",
+    "split"
+  ],
+  "slots": [
+    "badge",
+    "cta-secondary"
+  ],
   "files": [
     {
       "source": "hero-gradient.astro",
@@ -25,7 +40,11 @@
   "ai": {
     "whenToUse": "Use as the primary above-fold hero section on landing pages. Best for marketing sites, SaaS landing pages, and product pages that need a strong visual first impression with a gradient background.",
     "whenNotToUse": "Don't use for internal dashboard pages, documentation sites, or pages where a simpler text-only hero would be more appropriate. Avoid stacking multiple hero blocks.",
-    "pairsWith": ["cta-simple", "features-grid", "footer-minimal"],
+    "pairsWith": [
+      "cta-simple",
+      "features-grid",
+      "footer-minimal"
+    ],
     "contentSlots": {
       "headline": {
         "type": "string",

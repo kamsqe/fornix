@@ -5,13 +5,26 @@
   "type": "section",
   "description": "Clean, minimal footer with copyright, navigation links, and optional social icons",
   "category": "footer",
-  "tags": ["footer", "navigation", "minimal", "bottom"],
+  "tags": [
+    "footer",
+    "navigation",
+    "minimal",
+    "bottom"
+  ],
   "dependencies": {},
   "requires": [],
-  "conflicts": [],
+  "conflicts": [
+    "footer-rich"
+  ],
   "envVars": [],
-  "variants": ["default", "centered", "two-column"],
-  "slots": ["social-icons"],
+  "variants": [
+    "default",
+    "centered",
+    "two-column"
+  ],
+  "slots": [
+    "social-icons"
+  ],
   "files": [
     {
       "source": "footer-minimal.astro",
@@ -25,7 +38,11 @@
   "ai": {
     "whenToUse": "Use as the site-wide footer on every page. Best for marketing sites, landing pages, and simple apps that need copyright info and basic navigation links.",
     "whenNotToUse": "Don't use for complex footers with newsletter signup, multi-column link lists, or embedded widgets. Use a dedicated footer-mega block instead.",
-    "pairsWith": ["hero-gradient", "features-grid", "cta-simple"],
+    "pairsWith": [
+      "hero-gradient",
+      "features-grid",
+      "cta-simple"
+    ],
     "contentSlots": {
       "copyright": {
         "type": "string",
@@ -39,12 +56,22 @@
         "minItems": 0,
         "maxItems": 8,
         "items": {
-          "label": { "type": "string" },
-          "href": { "type": "string" }
+          "label": {
+            "type": "string"
+          },
+          "href": {
+            "type": "string"
+          }
         },
         "example": [
-          { "label": "Privacy", "href": "/privacy" },
-          { "label": "Terms", "href": "/terms" }
+          {
+            "label": "Privacy",
+            "href": "/privacy"
+          },
+          {
+            "label": "Terms",
+            "href": "/terms"
+          }
         ]
       },
       "tagline": {

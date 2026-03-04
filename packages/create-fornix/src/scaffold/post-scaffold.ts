@@ -90,7 +90,7 @@ export function runPostScaffold(
     log(pc.dim(`    ${config.packageManager} install`));
   }
   log(pc.dim(`    ${config.packageManager} dev`));
-  log(pc.dim(`    fornix add <block>`));
+  log(pc.dim(`    npx create-fornix add <block>`));
   log("");
 }
 
@@ -224,9 +224,9 @@ function generateClaudeMd(
   lines.push("");
   lines.push(`- \`${config.packageManager} dev\` — start development server`);
   lines.push(`- \`${config.packageManager} build\` — build for production`);
-  lines.push("- `fornix add <block>` — add a new block");
-  lines.push("- `fornix remove <block>` — remove a block");
-  lines.push("- `fornix status` — show project configuration");
+  lines.push("- `npx create-fornix add <block>` — add a new block");
+  lines.push("- `npx create-fornix remove <block>` — remove a block");
+  lines.push("- `npx create-fornix status` — show project configuration");
   lines.push("");
 
   // Project structure

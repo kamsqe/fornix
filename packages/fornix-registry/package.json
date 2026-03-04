@@ -1,6 +1,6 @@
 {
   "name": "fornix-registry",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Block metadata schemas and registry tooling for Fornix",
   "type": "module",
   "license": "MIT",

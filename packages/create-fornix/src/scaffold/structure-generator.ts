@@ -12,6 +12,7 @@ export function generateStructure(config: ResolvedConfig, manifests: ReadonlyArr
 
   // 1. package.json
   const adapterDeps = getAdapterDependencies(config);
+  const blockDeps = getBlockDependencies(manifests);
   const pkg = {
     name: config.projectName,
     type: "module",
@@ -31,9 +32,13 @@ export function generateStructure(config: ResolvedConfig, manifests: ReadonlyArr
         "@tailwindcss/vite": "^4.0.0",
       }),
       ...adapterDeps,
+      ...blockDeps,
     },
     devDependencies: {
       typescript: "^5.7.0",
+      ...(config.deployTarget === "cloudflare" && {
+        "@cloudflare/workers-types": "^4.0.0",
+      }),
     },
   };
   files["package.json"] = JSON.stringify(pkg, null, 2) + "\n";
@@ -43,9 +48,12 @@ export function generateStructure(config: ResolvedConfig, manifests: ReadonlyArr
     extends: "astro/tsconfigs/strict",
     compilerOptions: {
       jsx: "preserve",
-      jsxImportSource: "react", // Even if not using React yet, good default for UI frameworks
+      jsxImportSource: "react",
       strictNullChecks: true,
       baseUrl: ".",
+      ...(config.deployTarget === "cloudflare" && {
+        types: ["@cloudflare/workers-types"],
+      }),
       paths: {
         "@/*": ["src/*"],
       },
@@ -197,6 +205,20 @@ const { title } = Astro.props;${tailwindImport}
   }
 
   return files;
+}
+
+// ── Block Dependencies ───────────────────────────────────
+
+function getBlockDependencies(
+  manifests: ReadonlyArray<BlockManifest>,
+): Record<string, string> {
+  const merged: Record<string, string> = {};
+  for (const manifest of manifests) {
+    if (manifest.dependencies) {
+      Object.assign(merged, manifest.dependencies);
+    }
+  }
+  return merged;
 }
 
 // ── Adapter Dependencies ─────────────────────────────────

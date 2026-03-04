@@ -17,3 +17,4 @@
  */
 
 // Add your table definitions here
+export {};

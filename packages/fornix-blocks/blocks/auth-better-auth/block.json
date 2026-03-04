@@ -57,6 +57,43 @@
     "whenToUse": "Use when the project needs user authentication — login, signup, session management, and protected routes. Better Auth supports email/password and OAuth providers (GitHub, Google, etc.).",
     "whenNotToUse": "Don't use for public-only sites with no user accounts, or projects that need a different auth provider (e.g. Clerk, Auth0). Not suitable for static-only deployments.",
     "pairsWith": ["db-d1"],
-    "contentSlots": {}
+    "contentSlots": {
+      "title": {
+        "type": "string",
+        "description": "Page heading",
+        "maxLength": 60,
+        "example": "Sign in to your account"
+      },
+      "emailLabel": {
+        "type": "string",
+        "description": "Email input label",
+        "maxLength": 30,
+        "example": "Email"
+      },
+      "passwordLabel": {
+        "type": "string",
+        "description": "Password input label",
+        "maxLength": 30,
+        "example": "Password"
+      },
+      "submitText": {
+        "type": "string",
+        "description": "Submit button label",
+        "maxLength": 30,
+        "example": "Sign in"
+      },
+      "signupLink": {
+        "type": "string",
+        "description": "Link text to signup page",
+        "maxLength": 60,
+        "example": "Don't have an account? Sign up"
+      },
+      "githubText": {
+        "type": "string",
+        "description": "GitHub OAuth button label",
+        "maxLength": 40,
+        "example": "Continue with GitHub"
+      }
+    }
   }
 }

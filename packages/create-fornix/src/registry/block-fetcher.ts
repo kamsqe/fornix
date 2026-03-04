@@ -92,6 +92,11 @@ function ensureCacheVersion(cacheDir: string): void {
   } catch { /* don't crash on cache issues */ }
 }
 
+/** @internal — Reset for testing only */
+export function resetCacheVersionCheck(): void {
+  cacheVersionChecked = false;
+}
+
 // ── Output Types ─────────────────────────────────────────
 
 export interface FetchedBlock {

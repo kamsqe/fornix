@@ -12,7 +12,7 @@ vi.mock("giget", () => ({
 }));
 
 // Import AFTER mocking
-const { fetchBlock, fetchBlocks } = await import(
+const { fetchBlock, fetchBlocks, resetCacheVersionCheck } = await import(
   "../../src/registry/block-fetcher.js"
 );
 
@@ -61,6 +61,8 @@ function seedCache(blockName: string): void {
   mkdirSync(blockDir, { recursive: true });
   writeFileSync(join(blockDir, "block.json"), MOCK_MANIFEST);
   writeFileSync(join(blockDir, "hero-gradient.astro"), MOCK_ASTRO);
+  // Write version marker so ensureCacheVersion doesn't clear seeded cache
+  writeFileSync(join(TEST_CACHE_DIR, ".version"), "0.0.8");
 }
 
 function seedStaleCache(blockName: string): void {
@@ -78,6 +80,7 @@ function seedStaleCache(blockName: string): void {
 beforeEach(() => {
   mkdirSync(TEST_CACHE_DIR, { recursive: true });
   mockDownloadTemplate.mockReset();
+  resetCacheVersionCheck();
 });
 
 afterEach(() => {

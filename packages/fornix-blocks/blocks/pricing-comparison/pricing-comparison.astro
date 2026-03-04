@@ -6,13 +6,26 @@
  */
 import { getEntry } from "astro:content";
 
+interface ComparisonPlan {
+  name: string;
+  price: string;
+  ctaText: string;
+  ctaHref: string;
+  highlighted: boolean;
+}
+
+interface ComparisonFeature {
+  name: string;
+  values: string[];
+}
+
 const entry = await getEntry("sections", "pricing-comparison");
-const { headline, subheadline, plans, features } = entry?.data ?? {
+const { headline, subheadline } = entry?.data ?? {
   headline: "",
   subheadline: "",
-  plans: [],
-  features: [],
 };
+const plans = (entry?.data?.plans ?? []) as ComparisonPlan[];
+const features = (entry?.data?.features ?? []) as ComparisonFeature[];
 ---
 
 <section class="pricing-comparison">
@@ -27,13 +40,7 @@ const { headline, subheadline, plans, features } = entry?.data ?? {
       <thead>
         <tr>
           <th class="pricing-comparison__feature-header"></th>
-          {(plans as Array<{
-            name: string;
-            price: string;
-            ctaText: string;
-            ctaHref: string;
-            highlighted: boolean;
-          }>).map((plan) => (
+          {plans.map((plan) => (
             <th class:list={["pricing-comparison__plan-header", { "pricing-comparison__plan-header--highlighted": plan.highlighted }]}>
               <span class="pricing-comparison__plan-name">{plan.name}</span>
               <span class="pricing-comparison__plan-price">{plan.price}</span>
@@ -42,13 +49,10 @@ const { headline, subheadline, plans, features } = entry?.data ?? {
         </tr>
       </thead>
       <tbody>
-        {(features as Array<{
-          name: string;
-          values: string[];
-        }>).map((feature) => (
+        {features.map((feature) => (
           <tr class="pricing-comparison__row">
             <td class="pricing-comparison__feature-name">{feature.name}</td>
-            {feature.values.map((value: string) => (
+            {feature.values.map((value) => (
               <td class="pricing-comparison__value">{value}</td>
             ))}
           </tr>
@@ -57,11 +61,7 @@ const { headline, subheadline, plans, features } = entry?.data ?? {
       <tfoot>
         <tr>
           <td></td>
-          {(plans as Array<{
-            ctaText: string;
-            ctaHref: string;
-            highlighted: boolean;
-          }>).map((plan) => (
+          {plans.map((plan) => (
             <td class="pricing-comparison__cta-cell">
               <a href={plan.ctaHref} class="pricing-comparison__cta">{plan.ctaText}</a>
             </td>

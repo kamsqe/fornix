@@ -26,8 +26,9 @@ export function generateTailwindConfig(
 
   const lines = [
     '@import "tailwindcss";',
+    '@import "./src/styles/palettes/_current.css";',
     "",
-    `@source "../src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}";`,
+    `@source "./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}";`,
     "",
     themeBlock,
     "",

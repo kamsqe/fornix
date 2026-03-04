@@ -84,7 +84,7 @@
       },
       "requires": [],
       "conflicts": [],
-      "requiredMode": "hybrid",
+      "requiredMode": "server",
       "envVars": [
         {
           "name": "CLOUDFLARE_ACCOUNT_ID",
@@ -376,7 +376,7 @@
       "dependencies": {},
       "requires": [],
       "conflicts": [],
-      "requiredMode": "hybrid",
+      "requiredMode": "server",
       "envVars": [],
       "variants": [
         "default",
@@ -732,7 +732,7 @@
       },
       "requires": [],
       "conflicts": [],
-      "requiredMode": "hybrid",
+      "requiredMode": "server",
       "envVars": [
         {
           "name": "RESEND_API_KEY",
@@ -1926,7 +1926,7 @@
       },
       "requires": [],
       "conflicts": [],
-      "requiredMode": "hybrid",
+      "requiredMode": "server",
       "envVars": [
         {
           "name": "STRIPE_SECRET_KEY",

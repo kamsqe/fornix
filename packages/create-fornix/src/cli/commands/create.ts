@@ -134,6 +134,43 @@ export const createCommand = defineCommand({
     },
   },
   async run({ args }) {
+    // Detect if explicit config flags were provided
+    const hasExplicitFlags = !!(
+      args.render || args.deploy || args.blocks || args.database ||
+      args.css || args.locales || args.palette || args.recipe
+    );
+
+    // ── Early AI provider check ──
+    // If heading for AI mode, check provider BEFORE the expensive registry fetch.
+    let forceManual = false;
+    if (!args.manual && !hasExplicitFlags) {
+      const providerName = parseProviderName(args.provider);
+      if (args.provider && !providerName) {
+        console.error(pc.red(`\u2716 Unknown provider: ${String(args.provider)}`));
+        console.error(pc.dim(`  Available: ${VALID_PROVIDER_NAMES.join(", ")}`));
+        process.exitCode = 1;
+        return;
+      }
+
+      const legacyProvider = await resolveProvider({
+        provider: providerName,
+        skipOllamaDetect: false,
+      });
+
+      if (!legacyProvider) {
+        showNoProviderGuide();
+        const fallback = await p.confirm({
+          message: "Would you like to continue in manual mode instead?",
+          initialValue: true,
+        });
+        if (p.isCancel(fallback) || !fallback) {
+          process.exitCode = 1;
+          return;
+        }
+        forceManual = true;
+      }
+    }
+
     // 1. Fetch real registry
     const registryResult = await fetchRegistryIndex();
     if (!isOk(registryResult)) {
@@ -144,14 +181,8 @@ export const createCommand = defineCommand({
     const manifests = registryResult.value.blocks;
     const allPalettes = registryResult.value.palettes.length > 0 ? registryResult.value.palettes : loadAllPalettes();
 
-    // Detect if explicit config flags were provided (for backwards compatibility)
-    const hasExplicitFlags = !!(
-      args.render || args.deploy || args.blocks || args.database ||
-      args.css || args.locales || args.palette || args.recipe
-    );
-
-    // ── Interactive manual prompts (--manual without --yes) ──
-    if (args.manual && !args.yes) {
+    // ── Interactive manual prompts (--manual without --yes, or AI fallback) ──
+    if ((args.manual || forceManual) && !args.yes) {
       const defaultProjectName = args.dir ? basename(resolve(args.dir)) : "my-project";
 
       const config = await runManualFlow({
@@ -171,12 +202,12 @@ export const createCommand = defineCommand({
       return runScaffold(finalConfig, manifests, allPalettes, args["dry-run"] ?? false, args.verbose ?? false, !(args.install ?? true), !(args.git ?? true));
     }
 
-    // ── Flag-driven mode (--manual --yes, or explicit config flags) ──
-    if (args.manual || hasExplicitFlags) {
+    // ── Flag-driven mode (--manual --yes, or explicit config flags, or AI fallback with --yes) ──
+    if (args.manual || hasExplicitFlags || forceManual) {
       return runFlagDrivenMode(args, manifests, allPalettes);
     }
 
-    // ── AI mode (default — no --manual, no explicit config flags) ──
+    // ── AI mode (default) ──
     return runAIMode(args, manifests, allPalettes);
   },
 });

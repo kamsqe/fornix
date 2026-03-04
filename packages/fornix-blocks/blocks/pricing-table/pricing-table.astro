@@ -6,12 +6,23 @@
  */
 import { getEntry } from "astro:content";
 
+interface Plan {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: string[];
+  ctaText: string;
+  ctaHref: string;
+  highlighted: boolean;
+}
+
 const entry = await getEntry("sections", "pricing-table");
-const { headline, subheadline, plans } = entry?.data ?? {
+const { headline, subheadline } = entry?.data ?? {
   headline: "",
   subheadline: "",
-  plans: [],
 };
+const plans = (entry?.data?.plans ?? []) as Plan[];
 ---
 
 <section class="pricing-table">
@@ -22,16 +33,7 @@ const { headline, subheadline, plans } = entry?.data ?? {
     )}
   </div>
   <div class="pricing-table__grid">
-    {(plans as Array<{
-      name: string;
-      price: string;
-      period: string;
-      description: string;
-      features: string[];
-      ctaText: string;
-      ctaHref: string;
-      highlighted: boolean;
-    }>).map((plan) => (
+    {plans.map((plan) => (
       <div class:list={["pricing-table__card", { "pricing-table__card--highlighted": plan.highlighted }]}>
         <div class="pricing-table__card-header">
           <h3 class="pricing-table__plan-name">{plan.name}</h3>
@@ -42,7 +44,7 @@ const { headline, subheadline, plans } = entry?.data ?? {
           <p class="pricing-table__description">{plan.description}</p>
         </div>
         <ul class="pricing-table__features">
-          {plan.features.map((feature: string) => (
+          {plan.features.map((feature) => (
             <li class="pricing-table__feature">{feature}</li>
           ))}
         </ul>

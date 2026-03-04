@@ -1,6 +1,6 @@
 {
   "name": "create-fornix",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "CLI-first Astro + Cloudflare project generator",
   "type": "module",
   "license": "MIT",

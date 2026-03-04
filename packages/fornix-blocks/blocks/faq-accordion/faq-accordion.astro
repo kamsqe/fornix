@@ -7,12 +7,17 @@
  */
 import { getEntry } from "astro:content";
 
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
 const entry = await getEntry("sections", "faq-accordion");
-const { headline, subheadline, items } = entry?.data ?? {
+const { headline, subheadline } = entry?.data ?? {
   headline: "",
   subheadline: "",
-  items: [],
 };
+const items = (entry?.data?.items ?? []) as FaqItem[];
 ---
 
 <section class="faq-accordion">
@@ -23,10 +28,7 @@ const { headline, subheadline, items } = entry?.data ?? {
     )}
   </div>
   <div class="faq-accordion__list">
-    {(items as Array<{
-      question: string;
-      answer: string;
-    }>).map((item) => (
+    {items.map((item) => (
       <details class="faq-accordion__item">
         <summary class="faq-accordion__question">{item.question}</summary>
         <div class="faq-accordion__answer">

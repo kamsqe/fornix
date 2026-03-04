@@ -6,13 +6,18 @@
  */
 import { getEntry } from "astro:content";
 
+interface NavLink {
+  label: string;
+  href: string;
+}
+
 const entry = await getEntry("sections", "header-transparent");
-const { brandName, navLinks, ctaText, ctaHref } = entry?.data ?? {
+const { brandName, ctaText, ctaHref } = entry?.data ?? {
   brandName: "",
-  navLinks: [],
   ctaText: "",
   ctaHref: "#",
 };
+const navLinks = (entry?.data?.navLinks ?? []) as NavLink[];
 ---
 
 <header class="header-transparent">
@@ -20,7 +25,7 @@ const { brandName, navLinks, ctaText, ctaHref } = entry?.data ?? {
     <a href="/" class="header-transparent__brand">{brandName}</a>
     <nav class="header-transparent__nav" aria-label="primary">
       <ul class="header-transparent__links">
-        {(navLinks as Array<{ label: string; href: string }>).map((link) => (
+        {navLinks.map((link) => (
           <li>
             <a href={link.href} class="header-transparent__link">{link.label}</a>
           </li>

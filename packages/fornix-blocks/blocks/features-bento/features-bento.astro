@@ -6,12 +6,19 @@
  */
 import { getEntry } from "astro:content";
 
+interface BentoItem {
+  icon: string;
+  title: string;
+  description: string;
+  size: string;
+}
+
 const entry = await getEntry("sections", "features-bento");
-const { headline, subheadline, items } = entry?.data ?? {
+const { headline, subheadline } = entry?.data ?? {
   headline: "",
   subheadline: "",
-  items: [],
 };
+const items = (entry?.data?.items ?? []) as BentoItem[];
 ---
 
 <section class="features-bento">
@@ -22,12 +29,7 @@ const { headline, subheadline, items } = entry?.data ?? {
     )}
   </div>
   <div class="features-bento__grid">
-    {(items as Array<{
-      icon: string;
-      title: string;
-      description: string;
-      size: string;
-    }>).map((item) => (
+    {items.map((item) => (
       <div class:list={["features-bento__card", `features-bento__card--${item.size}`]}>
         <span class="features-bento__icon">{item.icon}</span>
         <h3 class="features-bento__title">{item.title}</h3>

@@ -7,11 +7,18 @@
  */
 import { getEntry } from "astro:content";
 
+interface Testimonial {
+  quote: string;
+  name: string;
+  role: string;
+  avatar: string;
+}
+
 const entry = await getEntry("sections", "testimonials-carousel");
-const { headline, testimonials } = entry?.data ?? {
+const { headline } = entry?.data ?? {
   headline: "",
-  testimonials: [],
 };
+const testimonials = (entry?.data?.testimonials ?? []) as Testimonial[];
 ---
 
 <section class="testimonials-carousel">
@@ -19,12 +26,7 @@ const { headline, testimonials } = entry?.data ?? {
     <h2 class="testimonials-carousel__headline">{headline}</h2>
   )}
   <div class="testimonials-carousel__track">
-    {(testimonials as Array<{
-      quote: string;
-      name: string;
-      role: string;
-      avatar: string;
-    }>).map((item) => (
+    {testimonials.map((item) => (
       <div class="testimonials-carousel__slide">
         <blockquote class="testimonials-carousel__quote">{item.quote}</blockquote>
         <div class="testimonials-carousel__author">

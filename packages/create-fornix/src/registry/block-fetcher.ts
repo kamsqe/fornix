@@ -186,16 +186,9 @@ function loadFromCache(
       });
     }
 
-    // Read all block source files
+    // Read all block source files (recursively, to handle nested dirs like migrations/)
     const files: Record<string, string> = {};
-    const entries = readdirSync(blockCacheDir);
-
-    for (const entry of entries) {
-      const fullPath = join(blockCacheDir, entry);
-      if (statSync(fullPath).isFile() && entry !== "block.json") {
-        files[entry] = readFileSync(fullPath, "utf-8");
-      }
-    }
+    readFilesRecursive(blockCacheDir, "", files);
 
     return ok({
       manifest: result.data,
@@ -210,5 +203,29 @@ function loadFromCache(
       blockName,
       message: `Failed to load block from cache: ${message}`,
     });
+  }
+}
+
+/**
+ * Recursively reads all files in a directory tree, storing them with
+ * relative path keys (e.g., "migrations/.gitkeep" instead of ".gitkeep").
+ * Skips block.json and default-content.json as they are handled separately.
+ */
+function readFilesRecursive(
+  dir: string,
+  prefix: string,
+  files: Record<string, string>,
+): void {
+  const entries = readdirSync(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+    const fullPath = join(dir, entry.name);
+
+    if (entry.isDirectory()) {
+      readFilesRecursive(fullPath, relativePath, files);
+    } else if (entry.name !== "block.json") {
+      files[relativePath] = readFileSync(fullPath, "utf-8");
+    }
   }
 }

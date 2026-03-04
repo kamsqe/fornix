@@ -43,6 +43,7 @@ function manifest(
 export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
   "hero-gradient": manifest("hero-gradient", {
     category: "hero",
+    conflicts: ["hero-video"],
     ai: {
       whenToUse: "Landing page hero with gradient background",
       whenNotToUse: "Internal pages",

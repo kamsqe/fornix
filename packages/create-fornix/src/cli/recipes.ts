@@ -33,7 +33,7 @@ export const RECIPES: Record<string, RecipeConfig> = {
     themeSwitcher: false,
   },
   agency: {
-    renderMode: "static",
+    renderMode: "server",
     deployTarget: "cloudflare",
     database: "none",
     cssEngine: "tailwind",
@@ -112,7 +112,7 @@ export const RECIPES: Record<string, RecipeConfig> = {
     themeSwitcher: false,
   },
   portfolio: {
-    renderMode: "static",
+    renderMode: "server",
     deployTarget: "cloudflare",
     database: "none",
     cssEngine: "tailwind",

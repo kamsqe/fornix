@@ -6,13 +6,23 @@
  */
 import { getEntry } from "astro:content";
 
+interface FooterLink {
+  label: string;
+  href: string;
+}
+
+interface FooterColumn {
+  title: string;
+  links: FooterLink[];
+}
+
 const entry = await getEntry("sections", "footer-rich");
-const { brandName, brandDescription, columns, copyright } = entry?.data ?? {
+const { brandName, brandDescription, copyright } = entry?.data ?? {
   brandName: "",
   brandDescription: "",
-  columns: [],
   copyright: "",
 };
+const columns = (entry?.data?.columns ?? []) as FooterColumn[];
 ---
 
 <footer class="footer-rich">
@@ -24,14 +34,11 @@ const { brandName, brandDescription, columns, copyright } = entry?.data ?? {
       )}
     </div>
     <div class="footer-rich__columns">
-      {(columns as Array<{
-        title: string;
-        links: Array<{ label: string; href: string }>;
-      }>).map((column) => (
+      {columns.map((column) => (
         <div class="footer-rich__column">
           <h4 class="footer-rich__column-title">{column.title}</h4>
           <ul class="footer-rich__links">
-            {column.links.map((link: { label: string; href: string }) => (
+            {column.links.map((link) => (
               <li>
                 <a href={link.href} class="footer-rich__link">{link.label}</a>
               </li>

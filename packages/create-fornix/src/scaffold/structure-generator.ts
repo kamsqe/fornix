@@ -115,17 +115,21 @@ ${blockImports.join('\n')}
 ${blockComponents.length > 0 ? blockComponents.join('\n') : `    <h1>Welcome to <span class="text-gradient">${config.projectName}</span></h1>`}
   </main>
 </Layout>
-`.trim() + "\\n";
+`.trim() + "\n";
 
   files["src/pages/index.astro"] = indexAstroContent;
 
   // 5. Base Layout (needed by index.astro)
+  const tailwindImport = config.cssEngine === "tailwind"
+    ? '\nimport "../../tailwind.css";'
+    : '';
+
   files["src/layouts/Layout.astro"] = `
 ---
 interface Props {
   title: string;
 }
-const { title } = Astro.props;
+const { title } = Astro.props;${tailwindImport}
 ---
 <!doctype html>
 <html lang="en">

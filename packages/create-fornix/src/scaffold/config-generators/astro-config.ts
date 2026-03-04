@@ -66,6 +66,18 @@ export function generateAstroConfig(
       configObject.integrations.push(builders.functionCall("mdx"));
     }
 
+    // Tailwind CSS v4 — requires the Vite plugin
+    if (config.cssEngine === "tailwind") {
+      module.imports.$add({
+        from: "@tailwindcss/vite",
+        imported: "default",
+        local: "tailwindcss",
+      });
+      configObject.vite = {
+        plugins: [builders.functionCall("tailwindcss")],
+      };
+    }
+
     const { code } = generateCode(module);
     return ok(code);
   } catch (error: unknown) {

@@ -17,6 +17,8 @@
 
 import * as p from "@clack/prompts";
 import pc from "picocolors";
+import { resolveDependencies } from "../scaffold/dependency-resolver.js";
+import { isOk } from "../utils/result.js";
 import type { ResolvedConfig } from "../schemas/config.js";
 import type { BlockManifest, Palette } from "fornix-registry";
 
@@ -92,37 +94,67 @@ export async function runManualFlow(
   let selectedFooter: string | undefined;
   let selectedContentBlocks: string[] = [];
 
-  // 5a. Header selection (single-select, optional)
-  if (headerOptions.length > 0) {
-    const noneOption = { value: "__none__", label: "None", hint: "No header" };
-    const headerChoice = await p.select({
-      message: "Choose a header (appears on every page)",
-      options: [noneOption, ...headerOptions],
-    });
-    if (p.isCancel(headerChoice)) return handleCancel();
-    if (headerChoice !== "__none__") selectedHeader = headerChoice as string;
-  }
+  while (true) {
+    selectedHeader = undefined;
+    selectedFooter = undefined;
+    selectedContentBlocks = [];
 
-  // 5b. Content blocks (multi-select)
-  if (contentOptions.length > 0) {
-    const blocks = await p.multiselect({
-      message: "Select content blocks (space to toggle, enter to confirm)",
-      options: contentOptions,
-      required: false,
-    });
-    if (p.isCancel(blocks)) return handleCancel();
-    selectedContentBlocks = blocks as string[];
-  }
+    // 5a. Header selection (single-select, optional)
+    if (headerOptions.length > 0) {
+      const noneOption = { value: "__none__", label: "None", hint: "No header" };
+      const headerChoice = await p.select({
+        message: "Choose a header (appears on every page)",
+        options: [noneOption, ...headerOptions],
+      });
+      if (p.isCancel(headerChoice)) return handleCancel();
+      if (headerChoice !== "__none__") selectedHeader = headerChoice as string;
+    }
 
-  // 5c. Footer selection (single-select, optional)
-  if (footerOptions.length > 0) {
-    const noneOption = { value: "__none__", label: "None", hint: "No footer" };
-    const footerChoice = await p.select({
-      message: "Choose a footer (appears on every page)",
-      options: [noneOption, ...footerOptions],
-    });
-    if (p.isCancel(footerChoice)) return handleCancel();
-    if (footerChoice !== "__none__") selectedFooter = footerChoice as string;
+    // 5b. Content blocks (multi-select)
+    if (contentOptions.length > 0) {
+      const blocks = await p.multiselect({
+        message: "Select content blocks (space to toggle, enter to confirm)",
+        options: contentOptions,
+        required: false,
+      });
+      if (p.isCancel(blocks)) return handleCancel();
+      selectedContentBlocks = blocks as string[];
+    }
+
+    // 5c. Footer selection (single-select, optional)
+    if (footerOptions.length > 0) {
+      const noneOption = { value: "__none__", label: "None", hint: "No footer" };
+      const footerChoice = await p.select({
+        message: "Choose a footer (appears on every page)",
+        options: [noneOption, ...footerOptions],
+      });
+      if (p.isCancel(footerChoice)) return handleCancel();
+      if (footerChoice !== "__none__") selectedFooter = footerChoice as string;
+    }
+
+    // Check for conflicts
+    const tempSelected: string[] = [];
+    if (selectedHeader) tempSelected.push(selectedHeader);
+    tempSelected.push(...selectedContentBlocks);
+    if (selectedFooter) tempSelected.push(selectedFooter);
+
+    if (tempSelected.length > 0) {
+      const checkResult = resolveDependencies(tempSelected, input.manifests);
+      if (!isOk(checkResult)) {
+        if (checkResult.error.kind === "DependencyConflictError") {
+          p.log.warn(`Conflict detected: ${checkResult.error.blockA} conflicts with ${checkResult.error.blockB}`);
+          const retry = await p.confirm({
+            message: "Block conflict detected. Would you like to select your blocks again?",
+            initialValue: true,
+          });
+          if (p.isCancel(retry) || !retry) return handleCancel();
+          continue; // Restart the loop
+        }
+      }
+    }
+    
+    // No conflicts or user didn't pick any blocks
+    break;
   }
 
   // 6. Locales

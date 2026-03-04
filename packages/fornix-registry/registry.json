@@ -316,7 +316,7 @@
         "rss"
       ],
       "dependencies": {
-        "@astrojs/mdx": "^3.1.9",
+        "@astrojs/mdx": "^4.0.0",
         "@astrojs/rss": "^4.0.9"
       },
       "requires": [],
@@ -681,7 +681,7 @@
         "navigation"
       ],
       "dependencies": {
-        "@astrojs/mdx": "^3.1.9"
+        "@astrojs/mdx": "^4.0.0"
       },
       "requires": [],
       "conflicts": [],

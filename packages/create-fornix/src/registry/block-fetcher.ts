@@ -19,6 +19,7 @@ import {
   statSync,
   writeFileSync,
   rmSync,
+  cpSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { homedir } from "node:os";
@@ -149,6 +150,17 @@ export async function fetchBlock(
     return loadFromCache(blockName, blockCacheDir);
   }
 
+  // 1.5. Local Blocks Override
+  const localBlocksDir = process.env.FORNIX_LOCAL_BLOCKS_DIR;
+  if (localBlocksDir) {
+    const localBlockPath = resolve(process.cwd(), localBlocksDir, blockName);
+    if (existsSync(localBlockPath)) {
+      mkdirSync(cfg.cacheDir, { recursive: true });
+      cpSync(localBlockPath, blockCacheDir, { recursive: true, force: true });
+      return loadFromCache(blockName, blockCacheDir);
+    }
+  }
+
   // 2. Download from GitHub
   try {
     const source = `gh:${cfg.repo}/${cfg.blocksPrefix}/${blockName}#${cfg.ref}`;
@@ -170,10 +182,16 @@ export async function fetchBlock(
 
     const message =
       error instanceof Error ? error.message : String(error);
+      
+    let refinedMessage = message;
+    if (message.includes("404") || message.includes("zlib: invalid distance code")) {
+      refinedMessage += ` (This usually means the block doesn't exist on the remote branch. If developing locally, set FORNIX_LOCAL_BLOCKS_DIR or push your block to GitHub.)`;
+    }
+
     return err({
       kind: "FetchError" as const,
       blockName,
-      message: `Failed to fetch block '${blockName}': ${message}`,
+      message: `Failed to fetch block '${blockName}': ${refinedMessage}`,
     });
   }
 }

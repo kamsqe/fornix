@@ -114,7 +114,7 @@ describe("build matrix smoke tests", { timeout: 60_000 }, () => {
 });
 
 describe("add/remove lifecycle (mock)", { timeout: 60_000 }, () => {
-  it("add injects import into index.astro", () => {
+  it("add injects import into Layout.astro", () => {
     const base = createTempDir();
     const projectDir = join(base, "lifecycle-add");
 
@@ -131,21 +131,23 @@ describe("add/remove lifecycle (mock)", { timeout: 60_000 }, () => {
       },
     );
 
-    const indexContent = readFileSync(join(projectDir, "src/pages/index.astro"), "utf-8");
-    expect(indexContent).toContain("FooterMinimal");
-    expect(indexContent).toContain("footer-minimal.astro");
+    const layoutContent = readFileSync(join(projectDir, "src/layouts/Layout.astro"), "utf-8");
+    expect(layoutContent).toContain("FooterMinimal");
+    expect(layoutContent).toContain("footer-minimal.astro");
   });
 
-  it("remove strips import from index.astro", () => {
+  it("remove strips import from Layout.astro", () => {
     const base = createTempDir();
     const projectDir = join(base, "lifecycle-remove");
 
     scaffold(projectDir, "--blocks hero-gradient,footer-minimal --render static --deploy static");
 
-    // Verify both blocks are in index.astro
+    // Verify both blocks are in correct files
     let indexContent = readFileSync(join(projectDir, "src/pages/index.astro"), "utf-8");
     expect(indexContent).toContain("HeroGradient");
-    expect(indexContent).toContain("FooterMinimal");
+    
+    let layoutContent = readFileSync(join(projectDir, "src/layouts/Layout.astro"), "utf-8");
+    expect(layoutContent).toContain("FooterMinimal");
 
     // Run remove
     execSync(
@@ -158,11 +160,10 @@ describe("add/remove lifecycle (mock)", { timeout: 60_000 }, () => {
       },
     );
 
-    // footer-minimal should be gone from index.astro
-    indexContent = readFileSync(join(projectDir, "src/pages/index.astro"), "utf-8");
-    expect(indexContent).toContain("HeroGradient");
-    expect(indexContent).not.toContain("FooterMinimal");
-    expect(indexContent).not.toContain("footer-minimal.astro");
+    // footer-minimal should be gone from Layout.astro
+    layoutContent = readFileSync(join(projectDir, "src/layouts/Layout.astro"), "utf-8");
+    expect(layoutContent).not.toContain("FooterMinimal");
+    expect(layoutContent).not.toContain("footer-minimal.astro");
   });
 });
 

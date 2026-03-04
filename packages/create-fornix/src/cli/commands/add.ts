@@ -185,6 +185,14 @@ export const addCommand = defineCommand({
           content,
         });
       }
+
+      if (sources["default-content.json"]) {
+        const collection = bManifest.type === "section" ? "sections" : bManifest.type + "s";
+        filesToWrite.push({
+          path: join(cwd, `src/content/${collection}/${name}.json`),
+          content: sources["default-content.json"],
+        });
+      }
     }
 
     // 7. Dry run check

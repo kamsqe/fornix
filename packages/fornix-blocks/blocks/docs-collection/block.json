@@ -7,7 +7,7 @@
   "category": "docs",
   "tags": ["docs", "mdx", "content", "navigation"],
   "dependencies": {
-    "@astrojs/mdx": "^3.1.9"
+    "@astrojs/mdx": "^4.0.0"
   },
   "requires": [],
   "conflicts": [],

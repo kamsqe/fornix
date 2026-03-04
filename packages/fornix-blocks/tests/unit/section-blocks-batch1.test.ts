@@ -81,15 +81,20 @@ for (const blockName of PHASE_39_BLOCKS) {
         expect(parsed.files[1].destination).toContain(`${blockName}.css`);
       });
 
-      it("declares no conflicts with companion blocks", () => {
+      it("declares no conflicts with companion blocks (excluding hero-vs-hero)", () => {
         const raw = readFileSync(join(blockDir, "block.json"), "utf-8");
         const parsed = JSON.parse(raw);
 
-        // None of the Phase 39 blocks should conflict with each other
+        const heroBlocks = ["hero-split", "hero-video", "hero-gradient"];
+        const isHero = heroBlocks.includes(blockName);
+
+        // Hero blocks naturally conflict with other hero blocks (same slot).
+        // Non-hero blocks should not conflict with any Phase 39 companion.
         for (const otherBlock of PHASE_39_BLOCKS) {
-          if (otherBlock !== blockName) {
-            expect(parsed.conflicts).not.toContain(otherBlock);
-          }
+          if (otherBlock === blockName) continue;
+          const otherIsHero = heroBlocks.includes(otherBlock);
+          if (isHero && otherIsHero) continue;
+          expect(parsed.conflicts).not.toContain(otherBlock);
         }
       });
     });

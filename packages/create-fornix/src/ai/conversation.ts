@@ -263,7 +263,7 @@ function filterBlocksToRegistry(
   config: MutableConfig,
   registry: BlockRegistry,
 ): void {
-  const registryBlockNames = new Set(registry.blocks.map((b) => b.name));
+  const registryBlockNames = new Set(Object.values(registry.blocks).map((b) => b.name));
   config.blocks = config.blocks.filter((b) => registryBlockNames.has(b.name));
 }
 
@@ -274,7 +274,7 @@ function addRecommendedBlocks(
   config: MutableConfig,
   registry: BlockRegistry,
 ): void {
-  const registryBlockNames = new Set(registry.blocks.map((b) => b.name));
+  const registryBlockNames = new Set(Object.values(registry.blocks).map((b) => b.name));
 
   for (const recommendation of intent.recommendedBlocks) {
     if (
@@ -370,7 +370,7 @@ function generateContent(
   registry: BlockRegistry,
 ): Record<string, Record<string, unknown>> | undefined {
   const selectedBlockNames = new Set(config.blocks.map((b) => b.name));
-  const blocksWithContent = registry.blocks.filter(
+  const blocksWithContent = Object.values(registry.blocks).filter(
     (b) =>
       selectedBlockNames.has(b.name) &&
       b.ai?.contentSlots &&
@@ -396,7 +396,7 @@ function generateContent(
       for (const [slotName, slot] of Object.entries(slots)) {
         localeContent[slotName] = generateSlotContent(
           slotName,
-          slot,
+          slot as { type: string; description?: string; maxLength?: number; example?: unknown },
           intent,
           locale,
         );

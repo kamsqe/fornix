@@ -22,7 +22,7 @@ vi.mock("../../src/registry/registry-fetcher.js", async (importOriginal) => {
         ok: true,
         value: {
           blocks: fixtures.FIXTURE_MANIFESTS,
-          palettes: fixtures.FIXTURE_PALETTES || [],
+          palettes: fixtures.loadAllPalettes(),
         },
       };
     }),

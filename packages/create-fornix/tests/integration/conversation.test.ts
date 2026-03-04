@@ -128,104 +128,111 @@ function createTestMockProvider(fixtureMap: Record<string, Intent>): AIProvider 
 
 /** Create a test registry with common blocks and palettes. */
 function createTestRegistry(): BlockRegistry {
-  return {
-    blocks: [
-      createTestBlock({ name: "hero-gradient" }),
-      createTestBlock({
-        name: "auth-better-auth",
-        type: "integration",
-        description: "Authentication with BetterAuth",
-        category: "auth",
-        tags: ["auth"],
-        requiredMode: "server",
-        requires: ["db-d1"],
-        files: [{ source: "auth.ts", destination: "src/lib/auth.ts" }],
-      }),
-      createTestBlock({
-        name: "db-d1",
-        type: "integration",
-        description: "Cloudflare D1 database",
-        category: "database",
-        tags: ["database"],
-        requiredMode: "server",
-        files: [{ source: "db.ts", destination: "src/lib/db.ts" }],
-      }),
-      createTestBlock({
-        name: "payments-stripe",
-        type: "integration",
-        description: "Stripe payments",
-        category: "payments",
-        tags: ["payments"],
-        files: [{ source: "stripe.ts", destination: "src/lib/stripe.ts" }],
-      }),
-      createTestBlock({
-        name: "analytics-cf",
-        type: "integration",
-        description: "Cloudflare analytics",
-        category: "analytics",
-        tags: ["analytics"],
-        files: [{ source: "analytics.ts", destination: "src/lib/analytics.ts" }],
-      }),
-      createTestBlock({
-        name: "features-grid",
-        type: "section",
-        description: "A grid of feature cards",
-        category: "features",
-        tags: ["features", "grid"],
-        ai: {
-          whenToUse: "To display product features",
-          whenNotToUse: "When features are not relevant",
-          pairsWith: ["hero-gradient"],
-          contentSlots: {
-            title: { type: "string", description: "Section title", maxLength: 80 },
-            features: {
-              type: "array",
-              description: "List of features",
-              minItems: 3,
-              maxItems: 6,
-              items: {
-                title: { type: "string" },
-                description: { type: "string" },
-              },
+  const blockArray = [
+    createTestBlock({ name: "hero-gradient" }),
+    createTestBlock({
+      name: "auth-better-auth",
+      type: "integration",
+      description: "Authentication with BetterAuth",
+      category: "auth",
+      tags: ["auth"],
+      requiredMode: "server",
+      requires: ["db-d1"],
+      files: [{ source: "auth.ts", destination: "src/lib/auth.ts" }],
+    }),
+    createTestBlock({
+      name: "db-d1",
+      type: "integration",
+      description: "Cloudflare D1 database",
+      category: "database",
+      tags: ["database"],
+      requiredMode: "server",
+      files: [{ source: "db.ts", destination: "src/lib/db.ts" }],
+    }),
+    createTestBlock({
+      name: "payments-stripe",
+      type: "integration",
+      description: "Stripe payments",
+      category: "payments",
+      tags: ["payments"],
+      files: [{ source: "stripe.ts", destination: "src/lib/stripe.ts" }],
+    }),
+    createTestBlock({
+      name: "analytics-cf",
+      type: "integration",
+      description: "Cloudflare analytics",
+      category: "analytics",
+      tags: ["analytics"],
+      files: [{ source: "analytics.ts", destination: "src/lib/analytics.ts" }],
+    }),
+    createTestBlock({
+      name: "features-grid",
+      type: "section",
+      description: "A grid of feature cards",
+      category: "features",
+      tags: ["features", "grid"],
+      ai: {
+        whenToUse: "To display product features",
+        whenNotToUse: "When features are not relevant",
+        pairsWith: ["hero-gradient"],
+        contentSlots: {
+          title: { type: "string", description: "Section title", maxLength: 80 },
+          features: {
+            type: "array",
+            description: "List of features",
+            minItems: 3,
+            maxItems: 6,
+            items: {
+              title: { type: "string" },
+              description: { type: "string" },
             },
           },
         },
-        files: [{ source: "features-grid.astro", destination: "src/components/features-grid.astro" }],
-      }),
-      createTestBlock({
-        name: "cta-simple",
-        type: "section",
-        description: "A simple call-to-action section",
-        category: "cta",
-        tags: ["cta", "conversion"],
-        ai: {
-          whenToUse: "To drive conversions",
-          whenNotToUse: "On informational pages",
-          pairsWith: ["hero-gradient"],
-          contentSlots: {
-            heading: { type: "string", description: "CTA heading", maxLength: 60 },
-            buttonText: { type: "string", description: "Button label", maxLength: 30 },
-          },
+      },
+      files: [{ source: "features-grid.astro", destination: "src/components/features-grid.astro" }],
+    }),
+    createTestBlock({
+      name: "cta-simple",
+      type: "section",
+      description: "A simple call-to-action section",
+      category: "cta",
+      tags: ["cta", "conversion"],
+      ai: {
+        whenToUse: "To drive conversions",
+        whenNotToUse: "On informational pages",
+        pairsWith: ["hero-gradient"],
+        contentSlots: {
+          heading: { type: "string", description: "CTA heading", maxLength: 60 },
+          buttonText: { type: "string", description: "Button label", maxLength: 30 },
         },
-        files: [{ source: "cta-simple.astro", destination: "src/components/cta-simple.astro" }],
-      }),
-      createTestBlock({
-        name: "footer-minimal",
-        type: "section",
-        description: "A minimal footer with links",
-        category: "footer",
-        tags: ["footer"],
-        ai: {
-          whenToUse: "For clean, minimal footers",
-          whenNotToUse: "When extensive footer navigation is needed",
-          pairsWith: [],
-          contentSlots: {
-            copyright: { type: "string", description: "Copyright text" },
-          },
+      },
+      files: [{ source: "cta-simple.astro", destination: "src/components/cta-simple.astro" }],
+    }),
+    createTestBlock({
+      name: "footer-minimal",
+      type: "section",
+      description: "A minimal footer with links",
+      category: "footer",
+      tags: ["footer"],
+      ai: {
+        whenToUse: "For clean, minimal footers",
+        whenNotToUse: "When extensive footer navigation is needed",
+        pairsWith: [],
+        contentSlots: {
+          copyright: { type: "string", description: "Copyright text" },
         },
-        files: [{ source: "footer.astro", destination: "src/components/footer.astro" }],
-      }),
-    ],
+      },
+      files: [{ source: "footer.astro", destination: "src/components/footer.astro" }],
+    }),
+  ];
+
+  const blocks: Record<string, BlockManifest> = {};
+  for (const b of blockArray) {
+    blocks[b.name] = b;
+  }
+
+  return {
+    blocks,
     palettes: [
       createTestPalette(),
       createTestPalette({
@@ -388,7 +395,7 @@ describe("runAIConversation", () => {
       }
 
       // Registry blocks with contentSlots that are selected should have content
-      const registryBlocksWithContent = registry.blocks.filter(
+      const registryBlocksWithContent = Object.values(registry.blocks).filter(
         (b) => b.ai?.contentSlots && Object.keys(b.ai.contentSlots).length > 0,
       );
       const selectedBlockNames = new Set(config.blocks.map((b) => b.name));

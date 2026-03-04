@@ -220,7 +220,7 @@ async function runAIMode(
 
   // 4. Build registry
   const registry: BlockRegistry = {
-    blocks: Object.values(manifests),
+    blocks: manifests,
     palettes: [...allPalettes],
   };
 
@@ -281,11 +281,11 @@ async function runAIMode(
 
 // ── Flag-Driven Mode ────────────────────────────────────
 
-function runFlagDrivenMode(
+async function runFlagDrivenMode(
   args: Record<string, unknown>,
   manifests: Record<string, import("fornix-registry").BlockManifest>,
   allPalettes: ReadonlyArray<Palette>,
-): void {
+): Promise<void> {
   const projectDir = resolve(String(args.dir ?? "."));
   const projectName = basename(projectDir);
 

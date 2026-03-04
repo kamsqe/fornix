@@ -216,7 +216,7 @@ describe("scaffold → real filesystem → astro check", { timeout: 300_000 }, (
   it("hybrid + 2 locales → astro check exits 0", { timeout: 300_000 }, () => {
     const input = buildInput({
       renderMode: "hybrid",
-      deployTarget: "static",
+      deployTarget: "cloudflare",
       cssEngine: "vanilla",
       locales: ["en", "es"],
       defaultLocale: "en",

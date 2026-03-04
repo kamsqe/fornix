@@ -24,8 +24,22 @@ export function wireI18n(
 
   files["src/i18n/utils.ts"] = generateI18nUtils(config);
   files["src/pages/[locale]/index.astro"] = generateLocaleIndexPage(config, manifests ?? []);
+  // Override the default index.astro with a redirect to the default locale
+  files["src/pages/index.astro"] = generateRootRedirect(config);
 
   return ok(files);
+}
+
+// ── Root Redirect Generator ──────────────────────────────
+
+function generateRootRedirect(config: ResolvedConfig): string {
+  const needsPrerender = config.renderMode === "server" || config.renderMode === "hybrid";
+  const prerenderLine = needsPrerender ? "export const prerender = true;\n" : "";
+
+  return `---
+${prerenderLine}return Astro.redirect("/${config.defaultLocale}/");
+---
+`;
 }
 
 // ── i18n Utils Generator ─────────────────────────────────
@@ -83,7 +97,7 @@ function generateLocaleIndexPage(
       .split("-")
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join("");
-    imports.push(`import ${componentName} from '../../../components/sections/${block.name}.astro';`);
+    imports.push(`import ${componentName} from '../../components/sections/${block.name}.astro';`);
     tags.push(`    <${componentName} />`);
   }
 
@@ -95,12 +109,16 @@ function generateLocaleIndexPage(
     ? "\n" + tags.join("\n") + "\n  "
     : "\n    <h1>" + config.projectName + "</h1>\n    <p>Locale: {locale}</p>\n  ";
 
+  // In Astro v5 with output: "server", getStaticPaths requires prerender = true
+  const needsPrerender = config.renderMode === "server" || config.renderMode === "hybrid";
+  const prerenderLine = needsPrerender ? "export const prerender = true;\n" : "";
+
   return `---
-import { locales } from "../../../i18n/utils";
-import Layout from "../../../layouts/Layout.astro";
-${importSection}
+import { locales } from "../../i18n/utils";
+import Layout from "../../layouts/Layout.astro";
+${importSection}${prerenderLine}
 export function getStaticPaths() {
-  return locales.map((locale) => ({ params: { locale } }));
+  return locales.map((locale: string) => ({ params: { locale } }));
 }
 
 const { locale } = Astro.params;

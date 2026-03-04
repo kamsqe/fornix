@@ -17,6 +17,8 @@ import {
   readdirSync,
   mkdirSync,
   statSync,
+  writeFileSync,
+  rmSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { homedir } from "node:os";
@@ -24,6 +26,7 @@ import { BlockManifestSchema } from "fornix-registry";
 import type { BlockManifest } from "fornix-registry";
 import { ok, err, type Result } from "../utils/result.js";
 import { FIXTURE_MANIFESTS, FIXTURE_BLOCK_SOURCES } from "../cli/fixture-registry.js";
+import { createRequire } from "node:module";
 
 // ── Config ───────────────────────────────────────────────
 
@@ -50,6 +53,44 @@ const DEFAULT_CONFIG: FetcherConfig = {
   force: process.env.FORNIX_NO_CACHE === "true",
   maxCacheAge: 24 * 60 * 60 * 1000, // 24 hours
 };
+
+// ── Version-based cache invalidation ─────────────────────
+
+let cacheVersionChecked = false;
+
+/**
+ * Clears the entire block cache when the CLI version changes.
+ * This prevents stale templates (with known bugs) from being served
+ * after the user upgrades to a fixed version.
+ */
+function ensureCacheVersion(cacheDir: string): void {
+  if (cacheVersionChecked) return;
+  cacheVersionChecked = true;
+
+  let cliVersion = "unknown";
+  try {
+    const require = createRequire(import.meta.url);
+    const pkg = require("../../package.json");
+    cliVersion = pkg.version ?? "unknown";
+  } catch { /* fallback */ }
+
+  const versionFile = join(cacheDir, ".version");
+
+  try {
+    if (existsSync(versionFile)) {
+      const cached = readFileSync(versionFile, "utf-8").trim();
+      if (cached === cliVersion) return;
+    }
+
+    // Version changed — clear entire block cache
+    if (existsSync(cacheDir)) {
+      rmSync(cacheDir, { recursive: true, force: true });
+    }
+
+    mkdirSync(cacheDir, { recursive: true });
+    writeFileSync(versionFile, cliVersion);
+  } catch { /* don't crash on cache issues */ }
+}
 
 // ── Output Types ─────────────────────────────────────────
 
@@ -92,6 +133,9 @@ export async function fetchBlock(
   }
 
   const cfg: FetcherConfig = { ...DEFAULT_CONFIG, ...config };
+
+  // Invalidate entire cache if CLI version changed
+  ensureCacheVersion(cfg.cacheDir);
 
   const blockCacheDir = join(cfg.cacheDir, blockName);
 

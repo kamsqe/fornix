@@ -18,7 +18,7 @@
 
 .faq-accordion__subheadline {
   font-size: 1.125rem;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
 }
 
 .faq-accordion__list {
@@ -73,7 +73,7 @@
 .faq-accordion__answer p {
   font-size: 0.95rem;
   line-height: 1.7;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
   margin: 0;
 }
 

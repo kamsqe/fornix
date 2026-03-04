@@ -6,7 +6,7 @@ import type { BlockManifest } from "fornix-registry";
 import { fetchRegistryIndex } from "../../registry/registry-fetcher.js";
 import { fetchBlocks } from "../../registry/block-fetcher.js";
 import { isOk } from "../../utils/result.js";
-import { addBlockToPage } from "../../scaffold/page-updater.js";
+import { addBlockToPage, addBlockToLayout, isLayoutBlock } from "../../scaffold/page-updater.js";
 
 // ── Types ────────────────────────────────────────────────
 
@@ -110,7 +110,30 @@ export const addCommand = defineCommand({
     // 4. Resolve dependencies
     const blocksToAdd = resolveDependencies(blockName, installedNames, manifests);
 
-    // 5. Check mode compatibility
+    // 5. Check for conflicts with installed blocks
+    for (const name of blocksToAdd) {
+      const m = manifests[name];
+      if (m?.conflicts && m.conflicts.length > 0) {
+        for (const conflictName of m.conflicts) {
+          if (installedNames.has(conflictName)) {
+            console.error(
+              pc.red(
+                `✗ Block '${name}' conflicts with installed block '${conflictName}'.`,
+              ),
+            );
+            console.log(
+              pc.dim(
+                `  Remove '${conflictName}' first: npx create-fornix remove ${conflictName}`,
+              ),
+            );
+            process.exitCode = 1;
+            return;
+          }
+        }
+      }
+    }
+
+    // 6. Check mode compatibility
     for (const name of blocksToAdd) {
       const m = manifests[name];
       if (m?.requiredMode && manifest.renderMode !== m.requiredMode) {
@@ -205,19 +228,36 @@ export const addCommand = defineCommand({
 
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
 
-    // 9b. Update index.astro — add import and component tag for section blocks
+    // 9b. Update index.astro or Layout.astro depending on block category
     const indexPath = join(cwd, "src/pages/index.astro");
-    if (existsSync(indexPath)) {
-      let pageContent = readFileSync(indexPath, "utf-8");
-      for (const name of blocksToAdd) {
-        const bManifest = manifests[name];
-        if (bManifest && bManifest.type === "section") {
-          pageContent = addBlockToPage(pageContent, name);
+    const layoutPath = join(cwd, "src/layouts/Layout.astro");
+
+    for (const name of blocksToAdd) {
+      const bManifest = manifests[name];
+      if (!bManifest || bManifest.type !== "section") continue;
+
+      if (isLayoutBlock(name, cwd)) {
+        // Header/footer → Layout.astro
+        if (existsSync(layoutPath)) {
+          const layoutContent = readFileSync(layoutPath, "utf-8");
+          const updated = addBlockToLayout(layoutContent, name, cwd);
+          if (updated !== layoutContent) {
+            writeFileSync(layoutPath, updated);
+            if (typedArgs.verbose) {
+              console.log(`  ${pc.dim("✎")} updated Layout.astro (${name})`);
+            }
+          }
         }
-      }
-      writeFileSync(indexPath, pageContent);
-      if (typedArgs.verbose) {
-        console.log(`  ${pc.dim("✎")} updated index.astro`);
+      } else {
+        // Content block → index.astro
+        if (existsSync(indexPath)) {
+          let pageContent = readFileSync(indexPath, "utf-8");
+          pageContent = addBlockToPage(pageContent, name, cwd);
+          writeFileSync(indexPath, pageContent);
+          if (typedArgs.verbose) {
+            console.log(`  ${pc.dim("✎")} updated index.astro (${name})`);
+          }
+        }
       }
     }
 

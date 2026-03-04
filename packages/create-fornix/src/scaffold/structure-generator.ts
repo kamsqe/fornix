@@ -86,50 +86,77 @@ pnpm-debug.log*
 Thumbs.db
 `.trim() + "\n";
 
-  // 4. Base Astro file
-  const blockImports: string[] = [];
-  const blockComponents: string[] = [];
-  
+  // 4. Split blocks into zones: header, content (inside main), footer
+  const LAYOUT_CATEGORIES = new Set(["header", "footer"]);
+
+  const headerImports: string[] = [];
+  const headerComponents: string[] = [];
+  const contentImports: string[] = [];
+  const contentComponents: string[] = [];
+  const footerImports: string[] = [];
+  const footerComponents: string[] = [];
+
   if (manifests.length > 0) {
     for (const manifest of manifests) {
       if (manifest.type !== 'section') continue;
 
-      // Find the main component file logic: usually the first .astro or .tsx file
       const mainFile = manifest.files.find(f => f.destination.endsWith('.astro') || f.destination.endsWith('.tsx'));
-      if (mainFile) {
-        const componentName = manifest.name
-          .split('-')
-          .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-          .join('');
-        
-        let importPath = mainFile.destination;
-        if (importPath.startsWith('src/')) {
-          importPath = '../' + importPath.substring(4);
-        }
-        
-        blockImports.push(`import ${componentName} from '${importPath}';`);
-        blockComponents.push(`    <${componentName} />`);
+      if (!mainFile) continue;
+
+      const componentName = manifest.name
+        .split('-')
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join('');
+
+      let importPath = mainFile.destination;
+      if (importPath.startsWith('src/')) {
+        importPath = '../' + importPath.substring(4);
+      }
+
+      const category = manifest.category ?? "other";
+
+      if (category === "header") {
+        headerImports.push(`import ${componentName} from '${importPath}';`);
+        headerComponents.push(`    <${componentName} />`);
+      } else if (category === "footer") {
+        footerImports.push(`import ${componentName} from '${importPath}';`);
+        footerComponents.push(`    <${componentName} />`);
+      } else {
+        contentImports.push(`import ${componentName} from '${importPath}';`);
+        contentComponents.push(`    <${componentName} />`);
       }
     }
   }
 
+  // index.astro — only content blocks (hero, features, pricing, etc.)
   const indexAstroContent = `
 ---
 import Layout from '../layouts/Layout.astro';
-${blockImports.join('\n')}
+${contentImports.join('\n')}
 ---
 <Layout title="Welcome to ${config.projectName}.">
   <main>
-${blockComponents.length > 0 ? blockComponents.join('\n') : `    <h1>Welcome to <span class="text-gradient">${config.projectName}</span></h1>`}
+${contentComponents.length > 0 ? contentComponents.join('\n') : `    <h1>Welcome to <span class="text-gradient">${config.projectName}</span></h1>`}
   </main>
 </Layout>
 `.trim() + "\n";
 
   files["src/pages/index.astro"] = indexAstroContent;
 
-  // 5. Base Layout (needed by index.astro)
+  // 5. Layout.astro — header/footer blocks live here (site-wide)
   const tailwindImport = config.cssEngine === "tailwind"
     ? '\nimport "../../tailwind.css";'
+    : '';
+
+  const layoutImportsStr = [...headerImports, ...footerImports].join('\n');
+  const layoutImportSection = layoutImportsStr ? '\n' + layoutImportsStr : '';
+
+  const headerSection = headerComponents.length > 0
+    ? '\n' + headerComponents.join('\n') + '\n'
+    : '';
+
+  const footerSection = footerComponents.length > 0
+    ? '\n' + footerComponents.join('\n')
     : '';
 
   files["src/layouts/Layout.astro"] = `
@@ -137,7 +164,7 @@ ${blockComponents.length > 0 ? blockComponents.join('\n') : `    <h1>Welcome to 
 interface Props {
   title: string;
 }
-const { title } = Astro.props;${tailwindImport}
+const { title } = Astro.props;${tailwindImport}${layoutImportSection}
 ---
 <!doctype html>
 <html lang="en">
@@ -149,8 +176,8 @@ const { title } = Astro.props;${tailwindImport}
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body>
-    <slot />
+  <body>${headerSection}
+    <slot />${footerSection}
   </body>
 </html>
 

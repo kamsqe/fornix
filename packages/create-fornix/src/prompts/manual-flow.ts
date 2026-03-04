@@ -83,18 +83,46 @@ export async function runManualFlow(
   });
   if (p.isCancel(cssEngine)) return handleCancel();
 
-  // 5. Block selection (categorized)
-  const blockOptions = buildBlockOptions(input.manifests);
-  let selectedBlocks: string[] = [];
+  // 5. Block selection — split by category for single-select header/footer
+  const headerOptions = buildCategoryOptions(input.manifests, "header");
+  const footerOptions = buildCategoryOptions(input.manifests, "footer");
+  const contentOptions = buildContentBlockOptions(input.manifests);
 
-  if (blockOptions.length > 0) {
+  let selectedHeader: string | undefined;
+  let selectedFooter: string | undefined;
+  let selectedContentBlocks: string[] = [];
+
+  // 5a. Header selection (single-select, optional)
+  if (headerOptions.length > 0) {
+    const noneOption = { value: "__none__", label: "None", hint: "No header" };
+    const headerChoice = await p.select({
+      message: "Choose a header (appears on every page)",
+      options: [noneOption, ...headerOptions],
+    });
+    if (p.isCancel(headerChoice)) return handleCancel();
+    if (headerChoice !== "__none__") selectedHeader = headerChoice as string;
+  }
+
+  // 5b. Content blocks (multi-select)
+  if (contentOptions.length > 0) {
     const blocks = await p.multiselect({
-      message: "Select blocks to include (space to toggle, enter to confirm)",
-      options: blockOptions,
+      message: "Select content blocks (space to toggle, enter to confirm)",
+      options: contentOptions,
       required: false,
     });
     if (p.isCancel(blocks)) return handleCancel();
-    selectedBlocks = blocks as string[];
+    selectedContentBlocks = blocks as string[];
+  }
+
+  // 5c. Footer selection (single-select, optional)
+  if (footerOptions.length > 0) {
+    const noneOption = { value: "__none__", label: "None", hint: "No footer" };
+    const footerChoice = await p.select({
+      message: "Choose a footer (appears on every page)",
+      options: [noneOption, ...footerOptions],
+    });
+    if (p.isCancel(footerChoice)) return handleCancel();
+    if (footerChoice !== "__none__") selectedFooter = footerChoice as string;
   }
 
   // 6. Locales
@@ -136,6 +164,29 @@ export async function runManualFlow(
     if (p.isCancel(switcherChoice)) return handleCancel();
     themeSwitcher = switcherChoice as boolean;
   }
+
+  // 8b. Auto-suggest header when i18n or theme-switcher needs navigation
+  if (!selectedHeader && headerOptions.length > 0) {
+    const needsNav = locales.length >= 2 || themeSwitcher;
+    if (needsNav) {
+      const autoHeader = await p.confirm({
+        message: `You enabled ${locales.length >= 2 ? "multiple locales" : "theme switching"} — add a header for navigation?`,
+        initialValue: true,
+      });
+      if (p.isCancel(autoHeader)) return handleCancel();
+      if (autoHeader) {
+        // Default to first available header
+        selectedHeader = headerOptions[0].value as string;
+        console.log(pc.dim(`  Adding ${selectedHeader} for navigation.`));
+      }
+    }
+  }
+
+  // ── Assemble selected blocks ──
+  const selectedBlocks: string[] = [];
+  if (selectedHeader) selectedBlocks.push(selectedHeader);
+  selectedBlocks.push(...selectedContentBlocks);
+  if (selectedFooter) selectedBlocks.push(selectedFooter);
 
   // ── Build ResolvedConfig ──
   const config: ResolvedConfig = {
@@ -208,6 +259,59 @@ function buildBlockOptions(
       options.push({
         value: block.name,
         label: `${block.name}`,
+        hint: `${category} — ${block.description}`,
+      });
+    }
+  }
+
+  return options;
+}
+
+/**
+ * Builds options for a single category (e.g. "header" or "footer").
+ * Used for single-select prompts.
+ */
+function buildCategoryOptions(
+  manifests: Readonly<Record<string, BlockManifest>>,
+  category: string,
+): Array<{ value: string; label: string; hint?: string }> {
+  return Object.values(manifests)
+    .filter((block) => (block.category ?? "other") === category)
+    .map((block) => ({
+      value: block.name,
+      label: block.name,
+      hint: block.description,
+    }));
+}
+
+/**
+ * Builds options for content blocks (everything except header/footer).
+ * Used for multi-select prompt.
+ */
+function buildContentBlockOptions(
+  manifests: Readonly<Record<string, BlockManifest>>,
+): Array<{ value: string; label: string; hint?: string }> {
+  const LAYOUT_CATEGORIES = new Set(["header", "footer"]);
+  const blocks = Object.values(manifests).filter(
+    (block) => !LAYOUT_CATEGORIES.has(block.category ?? "other"),
+  );
+
+  // Group by category
+  const categories = new Map<string, BlockManifest[]>();
+  for (const block of blocks) {
+    const category = block.category ?? "other";
+    if (!categories.has(category)) {
+      categories.set(category, []);
+    }
+    categories.get(category)!.push(block);
+  }
+
+  const options: Array<{ value: string; label: string; hint?: string }> = [];
+  for (const [category, categoryBlocks] of categories) {
+    for (const block of categoryBlocks) {
+      options.push({
+        value: block.name,
+        label: block.name,
         hint: `${category} — ${block.description}`,
       });
     }

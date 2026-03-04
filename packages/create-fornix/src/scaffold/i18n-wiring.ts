@@ -86,13 +86,16 @@ function generateLocaleIndexPage(
   config: ResolvedConfig,
   manifests: ReadonlyArray<BlockManifest>,
 ): string {
-  // Include section blocks the same way structure-generator does
-  const sectionBlocks = manifests.filter((m) => m.type === "section");
+  // Only content blocks — headers/footers live in Layout.astro (site-wide)
+  const LAYOUT_CATEGORIES = new Set(["header", "footer"]);
+  const contentBlocks = manifests.filter(
+    (m) => m.type === "section" && !LAYOUT_CATEGORIES.has(m.category ?? ""),
+  );
 
   const imports: string[] = [];
   const tags: string[] = [];
 
-  for (const block of sectionBlocks) {
+  for (const block of contentBlocks) {
     const componentName = block.name
       .split("-")
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))

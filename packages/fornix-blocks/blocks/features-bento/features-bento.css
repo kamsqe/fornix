@@ -18,7 +18,7 @@
 
 .features-bento__subheadline {
   font-size: 1.125rem;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
   max-width: 56ch;
   margin: 0 auto;
 }
@@ -71,7 +71,7 @@
 .features-bento__description {
   font-size: 0.95rem;
   line-height: 1.6;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
 }
 
 @media (max-width: 768px) {

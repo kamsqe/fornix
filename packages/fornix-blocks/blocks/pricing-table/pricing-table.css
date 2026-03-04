@@ -18,7 +18,7 @@
 
 .pricing-table__subheadline {
   font-size: 1.125rem;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
   max-width: 56ch;
   margin: 0 auto;
 }
@@ -74,12 +74,12 @@
 
 .pricing-table__period {
   font-size: 1rem;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
 }
 
 .pricing-table__description {
   font-size: 0.9rem;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
 }
 
 .pricing-table__features {
@@ -112,7 +112,7 @@
   text-align: center;
   padding: 0.875rem 2rem;
   background: var(--color-primary);
-  color: var(--color-background);
+  color: #ffffff;
   font-weight: 600;
   font-size: 1rem;
   border-radius: 0.5rem;

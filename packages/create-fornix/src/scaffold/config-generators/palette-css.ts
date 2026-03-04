@@ -59,7 +59,41 @@ function buildPaletteFile(colors: PaletteColors): string {
     (token) => `  --color-${token}: ${colors[token]};`,
   ).join("\n");
 
-  return `:root {\n${properties}\n}\n`;
+  // Auto-derive surface and muted from background/foreground
+  const surface = blendHex(colors.background, colors.foreground, 0.08);
+  const muted = blendHex(colors.foreground, colors.background, 0.4);
+
+  const derived = [
+    `  --color-surface: ${surface};`,
+    `  --color-muted: ${muted};`,
+  ].join("\n");
+
+  return `:root {\n${properties}\n${derived}\n}\n`;
+}
+
+/**
+ * Blends two hex colors by a ratio (0 = pure colorA, 1 = pure colorB).
+ * Simple linear interpolation in RGB space.
+ */
+function blendHex(colorA: string, colorB: string, ratio: number): string {
+  const a = parseHex(colorA);
+  const b = parseHex(colorB);
+  const r = Math.round(a.r + (b.r - a.r) * ratio);
+  const g = Math.round(a.g + (b.g - a.g) * ratio);
+  const bl = Math.round(a.b + (b.b - a.b) * ratio);
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${bl.toString(16).padStart(2, "0")}`;
+}
+
+function parseHex(hex: string): { r: number; g: number; b: number } {
+  const h = hex.replace("#", "");
+  const full = h.length === 3
+    ? h.split("").map((c) => c + c).join("")
+    : h;
+  return {
+    r: parseInt(full.slice(0, 2), 16),
+    g: parseInt(full.slice(2, 4), 16),
+    b: parseInt(full.slice(4, 6), 16),
+  };
 }
 
 function buildSwitcherScript(paletteNames: ReadonlyArray<string>): string {

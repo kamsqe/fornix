@@ -18,7 +18,7 @@
 
 .pricing-comparison__subheadline {
   font-size: 1.125rem;
-  color: var(--color-secondary);
+  color: var(--color-muted, #94a3b8);
 }
 
 .pricing-comparison__table-wrapper {
@@ -89,7 +89,7 @@
   display: inline-block;
   padding: 0.75rem 1.5rem;
   background: var(--color-primary);
-  color: var(--color-background);
+  color: #ffffff;
   font-weight: 600;
   border-radius: 0.5rem;
   text-decoration: none;

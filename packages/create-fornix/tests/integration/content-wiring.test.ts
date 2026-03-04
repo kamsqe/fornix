@@ -111,12 +111,12 @@ describe("wireContent", () => {
     if (isOk(result)) {
       const configTs = result.value["src/content/config.ts"];
       expect(configTs).toBeDefined();
-      expect(configTs).toContain("hero-gradient");
+      expect(configTs).toContain("sections");
       expect(configTs).toContain("defineCollection");
     }
   });
 
-  // ── 2 blocks with content → both collections merged ──
+  // ── 2 blocks of same type → single shared collection ──
 
   it("merges collections from 2 blocks into config.ts", () => {
     const heroManifest = manifest("hero-gradient", {
@@ -155,8 +155,9 @@ describe("wireContent", () => {
     if (isOk(result)) {
       const configTs = result.value["src/content/config.ts"];
       expect(configTs).toBeDefined();
-      expect(configTs).toContain("hero-gradient");
-      expect(configTs).toContain("features-grid");
+      // Both section blocks share the "sections" collection
+      expect(configTs).toContain("sections");
+      expect(configTs).toContain("defineCollection");
     }
   });
 

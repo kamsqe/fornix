@@ -438,7 +438,7 @@ describe("scaffold", () => {
     expect(isOk(result)).toBe(true);
     if (isOk(result)) {
       expect(result.value.files["tailwind.css"]).toBeDefined();
-      expect(result.value.files["tailwind.css"]).toContain("@theme");
+      expect(result.value.files["tailwind.css"]).toContain("@import \"tailwindcss\"");
     }
   });
 

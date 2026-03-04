@@ -62,7 +62,7 @@ function seedCache(blockName: string): void {
   writeFileSync(join(blockDir, "block.json"), MOCK_MANIFEST);
   writeFileSync(join(blockDir, "hero-gradient.astro"), MOCK_ASTRO);
   // Write version marker so ensureCacheVersion doesn't clear seeded cache
-  writeFileSync(join(TEST_CACHE_DIR, ".version"), "0.0.8");
+  writeFileSync(join(TEST_CACHE_DIR, ".version"), "0.0.9");
 }
 
 function seedStaleCache(blockName: string): void {
@@ -116,6 +116,8 @@ describe("block-fetcher", () => {
     });
 
     it("validates manifest from cache against schema", async () => {
+      // Write version marker so ensureCacheVersion doesn't clear cache
+      writeFileSync(join(TEST_CACHE_DIR, ".version"), "0.0.9");
       const blockDir = join(TEST_CACHE_DIR, "bad-block");
       mkdirSync(blockDir, { recursive: true });
       writeFileSync(

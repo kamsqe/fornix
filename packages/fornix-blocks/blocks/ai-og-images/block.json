@@ -18,7 +18,7 @@
   },
   "requires": [],
   "conflicts": [],
-  "requiredMode": "hybrid",
+  "requiredMode": "server",
   "envVars": [
     {
       "name": "CLOUDFLARE_ACCOUNT_ID",

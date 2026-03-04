@@ -15,7 +15,7 @@
   },
   "requires": [],
   "conflicts": [],
-  "requiredMode": "hybrid",
+  "requiredMode": "server",
   "envVars": [
     {
       "name": "RESEND_API_KEY",

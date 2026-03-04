@@ -128,10 +128,10 @@ describe("runtime AI blocks (phase 50)", () => {
         }
       });
 
-      it("requires hybrid mode", () => {
+      it("requires server mode", () => {
         const raw = readFileSync(join(blockDir, "block.json"), "utf-8");
         const parsed = JSON.parse(raw);
-        expect(parsed.requiredMode).toBe("hybrid");
+        expect(parsed.requiredMode).toBe("server");
       });
 
       it("declares required environment variables for Workers AI", () => {

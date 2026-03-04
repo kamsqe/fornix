@@ -193,7 +193,7 @@ describe("contact-form Astro Actions", () => {
   it("requires hybrid or server rendering mode", () => {
     const raw = readFileSync(join(BLOCKS_DIR, "contact-form/block.json"), "utf-8");
     const parsed = JSON.parse(raw);
-    expect(parsed.requiredMode).toBe("hybrid");
+    expect(parsed.requiredMode).toBe("server");
   });
 
   it("form uses data-astro-action attribute", () => {

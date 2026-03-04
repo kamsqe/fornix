@@ -15,7 +15,7 @@
   },
   "requires": [],
   "conflicts": [],
-  "requiredMode": "hybrid",
+  "requiredMode": "server",
   "envVars": [
     {
       "name": "STRIPE_SECRET_KEY",

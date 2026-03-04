@@ -6,7 +6,7 @@
  */
 
 import type { APIRoute } from "astro";
-import { createAuth } from "../../lib/auth";
+import { createAuth } from "../../../lib/auth";
 
 export const ALL: APIRoute = async (context) => {
   const d1 = (context.locals as Record<string, { env: { DB: D1Database } }>).runtime.env.DB;

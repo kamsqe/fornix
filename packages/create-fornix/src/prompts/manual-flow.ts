@@ -52,30 +52,7 @@ export async function runManualFlow(
   });
   if (p.isCancel(projectName)) return handleCancel();
 
-  // 2. Render mode
-  const renderMode = await p.select({
-    message: "Choose a render mode",
-    options: [
-      { value: "static", label: "Static (SSG)", hint: "Pre-built HTML, fastest" },
-      { value: "hybrid", label: "Hybrid", hint: "Static + per-page SSR opt-in" },
-      { value: "server", label: "Server (SSR)", hint: "Server-rendered on every request" },
-    ],
-  });
-  if (p.isCancel(renderMode)) return handleCancel();
-
-  // 3. Deploy target
-  const deployTarget = await p.select({
-    message: "Where will you deploy?",
-    options: [
-      { value: "cloudflare", label: "Cloudflare Pages", hint: "Recommended" },
-      { value: "vercel", label: "Vercel" },
-      { value: "netlify", label: "Netlify" },
-      { value: "static", label: "Static hosting", hint: "No adapter needed" },
-    ],
-  });
-  if (p.isCancel(deployTarget)) return handleCancel();
-
-  // 4. CSS engine
+  // 2. CSS engine
   const cssEngine = await p.select({
     message: "Choose a CSS engine",
     options: [
@@ -85,7 +62,7 @@ export async function runManualFlow(
   });
   if (p.isCancel(cssEngine)) return handleCancel();
 
-  // 5. Block selection — split by category for single-select header/footer
+  // 3. Block selection — split by category for single-select header/footer
   const headerOptions = buildCategoryOptions(input.manifests, "header");
   const footerOptions = buildCategoryOptions(input.manifests, "footer");
   const contentOptions = buildContentBlockOptions(input.manifests);
@@ -99,7 +76,7 @@ export async function runManualFlow(
     selectedFooter = undefined;
     selectedContentBlocks = [];
 
-    // 5a. Header selection (single-select, optional)
+    // 3a. Header selection (single-select, optional)
     if (headerOptions.length > 0) {
       const noneOption = { value: "__none__", label: "None", hint: "No header" };
       const headerChoice = await p.select({
@@ -110,10 +87,10 @@ export async function runManualFlow(
       if (headerChoice !== "__none__") selectedHeader = headerChoice as string;
     }
 
-    // 5b. Content blocks (multi-select)
+    // 3b. Content blocks (multi-select)
     if (contentOptions.length > 0) {
       const blocks = await p.multiselect({
-        message: "Select content blocks (space to toggle, enter to confirm)",
+        message: "Select features, layouts, and content blocks (space to toggle, enter to confirm)",
         options: contentOptions,
         required: false,
       });
@@ -121,7 +98,7 @@ export async function runManualFlow(
       selectedContentBlocks = blocks as string[];
     }
 
-    // 5c. Footer selection (single-select, optional)
+    // 3c. Footer selection (single-select, optional)
     if (footerOptions.length > 0) {
       const noneOption = { value: "__none__", label: "None", hint: "No footer" };
       const footerChoice = await p.select({
@@ -157,7 +134,7 @@ export async function runManualFlow(
     break;
   }
 
-  // 6. Locales
+  // 4. Locales
   const localesInput = await p.text({
     message: "Locales (comma-separated, e.g. en,es,ar)",
     placeholder: "en",
@@ -171,7 +148,7 @@ export async function runManualFlow(
     .filter(Boolean);
   const defaultLocale = locales[0] ?? "en";
 
-  // 7. Palette selection (grouped by category with separators)
+  // 5. Palette selection (grouped by category with separators)
   const paletteOptions = buildPaletteOptions(input.allPalettes);
   let selectedPalette: Palette | undefined;
 
@@ -185,7 +162,7 @@ export async function runManualFlow(
     selectedPalette = input.allPalettes.find((pal) => pal.name === paletteChoice);
   }
 
-  // 8. Theme switcher toggle (only if 2+ palettes available)
+  // 6. Theme switcher toggle (only if 2+ palettes available)
   let themeSwitcher = false;
   if (input.allPalettes.length >= 2) {
     const paletteCount = input.allPalettes.length;
@@ -197,7 +174,7 @@ export async function runManualFlow(
     themeSwitcher = switcherChoice as boolean;
   }
 
-  // 8b. Auto-suggest header when i18n or theme-switcher needs navigation
+  // 6b. Auto-suggest header when i18n or theme-switcher needs navigation
   if (!selectedHeader && headerOptions.length > 0) {
     const needsNav = locales.length >= 2 || themeSwitcher;
     if (needsNav) {
@@ -220,13 +197,89 @@ export async function runManualFlow(
   selectedBlocks.push(...selectedContentBlocks);
   if (selectedFooter) selectedBlocks.push(selectedFooter);
 
+  // 7. Resolve Final Dependencies
+  const resolveResult = resolveDependencies(selectedBlocks, input.manifests);
+  if (!isOk(resolveResult)) {
+    // Should be impossible due to the while loop check, but handle defensively
+    p.log.error("Failed to resolve dependencies: " + resolveResult.error.message);
+    return handleCancel();
+  }
+  const resolvedBlockNames = resolveResult.value;
+
+  // 8. Compute Required Render Mode & Database
+  let requiredMode: "static" | "hybrid" | "server" = "static";
+  let detectedDatabase = "none";
+  let modeReason = "";
+
+  for (const blockName of resolvedBlockNames) {
+    const manifest = input.manifests[blockName];
+    if (manifest) {
+      if (manifest.requiredMode === "server") {
+        requiredMode = "server";
+        modeReason = blockName;
+      } else if (manifest.requiredMode === "hybrid" && requiredMode === "static") {
+        requiredMode = "hybrid";
+        modeReason = blockName;
+      }
+
+      if (manifest.category === "database") {
+        if (blockName.includes("d1")) detectedDatabase = "d1";
+        else if (blockName.includes("turso")) detectedDatabase = "turso";
+        else if (blockName.includes("postgres")) detectedDatabase = "postgres";
+        else if (blockName.includes("astro-db")) detectedDatabase = "astro-db";
+      }
+    }
+  }
+
+  // 9. Render Mode Prompt
+  let renderMode = requiredMode;
+  if (requiredMode === "server") {
+    // No choice, must be server
+    p.log.step(`Auto-selecting ${pc.cyan("Server (SSR)")} render mode (required by ${pc.cyan(modeReason)})`);
+  } else {
+    const renderOptions = [
+      { value: "static", label: "Static (SSG)", hint: "Pre-built HTML, fastest" },
+      { value: "hybrid", label: "Hybrid", hint: "Static + per-page SSR opt-in" },
+      { value: "server", label: "Server (SSR)", hint: "Server-rendered on every request" },
+    ];
+
+    const validRenderOptions = renderOptions.filter((opt) => {
+      if (requiredMode === "hybrid") return opt.value === "hybrid" || opt.value === "server";
+      return true;
+    });
+
+    if (validRenderOptions.length === 1) {
+      renderMode = validRenderOptions[0].value as any;
+      p.log.step(`Auto-selecting ${pc.cyan(validRenderOptions[0].label)} render mode`);
+    } else {
+      const userRenderChoice = await p.select({
+        message: "Choose a render mode",
+        options: validRenderOptions,
+      });
+      if (p.isCancel(userRenderChoice)) return handleCancel();
+      renderMode = userRenderChoice as any;
+    }
+  }
+
+  // 10. Deploy target
+  const deployTarget = await p.select({
+    message: "Where will you deploy?",
+    options: [
+      { value: "cloudflare", label: "Cloudflare Pages", hint: "Recommended" },
+      { value: "vercel", label: "Vercel" },
+      { value: "netlify", label: "Netlify" },
+      { value: "static", label: "Static hosting", hint: "No adapter needed" },
+    ],
+  });
+  if (p.isCancel(deployTarget)) return handleCancel();
+
   // ── Build ResolvedConfig ──
   const config: ResolvedConfig = {
     projectName: (projectName as string).trim(),
     projectDir: `./${(projectName as string).trim()}`,
     renderMode: renderMode as "static" | "hybrid" | "server",
     deployTarget: deployTarget as "cloudflare" | "vercel" | "netlify" | "static",
-    database: "none",
+    database: detectedDatabase as any,
     cssEngine: cssEngine as "tailwind" | "vanilla",
     packageManager: "pnpm",
     blocks: selectedBlocks.map((name) => ({ name, variant: "default" })),
@@ -246,7 +299,7 @@ export async function runManualFlow(
     createdWith: "manual",
   } as ResolvedConfig;
 
-  // 9. Confirmation summary
+  // 11. Confirmation summary
   p.note(
     buildSummary(config, selectedBlocks, selectedPalette),
     "Project Summary",

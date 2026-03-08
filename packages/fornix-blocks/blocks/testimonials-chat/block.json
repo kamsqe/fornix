@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "name": "testimonials-chat",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Chat-style testimonials with message bubbles, avatars, timestamps, emoji reactions, and typing indicator",
+  "category": "testimonials",
+  "tags": ["testimonials", "chat", "social-proof", "reviews", "messaging"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "testimonials-chat.astro",
+      "destination": "src/components/sections/testimonials-chat.astro"
+    },
+    {
+      "source": "testimonials-chat.css",
+      "destination": "src/styles/sections/testimonials-chat.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for a fresh, modern take on testimonials styled like a chat thread. Great for SaaS, dev tools, and community-driven products.",
+    "whenNotToUse": "Don't use for formal/enterprise sites where a grid or carousel fits better. Avoid if you have fewer than 3 testimonials.",
+    "pairsWith": ["hero-gradient", "hero-glass", "stats-strip", "cta-banner"],
+    "contentSlots": {
+      "badge": { "type": "string", "maxLength": 30, "example": "The Buzz" },
+      "headline": { "type": "string", "maxLength": 80, "example": "What People Are Saying" },
+      "messages": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 8,
+        "items": {
+          "quote": { "type": "string" },
+          "author": { "type": "string" },
+          "role": { "type": "string" },
+          "company": { "type": "string" },
+          "avatar": { "type": "string" },
+          "time": { "type": "string" },
+          "reactions": { "type": "array" },
+          "verified": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

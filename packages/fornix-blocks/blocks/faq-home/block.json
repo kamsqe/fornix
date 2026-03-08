@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "name": "faq-home",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Lightweight FAQ accordion for landing pages with rounded cards and smooth expand/collapse",
+  "category": "faq",
+  "tags": ["faq", "accordion", "questions", "landing", "lightweight"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "faq-home.astro",
+      "destination": "src/components/sections/faq-home.astro"
+    },
+    {
+      "source": "faq-home.css",
+      "destination": "src/styles/sections/faq-home.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for a compact FAQ section on landing pages. Simpler and lighter than faq-accordion. Best for 3-6 common questions.",
+    "whenNotToUse": "Don't use if you need categorized FAQs or search — use faq-accordion for more complex setups.",
+    "pairsWith": ["hero-gradient", "pricing-table", "pricing-toggle", "cta-banner"],
+    "contentSlots": {
+      "badge": { "type": "string", "maxLength": 30, "example": "FAQ" },
+      "headline": { "type": "string", "maxLength": 80, "example": "Frequently Asked Questions" },
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 8,
+        "items": {
+          "question": { "type": "string" },
+          "answer": { "type": "string" }
+        }
+      }
+    }
+  }
+}

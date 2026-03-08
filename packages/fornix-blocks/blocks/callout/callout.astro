@@ -1,0 +1,44 @@
+---
+/**
+ * Callout — styled alert box for MDX content.
+ *
+ * Props-driven (no content collection) since this is an inline MDX component.
+ *
+ * Usage in MDX:
+ *   <Callout type="tip" title="Pro Tip">
+ *     This is really important information.
+ *   </Callout>
+ */
+
+export interface Props {
+  type?: "note" | "tip" | "warning" | "danger" | "success";
+  title?: string;
+}
+
+const { type = "note", title } = Astro.props;
+
+const config: Record<string, { icon: string; label: string }> = {
+  note: { icon: "ℹ️", label: "Note" },
+  tip: { icon: "💡", label: "Tip" },
+  warning: { icon: "⚠️", label: "Warning" },
+  danger: { icon: "🚨", label: "Danger" },
+  success: { icon: "✅", label: "Success" },
+};
+
+const { icon, label } = config[type] ?? config.note;
+const displayTitle = title || label;
+---
+
+<div class:list={["callout", `callout--${type}`]} role="alert">
+  <div class="callout__header">
+    <span class="callout__icon">{icon}</span>
+    <span class="callout__title">{displayTitle}</span>
+  </div>
+  <div class="callout__body">
+    <slot />
+  </div>
+</div>
+
+<style>
+  @import "../../styles/components/callout.css";
+</style>

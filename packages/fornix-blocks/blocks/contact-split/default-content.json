@@ -1,0 +1,12 @@
+{
+  "badge": "Get in Touch",
+  "headline": "Let's Work Together",
+  "description": "Have a project in mind? We'd love to hear about it. Drop us a line and we'll get back to you within 24 hours.",
+  "contactItems": [
+    { "icon": "📧", "label": "Email", "value": "hello@example.com", "href": "mailto:hello@example.com" },
+    { "icon": "📱", "label": "Phone", "value": "+1 (555) 123-4567", "href": "tel:+15551234567" },
+    { "icon": "📍", "label": "Address", "value": "123 Innovation Drive, San Francisco, CA", "href": "" },
+    { "icon": "🕐", "label": "Hours", "value": "Mon–Fri, 9 AM – 6 PM PST", "href": "" }
+  ],
+  "submitText": "Send Message"
+}

@@ -1,0 +1,87 @@
+---
+/**
+ * Stats Strip — horizontal social-proof metrics with count-up animation.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/stats-strip.json`.
+ */
+import { getEntry } from "astro:content";
+
+interface StatItem {
+  value: string;
+  label: string;
+  accent?: boolean;
+}
+
+const entry = await getEntry("sections", "stats-strip");
+const items = (entry?.data?.items ?? []) as StatItem[];
+---
+
+<section class="stats-strip">
+  <div class="stats-strip__inner">
+    {items.map((stat, i) => (
+      <div
+        class:list={["stats-strip__item", stat.accent && "stats-strip__item--accent"]}
+        style={`animation-delay: ${i * 0.1}s`}
+      >
+        <span
+          class="stats-strip__value"
+          {...(stat.value.match(/^\d/) ? { "data-count": stat.value } : {})}
+        >
+          {stat.value.match(/^\d/) ? "0" : stat.value}
+        </span>
+        <span class="stats-strip__label">{stat.label}</span>
+      </div>
+    ))}
+  </div>
+</section>
+
+<script>
+  function initStatsCountUp() {
+    const strip = document.querySelector(".stats-strip");
+    if (!strip) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            strip.classList.add("in-view");
+
+            strip.querySelectorAll("[data-count]").forEach((el) => {
+              const target = el.getAttribute("data-count") || "0";
+              const numMatch = target.match(/^(\d+)/);
+              if (!numMatch) return;
+
+              const end = parseInt(numMatch[1], 10);
+              const suffix = target.replace(/^\d+/, "");
+              const duration = 1200;
+              const startTime = performance.now();
+
+              function tick(now: number) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(end * eased);
+                el.textContent = current + suffix;
+                if (progress < 1) requestAnimationFrame(tick);
+              }
+              requestAnimationFrame(tick);
+            });
+
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    observer.observe(strip);
+  }
+
+  initStatsCountUp();
+  document.addEventListener("astro:after-swap", initStatsCountUp);
+</script>
+
+<style>
+  @import "../../styles/sections/stats-strip.css";
+</style>

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "name": "portfolio-grid",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Filterable project showcase grid with category tabs, image cards, and hover overlay with project details",
+  "category": "portfolio",
+  "tags": ["portfolio", "projects", "showcase", "gallery", "filter"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "masonry"],
+  "slots": [],
+  "files": [
+    {
+      "source": "portfolio-grid.astro",
+      "destination": "src/components/sections/portfolio-grid.astro"
+    },
+    {
+      "source": "portfolio-grid.css",
+      "destination": "src/styles/sections/portfolio-grid.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for agency, freelancer, or studio sites that need to showcase past work. Great for design portfolios, case studies, and project galleries.",
+    "whenNotToUse": "Don't use for simple product pages or blogs. Avoid if you have fewer than 3 projects.",
+    "pairsWith": ["hero-gradient", "about-stats", "testimonials-wall", "cta-banner"],
+    "contentSlots": {
+      "badge": {
+        "type": "string",
+        "maxLength": 30,
+        "example": "Our Work"
+      },
+      "headline": {
+        "type": "string",
+        "maxLength": 80,
+        "example": "Selected Projects"
+      },
+      "subheadline": {
+        "type": "string",
+        "maxLength": 200,
+        "example": "A curated collection of our recent work across industries."
+      },
+      "categories": {
+        "type": "array",
+        "description": "Filter categories (first one is 'All')",
+        "example": ["All", "Web", "Mobile", "Branding"]
+      },
+      "projects": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 12,
+        "items": {
+          "title": { "type": "string" },
+          "category": { "type": "string" },
+          "description": { "type": "string" },
+          "image": { "type": "string" },
+          "href": { "type": "string" }
+        }
+      }
+    }
+  }
+}

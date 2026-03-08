@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "name": "logo-cloud",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Logo cloud section showing partner, client, or technology logos with optional grayscale hover effect",
+  "category": "social-proof",
+  "tags": ["logos", "partners", "clients", "social-proof", "trust"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "compact", "grid"],
+  "slots": [],
+  "files": [
+    {
+      "source": "logo-cloud.astro",
+      "destination": "src/components/sections/logo-cloud.astro"
+    },
+    {
+      "source": "logo-cloud.css",
+      "destination": "src/styles/sections/logo-cloud.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for 'Trusted by' or 'Partners' sections showing brand logos. Great for SaaS, B2B, and enterprise sites. Place after hero or before footer for credibility.",
+    "whenNotToUse": "Don't use if you have fewer than 4 logos. Avoid if your partners are not recognizable — text-only trust strips work better for unknown brands.",
+    "pairsWith": ["hero-gradient", "hero-split", "stats-strip", "testimonials-wall"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Optional headline above the logos",
+        "maxLength": 60,
+        "example": "Trusted by the best teams"
+      },
+      "logos": {
+        "type": "array",
+        "description": "Array of logo items",
+        "minItems": 4,
+        "maxItems": 12,
+        "items": {
+          "name": { "type": "string", "description": "Company name (used as alt text)" },
+          "src": { "type": "string", "description": "Path to logo image (optional — text fallback if missing)" },
+          "href": { "type": "string", "description": "Optional link URL" }
+        },
+        "example": [
+          { "name": "Vercel", "src": "", "href": "" },
+          { "name": "Stripe", "src": "", "href": "" },
+          { "name": "Linear", "src": "", "href": "" },
+          { "name": "Notion", "src": "", "href": "" },
+          { "name": "Figma", "src": "", "href": "" },
+          { "name": "GitHub", "src": "", "href": "" }
+        ]
+      }
+    }
+  }
+}

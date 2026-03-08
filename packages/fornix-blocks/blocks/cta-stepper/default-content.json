@@ -1,0 +1,11 @@
+{
+  "headline": "What's Your Goal?",
+  "options": [
+    { "id": "build", "icon": "🚀", "label": "Build a new site", "response": "Great choice! We'll get you from zero to production in minutes.", "ctaText": "Start Building", "ctaHref": "#get-started" },
+    { "id": "scale", "icon": "📈", "label": "Scale my project", "response": "Perfect. Our edge-first architecture handles any traffic.", "ctaText": "Scale Now", "ctaHref": "#pricing" },
+    { "id": "ship", "icon": "⚡", "label": "Ship faster", "response": "You'll love our CLI. Pre-built blocks, zero config.", "ctaText": "Ship Today", "ctaHref": "#get-started" }
+  ],
+  "finalHeadline": "You're All Set",
+  "finalDescription": "Start your free trial today — no configuration needed.",
+  "footnote": "No credit card required · Cancel anytime"
+}

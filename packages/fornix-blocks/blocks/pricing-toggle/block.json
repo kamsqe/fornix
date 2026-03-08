@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "name": "pricing-toggle",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Pricing cards with monthly/annual toggle switch showing savings on annual plans",
+  "category": "pricing",
+  "tags": ["pricing", "toggle", "plans", "monthly", "annual", "billing"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "highlighted"],
+  "slots": [],
+  "files": [
+    {
+      "source": "pricing-toggle.astro",
+      "destination": "src/components/sections/pricing-toggle.astro"
+    },
+    {
+      "source": "pricing-toggle.css",
+      "destination": "src/styles/sections/pricing-toggle.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for SaaS pricing pages with monthly and annual billing options. The toggle encourages annual commitments by showing savings. Works well with 2-4 plans.",
+    "whenNotToUse": "Don't use if you have a single price or no billing period differentiation. Use pricing-table for simpler setups.",
+    "pairsWith": ["hero-gradient", "features-grid", "faq-accordion", "cta-banner", "testimonials-wall"],
+    "contentSlots": {
+      "badge": { "type": "string", "maxLength": 30, "example": "Pricing" },
+      "headline": { "type": "string", "maxLength": 80, "example": "Simple, Transparent Pricing" },
+      "subheadline": { "type": "string", "maxLength": 200, "example": "No hidden fees. Cancel anytime." },
+      "monthlyLabel": { "type": "string", "example": "Monthly" },
+      "annualLabel": { "type": "string", "example": "Annual" },
+      "annualSavings": { "type": "string", "example": "Save 20%" },
+      "plans": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 4,
+        "items": {
+          "name": { "type": "string" },
+          "monthlyPrice": { "type": "string" },
+          "annualPrice": { "type": "string" },
+          "description": { "type": "string" },
+          "features": { "type": "array" },
+          "ctaText": { "type": "string" },
+          "ctaHref": { "type": "string" },
+          "highlighted": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

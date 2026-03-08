@@ -1,0 +1,74 @@
+/* ── Logo Cloud ──────────────────────────────────────── */
+
+.logo-cloud {
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.logo-cloud__headline {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-muted, #64748b);
+  margin: 0 0 1.5rem;
+}
+
+.logo-cloud__grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem 3rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.logo-cloud__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  filter: grayscale(100%);
+  opacity: 0.5;
+  transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+.logo-cloud__item:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.logo-cloud__img {
+  height: 2rem;
+  width: auto;
+  max-width: 120px;
+  object-fit: contain;
+}
+
+.logo-cloud__text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-foreground, #0f172a);
+  white-space: nowrap;
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .logo-cloud {
+    padding: 2rem 1.5rem;
+  }
+
+  .logo-cloud__grid {
+    gap: 1.5rem 2rem;
+  }
+
+  .logo-cloud__img {
+    height: 1.5rem;
+  }
+
+  .logo-cloud__text {
+    font-size: 1rem;
+  }
+}

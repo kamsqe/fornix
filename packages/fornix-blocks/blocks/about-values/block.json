@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "name": "about-values",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Values grid showing company core values with icons, statements, proof points, and optional featured card with quote",
+  "category": "about",
+  "tags": ["about", "values", "mission", "culture", "brand"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "compact"],
+  "slots": [],
+  "files": [
+    {
+      "source": "about-values.astro",
+      "destination": "src/components/sections/about-values.astro"
+    },
+    {
+      "source": "about-values.css",
+      "destination": "src/styles/sections/about-values.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for mission/values pages or about sections that emphasize what the company believes in. Great for culture pages and brand storytelling.",
+    "whenNotToUse": "Don't use if you need a generic about section with stats — use about-stats instead.",
+    "pairsWith": ["hero-gradient", "about-stats", "about-timeline", "testimonials-wall", "cta-banner"],
+    "contentSlots": {
+      "badge": { "type": "string", "maxLength": 30, "example": "What We Believe" },
+      "headline": { "type": "string", "maxLength": 100, "example": "Building Software With Purpose" },
+      "subheadline": { "type": "string", "maxLength": 200 },
+      "values": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 6,
+        "items": {
+          "icon": { "type": "string" },
+          "name": { "type": "string" },
+          "statement": { "type": "string" },
+          "proof": { "type": "string" },
+          "featured": { "type": "boolean" },
+          "quote": { "type": "string" },
+          "quoteAuthor": { "type": "string" },
+          "quoteRole": { "type": "string" }
+        }
+      },
+      "ctaText": { "type": "string", "example": "Work With Us" },
+      "ctaHref": { "type": "string", "example": "/contact" }
+    }
+  }
+}

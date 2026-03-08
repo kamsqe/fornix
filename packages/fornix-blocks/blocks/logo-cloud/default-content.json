@@ -1,0 +1,11 @@
+{
+  "headline": "Trusted by the best teams",
+  "logos": [
+    { "name": "Vercel", "src": "", "href": "" },
+    { "name": "Stripe", "src": "", "href": "" },
+    { "name": "Linear", "src": "", "href": "" },
+    { "name": "Notion", "src": "", "href": "" },
+    { "name": "Figma", "src": "", "href": "" },
+    { "name": "GitHub", "src": "", "href": "" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "badge": "Our Journey",
+  "headline": "From Idea to Impact",
+  "subheadline": "Key milestones that shaped who we are.",
+  "milestones": [
+    { "year": "2021", "icon": "💡", "title": "The Spark", "description": "Started as a weekend project to simplify Astro site scaffolding. Built the first CLI prototype in a hackathon.", "isCta": false },
+    { "year": "2022", "icon": "🛠", "title": "Building Blocks", "description": "Developed the block system architecture. Launched the first 10 blocks with community feedback.", "isCta": false },
+    { "year": "2023", "icon": "🚀", "title": "Going Edge-First", "description": "Integrated Cloudflare Workers for global edge deployment. Performance became our differentiator.", "isCta": false },
+    { "year": "2024", "icon": "✨", "title": "AI-Powered Scaffolding", "description": "Added AI-driven project configuration that understands your tech stack and recommends blocks.", "isCta": false },
+    { "year": "Today", "icon": "👋", "title": "Join the Journey", "description": "40+ blocks, 10K+ developers, and growing. We're just getting started.", "isCta": true }
+  ],
+  "ctaText": "Start Building",
+  "ctaHref": "#get-started"
+}

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "name": "callout",
+  "version": "1.0.0",
+  "type": "component",
+  "description": "Styled alert/callout box for MDX content with type variants: note, tip, warning, danger, success",
+  "category": "mdx",
+  "tags": ["callout", "alert", "notice", "mdx", "docs"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["note", "tip", "warning", "danger", "success"],
+  "slots": ["content"],
+  "files": [
+    {
+      "source": "callout.astro",
+      "destination": "src/components/mdx/callout.astro"
+    },
+    {
+      "source": "callout.css",
+      "destination": "src/styles/components/callout.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use inside MDX content (blog posts, docs) to highlight important information: notes, tips, warnings, or danger alerts.",
+    "whenNotToUse": "Don't use as a standalone section — this is an inline MDX component, not a page section.",
+    "pairsWith": ["blog-mdx", "docs-collection"],
+    "contentSlots": {
+      "type": {
+        "type": "string",
+        "description": "Callout variant: note, tip, warning, danger, success",
+        "example": "tip"
+      },
+      "title": {
+        "type": "string",
+        "description": "Optional override for the callout title",
+        "example": "Pro tip"
+      },
+      "content": {
+        "type": "slot",
+        "description": "The callout body content (rendered via <slot />)"
+      }
+    }
+  }
+}

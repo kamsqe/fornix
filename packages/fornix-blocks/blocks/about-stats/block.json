@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "name": "about-stats",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "About section with centered narrative, stat cards with icons, and optional trust strip of partner logos",
+  "category": "about",
+  "tags": ["about", "stats", "team", "mission", "social-proof"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "no-trust-strip"],
+  "slots": ["trust-strip"],
+  "files": [
+    {
+      "source": "about-stats.astro",
+      "destination": "src/components/sections/about-stats.astro"
+    },
+    {
+      "source": "about-stats.css",
+      "destination": "src/styles/sections/about-stats.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for company/team introduction with key metrics. Great after a hero section to build credibility. Works well for SaaS, agencies, and product pages that want to combine narrative with social proof numbers.",
+    "whenNotToUse": "Don't use if you don't have meaningful stats to showcase. Avoid on minimal landing pages where a simple text block suffices.",
+    "pairsWith": ["hero-gradient", "hero-split", "stats-strip", "features-grid", "testimonials-wall"],
+    "contentSlots": {
+      "badge": {
+        "type": "string",
+        "description": "Small eyebrow label above the title (e.g. 'Our Mission')",
+        "maxLength": 30,
+        "example": "Our Mission"
+      },
+      "headline": {
+        "type": "string",
+        "description": "Section headline",
+        "maxLength": 80,
+        "example": "Crafting Digital Experiences That Matter"
+      },
+      "description": {
+        "type": "string",
+        "description": "Supporting paragraph about the company or team",
+        "maxLength": 300,
+        "example": "We're a team of designers and engineers obsessed with performance, accessibility, and beautiful interfaces."
+      },
+      "stats": {
+        "type": "array",
+        "description": "Stat cards with icon, value, subtitle, and description",
+        "minItems": 2,
+        "maxItems": 4,
+        "items": {
+          "icon": { "type": "string" },
+          "value": { "type": "string" },
+          "subtitle": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "example": [
+          { "icon": "⚡", "value": "99.9%", "subtitle": "Uptime", "description": "Enterprise-grade reliability across all deployments." },
+          { "icon": "🎨", "value": "50+", "subtitle": "Templates", "description": "Professionally designed, ready to customize." },
+          { "icon": "🌍", "value": "120+", "subtitle": "Countries", "description": "Serving users around the globe." }
+        ]
+      },
+      "trustLabels": {
+        "type": "array",
+        "description": "Optional list of partner/client names for social proof strip",
+        "items": { "type": "string" },
+        "example": ["Vercel", "Linear", "Stripe", "Notion"]
+      },
+      "trustHeadline": {
+        "type": "string",
+        "description": "Label above the trust strip",
+        "example": "Trusted by industry leaders"
+      }
+    }
+  }
+}

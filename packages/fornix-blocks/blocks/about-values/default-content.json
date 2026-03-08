@@ -1,0 +1,37 @@
+{
+  "badge": "What We Believe",
+  "headline": "Building Software With Purpose",
+  "subheadline": "Our values guide every decision we make — from how we write code to how we serve our users.",
+  "values": [
+    {
+      "icon": "⚡",
+      "name": "Speed",
+      "statement": "Performance isn't a feature — it's a baseline. Every millisecond matters.",
+      "proof": "Sub-50ms TTFB globally",
+      "featured": true,
+      "quote": "They shipped our entire rebrand in a weekend. Unreal velocity.",
+      "quoteAuthor": "Sarah Chen",
+      "quoteRole": "VP of Product"
+    },
+    {
+      "icon": "✨",
+      "name": "Craft",
+      "statement": "We sweat the details that most people never notice — until they're missing.",
+      "proof": "Zero accessibility violations"
+    },
+    {
+      "icon": "🤝",
+      "name": "Honesty",
+      "statement": "We tell you what you need to hear, not what you want to hear.",
+      "proof": "100% transparent pricing"
+    },
+    {
+      "icon": "🌱",
+      "name": "Growth",
+      "statement": "We're always learning. The best solution today might not be the best tomorrow.",
+      "proof": "Weekly knowledge sharing"
+    }
+  ],
+  "ctaText": "Work With Us",
+  "ctaHref": "/contact"
+}

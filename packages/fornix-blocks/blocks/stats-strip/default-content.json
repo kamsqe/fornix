@@ -1,0 +1,9 @@
+{
+  "items": [
+    { "value": "10K+", "label": "Active Users", "accent": true },
+    { "value": "99.9%", "label": "Uptime", "accent": false },
+    { "value": "150+", "label": "Countries", "accent": false },
+    { "value": "4.9", "label": "Star Rating", "accent": false },
+    { "value": "24/7", "label": "Support", "accent": true }
+  ]
+}

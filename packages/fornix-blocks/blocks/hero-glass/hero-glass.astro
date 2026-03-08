@@ -1,0 +1,98 @@
+---
+/**
+ * Hero Glass — glassmorphic hero with layered frosted depth panels,
+ * ambient glow orbs, and mouse-tracking parallax.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/hero-glass.json`.
+ */
+import { getEntry } from "astro:content";
+
+const entry = await getEntry("sections", "hero-glass");
+const {
+  badge = "",
+  headline = "",
+  subheadline = "",
+  ctaText = "Get Started",
+  ctaHref = "#",
+  ctaSecondaryText = "",
+  ctaSecondaryHref = "#",
+} = entry?.data ?? {};
+---
+
+<section id="hero-glass" class="hero-glass">
+  <!-- Ambient glow orbs -->
+  <div class="hero-glass__orbs" aria-hidden="true">
+    <div class="hero-glass__orb hero-glass__orb--primary"></div>
+    <div class="hero-glass__orb hero-glass__orb--accent"></div>
+  </div>
+
+  <!-- Depth tunnel -->
+  <div class="hero-glass__tunnel-wrap">
+    <div id="hero-glass-tunnel" class="hero-glass__tunnel">
+      <!-- Layer 3 (deepest) -->
+      <div class="hero-glass__layer hero-glass__layer--3"></div>
+      <!-- Layer 2 -->
+      <div class="hero-glass__layer hero-glass__layer--2"></div>
+      <!-- Layer 1 (front) -->
+      <div class="hero-glass__layer hero-glass__layer--1">
+        <!-- Content -->
+        <div class="hero-glass__content">
+          {badge && (
+            <span class="hero-glass__badge">{badge}</span>
+          )}
+          <h1 class="hero-glass__headline">{headline}</h1>
+          {subheadline && (
+            <p class="hero-glass__subheadline">{subheadline}</p>
+          )}
+          <div class="hero-glass__actions">
+            {ctaText && (
+              <a href={ctaHref} class="hero-glass__cta hero-glass__cta--primary">{ctaText}</a>
+            )}
+            {ctaSecondaryText && (
+              <a href={ctaSecondaryHref} class="hero-glass__cta hero-glass__cta--secondary">
+                <span>{ctaSecondaryText}</span>
+                <svg class="hero-glass__play-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initHeroGlass() {
+    const tunnel = document.getElementById("hero-glass-tunnel");
+    const section = document.getElementById("hero-glass");
+    if (!tunnel || !section) return;
+
+    // Only enable on hover-capable devices
+    if (!window.matchMedia("(any-hover: hover)").matches) return;
+
+    section.addEventListener("mousemove", (e) => {
+      const rect = section.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -8;
+      const rotateY = ((x - centerX) / centerX) * 8;
+      tunnel.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      tunnel.style.transition = "transform 0.1s linear";
+    });
+
+    section.addEventListener("mouseleave", () => {
+      tunnel.style.transform = "rotateX(0deg) rotateY(0deg)";
+      tunnel.style.transition = "transform 0.5s ease-out";
+    });
+  }
+
+  initHeroGlass();
+  document.addEventListener("astro:after-swap", initHeroGlass);
+</script>
+
+<style>
+  @import "../../styles/sections/hero-glass.css";
+</style>

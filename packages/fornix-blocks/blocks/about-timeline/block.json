@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "name": "about-timeline",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Vertical timeline showing company milestones with glowing nodes, year badges, and alternating content cards",
+  "category": "about",
+  "tags": ["about", "timeline", "history", "milestones", "journey"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "about-timeline.astro",
+      "destination": "src/components/sections/about-timeline.astro"
+    },
+    {
+      "source": "about-timeline.css",
+      "destination": "src/styles/sections/about-timeline.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use for 'Our Journey' or 'Our Story' sections showing company history. Great for about pages, investor decks, and brand pages.",
+    "whenNotToUse": "Don't use if you have fewer than 3 milestones. Avoid for very long histories (>8 items) — it becomes too scrollable.",
+    "pairsWith": ["hero-gradient", "about-stats", "about-values", "testimonials-wall"],
+    "contentSlots": {
+      "badge": { "type": "string", "maxLength": 30, "example": "Our Journey" },
+      "headline": { "type": "string", "maxLength": 80, "example": "From Idea to Impact" },
+      "subheadline": { "type": "string", "maxLength": 200 },
+      "milestones": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 8,
+        "items": {
+          "year": { "type": "string" },
+          "icon": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "isCta": { "type": "boolean" }
+        }
+      },
+      "ctaText": { "type": "string" },
+      "ctaHref": { "type": "string" }
+    }
+  }
+}

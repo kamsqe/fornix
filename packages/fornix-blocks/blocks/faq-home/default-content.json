@@ -1,0 +1,11 @@
+{
+  "badge": "FAQ",
+  "headline": "Frequently Asked Questions",
+  "items": [
+    { "question": "Is this free to use?", "answer": "Yes — the CLI and all blocks are free and open source under the MIT license. Use them for personal and commercial projects." },
+    { "question": "Can I use this for commercial projects?", "answer": "Absolutely. The MIT license allows unlimited commercial use with no attribution required." },
+    { "question": "How do I switch between themes?", "answer": "Run the CLI and pick a palette during setup, or edit the CSS variables in your global stylesheet at any time." },
+    { "question": "Does it work with React components?", "answer": "Blocks are pure Astro by design, but you can add React islands alongside them using Astro's built-in framework integration." },
+    { "question": "Where can I deploy?", "answer": "Anywhere that supports Astro — Cloudflare Workers (recommended), Vercel, Netlify, or any static host." }
+  ]
+}

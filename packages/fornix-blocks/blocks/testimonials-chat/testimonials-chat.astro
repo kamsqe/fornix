@@ -1,0 +1,142 @@
+---
+/**
+ * Testimonials Chat — chat-bubble-style testimonials with reactions and typing indicator.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/testimonials-chat.json`.
+ */
+import { getEntry } from "astro:content";
+
+interface Reaction {
+  emoji: string;
+  count: number;
+}
+
+interface Message {
+  quote: string;
+  author: string;
+  role?: string;
+  company?: string;
+  avatar?: string;
+  time?: string;
+  reactions?: Reaction[];
+  verified?: boolean;
+}
+
+const entry = await getEntry("sections", "testimonials-chat");
+const { badge = "", headline = "" } = entry?.data ?? {};
+const messages = (entry?.data?.messages ?? []) as Message[];
+---
+
+<section class="testimonials-chat">
+  <div class="testimonials-chat__inner">
+    <!-- Header -->
+    <div class="testimonials-chat__header">
+      {badge && (
+        <span class="testimonials-chat__badge">
+          <span class="testimonials-chat__badge-dot"></span>
+          {messages.length} {badge}
+        </span>
+      )}
+      <h2 class="testimonials-chat__headline">{headline}</h2>
+    </div>
+
+    <!-- Chat Thread -->
+    <div class="testimonials-chat__thread">
+      {messages.map((m, i) => (
+        <div
+          class="testimonials-chat__message"
+          data-delay={i * 150}
+          style={`animation-delay: ${i * 150}ms`}
+        >
+          <div class="testimonials-chat__row">
+            {/* Avatar */}
+            <div class="testimonials-chat__avatar-wrap">
+              {m.avatar ? (
+                <img src={m.avatar} alt={m.author} class="testimonials-chat__avatar" loading="lazy" />
+              ) : (
+                <div class="testimonials-chat__avatar testimonials-chat__avatar--fallback">
+                  {m.author.charAt(0)}
+                </div>
+              )}
+              {m.verified && (
+                <div class="testimonials-chat__verified" title="Verified">
+                  <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              )}
+            </div>
+
+            {/* Bubble */}
+            <div class="testimonials-chat__bubble-wrap">
+              {/* Meta */}
+              <div class="testimonials-chat__meta">
+                <span class="testimonials-chat__author">{m.author}</span>
+                {(m.role || m.company) && (
+                  <span class="testimonials-chat__role">
+                    {m.role}{m.company ? `, ${m.company}` : ""}
+                  </span>
+                )}
+                {m.time && <span class="testimonials-chat__time">· {m.time}</span>}
+              </div>
+
+              {/* Quote */}
+              <div class="testimonials-chat__bubble">
+                <p class="testimonials-chat__quote">{m.quote}</p>
+              </div>
+
+              {/* Reactions */}
+              {m.reactions && m.reactions.length > 0 && (
+                <div class="testimonials-chat__reactions">
+                  {m.reactions.map((r) => (
+                    <span class="testimonials-chat__reaction">
+                      <span>{r.emoji}</span>
+                      <span class="testimonials-chat__reaction-count">{r.count}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Typing indicator */}
+      <div class="testimonials-chat__typing">
+        <div class="testimonials-chat__avatar testimonials-chat__avatar--fallback">💬</div>
+        <div class="testimonials-chat__typing-bubble">
+          <span class="testimonials-chat__typing-dot"></span>
+          <span class="testimonials-chat__typing-dot"></span>
+          <span class="testimonials-chat__typing-dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initTestimonialsChat() {
+    const messages = document.querySelectorAll(".testimonials-chat__message");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const delay = parseInt((entry.target as HTMLElement).dataset.delay || "0");
+            setTimeout(() => entry.target.classList.add("in-view"), delay);
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    messages.forEach((m) => observer.observe(m));
+  }
+
+  initTestimonialsChat();
+  document.addEventListener("astro:after-swap", initTestimonialsChat);
+</script>
+
+<style>
+  @import "../../styles/sections/testimonials-chat.css";
+</style>

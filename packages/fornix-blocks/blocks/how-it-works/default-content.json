@@ -1,0 +1,10 @@
+{
+  "badge": "Getting Started",
+  "headline": "Three Steps to Launch",
+  "subheadline": "From zero to production in minutes, not months.",
+  "steps": [
+    { "icon": "📦", "title": "Install", "description": "Run a single command to scaffold your project with the blocks you need.", "command": "npx create-fornix my-app" },
+    { "icon": "🎨", "title": "Customize", "description": "Pick your blocks, choose a color palette, and configure everything to match your brand.", "command": "" },
+    { "icon": "🚀", "title": "Deploy", "description": "Ship to Cloudflare's global edge network with one command.", "command": "npm run deploy" }
+  ]
+}

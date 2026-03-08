@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "name": "contact-split",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Two-column contact section with info panel (address, email, phone) alongside a contact form",
+  "category": "contact",
+  "tags": ["contact", "form", "split", "info", "two-column"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "reversed"],
+  "slots": ["map"],
+  "files": [
+    {
+      "source": "contact-split.astro",
+      "destination": "src/components/sections/contact-split.astro"
+    },
+    {
+      "source": "contact-split.css",
+      "destination": "src/styles/sections/contact-split.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when you need both contact info and a form visible together. Great for business sites, agencies, and service pages.",
+    "whenNotToUse": "Don't use if you only need a standalone form — use contact-form instead. Avoid on minimal pages.",
+    "pairsWith": ["hero-gradient", "about-stats", "faq-accordion", "footer-rich"],
+    "contentSlots": {
+      "badge": { "type": "string", "maxLength": 30, "example": "Get in Touch" },
+      "headline": { "type": "string", "maxLength": 80, "example": "Let's Work Together" },
+      "description": { "type": "string", "maxLength": 300, "example": "Have a project in mind? We'd love to hear about it." },
+      "contactItems": {
+        "type": "array",
+        "items": { "icon": { "type": "string" }, "label": { "type": "string" }, "value": { "type": "string" }, "href": { "type": "string" } }
+      },
+      "formFields": { "type": "array", "description": "Form field configs" },
+      "submitText": { "type": "string", "example": "Send Message" }
+    }
+  }
+}

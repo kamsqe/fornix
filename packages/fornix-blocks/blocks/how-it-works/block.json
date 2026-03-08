@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "name": "how-it-works",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Numbered steps section showing a process flow with icons, descriptions, and optional code snippets",
+  "category": "process",
+  "tags": ["steps", "process", "how-it-works", "flow", "getting-started"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default", "horizontal", "vertical"],
+  "slots": [],
+  "files": [
+    {
+      "source": "how-it-works.astro",
+      "destination": "src/components/sections/how-it-works.astro"
+    },
+    {
+      "source": "how-it-works.css",
+      "destination": "src/styles/sections/how-it-works.css"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use to explain a multi-step process like onboarding, setup, or workflow. Great for SaaS products, developer tools, and any product with a clear getting-started flow.",
+    "whenNotToUse": "Don't use for generic feature lists — use features-grid instead. Avoid if your process has more than 5 steps (too dense).",
+    "pairsWith": ["hero-gradient", "hero-split", "cta-banner", "stats-strip"],
+    "contentSlots": {
+      "badge": {
+        "type": "string",
+        "description": "Eyebrow text above headline",
+        "maxLength": 30,
+        "example": "Getting Started"
+      },
+      "headline": {
+        "type": "string",
+        "description": "Section headline",
+        "maxLength": 80,
+        "example": "Three Steps to Launch"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Supporting text",
+        "maxLength": 200,
+        "example": "From zero to production in minutes, not months."
+      },
+      "steps": {
+        "type": "array",
+        "description": "Array of process steps",
+        "minItems": 2,
+        "maxItems": 5,
+        "items": {
+          "icon": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "command": { "type": "string", "description": "Optional terminal command to display" }
+        },
+        "example": [
+          { "icon": "📦", "title": "Install", "description": "Run a single command to scaffold your project.", "command": "npx create-fornix my-app" },
+          { "icon": "🎨", "title": "Customize", "description": "Pick blocks, themes, and configure to your needs.", "command": "" },
+          { "icon": "🚀", "title": "Deploy", "description": "Ship to the edge with one command.", "command": "npm run deploy" }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+---
+/**
+ * How It Works — numbered process steps with connector arrows.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/how-it-works.json`.
+ */
+import { getEntry } from "astro:content";
+
+interface Step {
+  icon: string;
+  title: string;
+  description: string;
+  command?: string;
+}
+
+const entry = await getEntry("sections", "how-it-works");
+const {
+  badge = "",
+  headline = "",
+  subheadline = "",
+} = entry?.data ?? {};
+const steps = (entry?.data?.steps ?? []) as Step[];
+---
+
+<section class="how-it-works">
+  <div class="how-it-works__inner">
+    <!-- Header -->
+    <div class="how-it-works__header">
+      {badge && (
+        <span class="how-it-works__badge">{badge}</span>
+      )}
+      <h2 class="how-it-works__headline">{headline}</h2>
+      {subheadline && (
+        <p class="how-it-works__subheadline">{subheadline}</p>
+      )}
+    </div>
+
+    <!-- Steps Grid -->
+    <div class="how-it-works__grid">
+      {steps.map((step, i) => (
+        <div class="how-it-works__step" style={`animation-delay: ${i * 120}ms`}>
+          {/* Connector arrow (not on last step) */}
+          {i < steps.length - 1 && (
+            <div class="how-it-works__connector" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </div>
+          )}
+
+          {/* Step number + icon */}
+          <div class="how-it-works__top">
+            <span class="how-it-works__number">{String(i + 1).padStart(2, "0")}</span>
+            <div class="how-it-works__icon">{step.icon}</div>
+          </div>
+
+          {/* Content */}
+          <div class="how-it-works__content">
+            <h3 class="how-it-works__title">{step.title}</h3>
+            <p class="how-it-works__description">{step.description}</p>
+            {step.command && (
+              <div class="how-it-works__command">
+                <span class="how-it-works__prompt">❯</span> {step.command}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/how-it-works.css";
+</style>

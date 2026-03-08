@@ -1,0 +1,40 @@
+---
+/**
+ * Logo Cloud — partner/client logo showcase with optional image or text fallback.
+ *
+ * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Content is read from `src/content/sections/logo-cloud.json`.
+ */
+import { getEntry } from "astro:content";
+
+interface LogoItem {
+  name: string;
+  src?: string;
+  href?: string;
+}
+
+const entry = await getEntry("sections", "logo-cloud");
+const { headline = "" } = entry?.data ?? {};
+const logos = (entry?.data?.logos ?? []) as LogoItem[];
+---
+
+<section class="logo-cloud">
+  {headline && (
+    <p class="logo-cloud__headline">{headline}</p>
+  )}
+  <div class="logo-cloud__grid">
+    {logos.map((logo) => {
+      const inner = logo.src
+        ? <img src={logo.src} alt={logo.name} class="logo-cloud__img" loading="lazy" />
+        : <span class="logo-cloud__text">{logo.name}</span>;
+
+      return logo.href
+        ? <a href={logo.href} class="logo-cloud__item" target="_blank" rel="noopener noreferrer">{inner}</a>
+        : <div class="logo-cloud__item">{inner}</div>;
+    })}
+  </div>
+</section>
+
+<style>
+  @import "../../styles/sections/logo-cloud.css";
+</style>

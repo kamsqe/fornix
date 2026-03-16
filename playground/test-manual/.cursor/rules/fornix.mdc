@@ -1,0 +1,35 @@
+---
+description: Fornix Project Architecture and Context
+globs: *
+---
+# Fornix Project: test-manual
+
+## Architecture
+- **Render Mode:** static
+- **Deploy Target:** static
+- **Database:** none
+- **CSS Engine:** tailwind
+- **Package Manager:** pnpm
+
+## Installed Blocks
+| Block | Type | Description |
+|-------|------|-------------|
+| `hero-gradient` | section | Block hero-gradient |
+| `footer-minimal` | section | Block footer-minimal |
+
+## Content & Locales
+
+### i18n
+i18n is enabled. The project supports the following locales: `en, es` with `en` as default.
+Content is organized in locale-specific folders under `src/content/`:
+- `src/content/en/`
+- `src/content/es/`
+
+## CLI Commands
+- `npx create-fornix [dir]` — scaffold a new project (AI mode default, `--manual` for interactive)
+- `fornix add <block>` / `fornix remove <block>` — manage blocks
+- `fornix list` / `fornix status` — inspect registry and project
+- `fornix mcp serve` — MCP server for AI agent integration
+
+> **Note to AI Agents:** You should respect the Fornix architectural guidelines by updating JSON content for text changes, and interacting via MCP rather than modifying block structures ad hoc.
+

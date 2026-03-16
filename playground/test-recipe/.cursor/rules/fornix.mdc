@@ -1,0 +1,37 @@
+---
+description: Fornix Project Architecture and Context
+globs: *
+---
+# Fornix Project: test-recipe
+
+## Architecture
+- **Render Mode:** server
+- **Deploy Target:** cloudflare
+- **Database:** d1
+- **CSS Engine:** tailwind
+- **Package Manager:** pnpm
+
+## Installed Blocks
+| Block | Type | Description |
+|-------|------|-------------|
+| `hero-video` | section | Block hero-video |
+| `features-bento` | section | Block features-bento |
+| `pricing-table` | section | Block pricing-table |
+| `faq-accordion` | section | Block faq-accordion |
+| `footer-rich` | section | Block footer-rich |
+| `db-d1` | integration | Block db-d1 |
+| `auth-better-auth` | integration | Block auth-better-auth |
+
+## Content & Locales
+
+### Content
+Content is located under `src/content/`.
+
+## CLI Commands
+- `npx create-fornix [dir]` — scaffold a new project (AI mode default, `--manual` for interactive)
+- `fornix add <block>` / `fornix remove <block>` — manage blocks
+- `fornix list` / `fornix status` — inspect registry and project
+- `fornix mcp serve` — MCP server for AI agent integration
+
+> **Note to AI Agents:** You should respect the Fornix architectural guidelines by updating JSON content for text changes, and interacting via MCP rather than modifying block structures ad hoc.
+

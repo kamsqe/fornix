@@ -1,0 +1,11 @@
+---
+interface Props {
+  headline?: string;
+  subheadline?: string;
+}
+const { headline = "Welcome", subheadline = "" } = Astro.props;
+---
+<section class="hero-gradient">
+  <h1>{headline}</h1>
+  {subheadline && <p>{subheadline}</p>}
+</section>

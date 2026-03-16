@@ -1,0 +1,13 @@
+{
+  "headline": "Pricing",
+  "subheadline": "Simple pricing.",
+  "plans": [
+    {
+      "name": "Free",
+      "price": "$0",
+      "features": [
+        "Basic"
+      ]
+    }
+  ]
+}

@@ -99,6 +99,10 @@ export const FIXTURE_MANIFESTS: Record<string, BlockManifest> = {
   "blog-mdx": manifest("blog-mdx", {
     type: "feature",
     category: "blog",
+    dependencies: {
+      "@astrojs/mdx": "^4.0.0",
+      "@astrojs/rss": "^4.0.9",
+    },
     files: [
       { source: "schema.ts", destination: "src/content/blog-schema.ts" },
       { source: "pages/index.astro", destination: "src/pages/blog/index.astro" },

@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "createdAt": "2026-03-13T06:05:16.683Z",
+  "createdWith": "manual",
+  "renderMode": "static",
+  "deployTarget": "cloudflare",
+  "database": "none",
+  "locales": [
+    "en"
+  ],
+  "defaultLocale": "en",
+  "palette": {
+    "preset": "midnight",
+    "colors": {
+      "primary": "#6366f1",
+      "secondary": "#818cf8",
+      "accent": "#c084fc",
+      "background": "#0f172a",
+      "foreground": "#f8fafc"
+    }
+  },
+  "themeSwitcher": false,
+  "blocks": [
+    {
+      "name": "hero-gradient",
+      "version": "1.0.0",
+      "variant": "default",
+      "installedAt": "2026-03-13T06:05:16.683Z"
+    },
+    {
+      "name": "features-grid",
+      "version": "1.0.0",
+      "variant": "default",
+      "installedAt": "2026-03-13T06:05:16.683Z"
+    },
+    {
+      "name": "footer-minimal",
+      "version": "1.0.0",
+      "variant": "default",
+      "installedAt": "2026-03-13T06:05:16.683Z"
+    }
+  ]
+}

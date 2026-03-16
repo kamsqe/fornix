@@ -1,0 +1,16 @@
+---
+import { locales } from "../../i18n/utils";
+import Layout from "../../layouts/Layout.astro";
+import HeroGradient from '../../components/sections/hero-gradient.astro';
+
+export function getStaticPaths() {
+  return locales.map((locale: string) => ({ params: { locale } }));
+}
+
+const { locale } = Astro.params;
+---
+<Layout title="test-manual">
+  <main>
+    <HeroGradient />
+  </main>
+</Layout>

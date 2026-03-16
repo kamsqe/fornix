@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "callout",
   "version": "1.0.0",
-  "type": "component",
+  "type": "section",
   "description": "Styled alert/callout box for MDX content with type variants: note, tip, warning, danger, success",
   "category": "mdx",
   "tags": ["callout", "alert", "notice", "mdx", "docs"],
@@ -38,7 +38,7 @@
         "example": "Pro tip"
       },
       "content": {
-        "type": "slot",
+        "type": "string",
         "description": "The callout body content (rendered via <slot />)"
       }
     }

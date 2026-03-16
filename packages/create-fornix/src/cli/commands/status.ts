@@ -14,7 +14,7 @@ interface FornixManifest {
   readonly database?: string;
   readonly locales?: ReadonlyArray<string>;
   readonly defaultLocale?: string;
-  readonly palette?: string;
+  readonly palette?: string | { readonly preset?: string; readonly colors?: Record<string, string> };
   readonly themeSwitcher?: boolean;
   readonly blocks: ReadonlyArray<{
     readonly name: string;
@@ -98,8 +98,12 @@ function printStatus(manifest: FornixManifest, verbose: boolean): void {
   );
 
   if (manifest.palette) {
+    const paletteName =
+      typeof manifest.palette === "string"
+        ? manifest.palette
+        : (manifest.palette.preset ?? "custom");
     console.log(
-      `  ${pc.dim("Palette:")}      ${pc.bold(manifest.palette)}`,
+      `  ${pc.dim("Palette:")}      ${pc.bold(paletteName)}`,
     );
   }
 

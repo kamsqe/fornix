@@ -21,6 +21,7 @@ export function validateConfig(
   checkRequiredModes(config, manifests, errors);
   checkDatabaseRequiresServer(config, errors);
   checkDefaultLocaleInLocales(config, errors);
+  checkServerDeployTarget(config, errors);
 
   if (errors.length > 0) {
     return err(errors);
@@ -84,6 +85,21 @@ function checkDefaultLocaleInLocales(
     errors.push({
       field: "defaultLocale",
       message: `defaultLocale '${config.defaultLocale}' is not in the locales array [${config.locales.join(", ")}]`,
+    });
+  }
+}
+
+function checkServerDeployTarget(
+  config: ResolvedConfig,
+  errors: ValidationError[]
+): void {
+  if (
+    (config.renderMode === "server" || config.renderMode === "hybrid") &&
+    config.deployTarget === "static"
+  ) {
+    errors.push({
+      field: "deployTarget",
+      message: `Deploy target 'static' is not compatible with render mode '${config.renderMode}'. Use a server-capable deploy target (cloudflare, vercel, netlify) or switch to render mode 'static'.`,
     });
   }
 }

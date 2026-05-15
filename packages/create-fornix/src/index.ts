@@ -1,12 +1,24 @@
 /**
- * v2 spine — public entry.
+ * v2 public entry.
  *
- * Day 1 surface: programmatic `scaffoldProject(config)` only.
- * The CLI command surface (citty-based) gets wired in once the spine e2e
- * test is green.
+ * Surface stays narrow on purpose: programmatic `scaffoldProject(config, opts)`
+ * plus the AI provider seam. The CLI (`dist/cli.js`) is a separate binary,
+ * not exposed through this entry.
  */
-export { scaffoldProject } from "./scaffold/scaffold-project.js";
-export type { ScaffoldResult } from "./scaffold/scaffold-project.js";
+export {
+  scaffoldProject,
+  type ScaffoldResult,
+  type ScaffoldOptions,
+} from "./scaffold/scaffold-project.js";
+
+export type {
+  AIProvider,
+  BrandContext,
+  CopyRequest,
+  CopyResponse,
+} from "./ai/provider.js";
+export { createMockProvider } from "./ai/providers/mock.js";
+export type { GeneratedCopyEntry } from "./ai/generate-copy.js";
 
 export type { ResolvedConfig } from "./schemas/config.js";
 export type { Result } from "./utils/result.js";

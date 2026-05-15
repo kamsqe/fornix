@@ -5,8 +5,11 @@
   "type": "module",
   "license": "MIT",
   "bin": {
-    "create-fornix": "./dist/index.js",
-    "fornix": "./dist/index.js"
+    "create-fornix": "./dist/cli.js",
+    "fornix": "./dist/cli.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

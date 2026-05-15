@@ -8,6 +8,36 @@ import { workspacePath } from "./workspace.js";
 const PALETTE_ROOT_SEGMENTS = ["packages", "fornix-registry", "palettes"];
 
 /**
+ * Load the raw palette JSON for a preset.
+ * Used by callers that need the colors (e.g. building `ResolvedConfig`)
+ * before handing off to `scaffoldProject`.
+ */
+export function loadPaletteData(
+  paletteName: string,
+): Result<Palette, SchemaValidationError> {
+  const path = workspacePath(...PALETTE_ROOT_SEGMENTS, `${paletteName}.json`);
+  let raw: string;
+  try {
+    raw = readFileSync(path, "utf8");
+  } catch {
+    return err({
+      kind: "SchemaValidationError",
+      message: `Palette "${paletteName}" not found at ${path}`,
+      path: ["palette", "preset"],
+    });
+  }
+  const parsed = PaletteSchema.safeParse(JSON.parse(raw));
+  if (!parsed.success) {
+    return err({
+      kind: "SchemaValidationError",
+      message: `Palette "${paletteName}" is invalid: ${parsed.error.message}`,
+      path: parsed.error.issues[0]?.path.map(String) ?? [],
+    });
+  }
+  return ok(parsed.data);
+}
+
+/**
  * Color tokens emitted into every palette CSS file.
  * Adding a token here means every palette must define it.
  */
@@ -29,31 +59,12 @@ export interface PaletteCss {
 export function loadPalette(
   paletteName: string,
 ): Result<PaletteCss, SchemaValidationError> {
-  const path = workspacePath(...PALETTE_ROOT_SEGMENTS, `${paletteName}.json`);
-  let raw: string;
-  try {
-    raw = readFileSync(path, "utf8");
-  } catch {
-    return err({
-      kind: "SchemaValidationError",
-      message: `Palette "${paletteName}" not found at ${path}`,
-      path: ["palette", "preset"],
-    });
-  }
-
-  const parsed = PaletteSchema.safeParse(JSON.parse(raw));
-  if (!parsed.success) {
-    return err({
-      kind: "SchemaValidationError",
-      message: `Palette "${paletteName}" is invalid: ${parsed.error.message}`,
-      path: parsed.error.issues[0]?.path.map(String) ?? [],
-    });
-  }
-
+  const data = loadPaletteData(paletteName);
+  if (!data.ok) return data;
   return ok({
-    name: parsed.data.name,
-    mode: parsed.data.mode,
-    css: renderPaletteCss(parsed.data),
+    name: data.value.name,
+    mode: data.value.mode,
+    css: renderPaletteCss(data.value),
   });
 }
 

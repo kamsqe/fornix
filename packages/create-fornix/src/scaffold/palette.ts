@@ -38,7 +38,7 @@ export function loadPaletteData(
 }
 
 /**
- * Color tokens emitted into every palette CSS file.
+ * Base color tokens — declared in every palette JSON.
  * Adding a token here means every palette must define it.
  */
 const COLOR_TOKENS = [
@@ -48,6 +48,30 @@ const COLOR_TOKENS = [
   "background",
   "foreground",
 ] as const;
+
+/**
+ * Derived tokens emitted into every palette CSS — computed via `color-mix`
+ * so they automatically track the base tokens of whichever palette is loaded.
+ *
+ * Why: block CSS references `--color-surface`, `--color-muted`, `--color-border`,
+ * `--color-on-primary` (audit findings) but earlier palette CSS only emitted
+ * the 5 base tokens. Light palettes inherited block-CSS fallback hex values
+ * (dark navy) and broke contrast catastrophically.
+ *
+ * Derivation strategy is palette-agnostic — same recipe works for light and dark.
+ */
+const DERIVED_TOKENS: ReadonlyArray<readonly [string, string]> = [
+  // A nudge off background, used for cards/containers that need to lift
+  // visually without changing the page color.
+  ["surface", "color-mix(in srgb, var(--color-background) 92%, var(--color-foreground) 8%)"],
+  // 50/50 blend — neutral mid-gray on both light and dark palettes.
+  ["muted", "color-mix(in srgb, var(--color-foreground) 50%, var(--color-background) 50%)"],
+  // Subtle outline — fades into the background.
+  ["border", "color-mix(in srgb, var(--color-foreground) 15%, var(--color-background) 85%)"],
+  // What you put on top of a `--color-primary` button. Tracks background
+  // so it inverts cleanly across light/dark palettes.
+  ["on-primary", "var(--color-background)"],
+];
 
 export interface PaletteCss {
   name: string;
@@ -69,22 +93,24 @@ export function loadPalette(
 }
 
 export function renderPaletteCss(palette: Palette): string {
-  const lines = COLOR_TOKENS.map(
-    (token) => `  --color-${token}: ${palette.colors[token]};`,
-  );
-  return `:root {\n${lines.join("\n")}\n  color-scheme: ${palette.mode};\n}\n`;
+  return renderPaletteCssFromColors(palette.colors, palette.mode);
 }
 
 /**
- * Build a palette CSS body from inline colors (used when the caller passes
- * `palette.colors` directly without a preset name).
+ * Build a palette CSS body from inline colors. Emits the 5 base tokens
+ * declared by the palette + 4 derived tokens (surface, muted, border,
+ * on-primary) computed via `color-mix` so the whole token set tracks
+ * the palette automatically.
  */
 export function renderPaletteCssFromColors(
   colors: Record<(typeof COLOR_TOKENS)[number], string>,
   mode: "light" | "dark",
 ): string {
-  const lines = COLOR_TOKENS.map(
+  const baseLines = COLOR_TOKENS.map(
     (token) => `  --color-${token}: ${colors[token]};`,
   );
-  return `:root {\n${lines.join("\n")}\n  color-scheme: ${mode};\n}\n`;
+  const derivedLines = DERIVED_TOKENS.map(
+    ([token, value]) => `  --color-${token}: ${value};`,
+  );
+  return `:root {\n${baseLines.join("\n")}\n${derivedLines.join("\n")}\n  color-scheme: ${mode};\n}\n`;
 }

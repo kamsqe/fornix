@@ -131,6 +131,27 @@ npx wrangler pages deploy dist
 
 The generated project is a standard Astro site — any static host works (Cloudflare Pages, Netlify, Vercel static, S3). Server-rendered + Cloudflare adapter wiring is on the roadmap.
 
+Pass `--deploy cloudflare` to the CLI to emit a `wrangler.json` alongside the project and print the exact deploy commands:
+
+```bash
+npx create-fornix my-site --deploy cloudflare --yes
+# scaffolds + prints:
+#   npm run build
+#   npx wrangler pages deploy dist --project-name my-site
+```
+
+## Showcase site
+
+The repo ships with a `pnpm showcase` script that scaffolds + builds a 12-block demo site via the published CLI binary — Fornix dogfooding itself.
+
+```bash
+pnpm showcase           # build to examples/showcase/dist
+pnpm showcase:dev       # build + `astro preview`
+pnpm showcase:deploy    # build + `wrangler pages deploy` (needs CF auth)
+```
+
+The output is regenerated on every run; `examples/showcase/` is gitignored.
+
 ## Project structure
 
 ```

@@ -37,6 +37,9 @@ my-site/
 playground/test-*/
 astroglass-preview/
 
+# Showcase site is regenerated on every build, not checked in
+examples/showcase/
+
 # Local agent state
 .claude/
 

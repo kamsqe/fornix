@@ -29,10 +29,25 @@ function baseExpressionFor(slot: ContentSlot): string {
     case "boolean":
       return "z.boolean()";
     case "array":
-      return "z.array(z.record(z.unknown()))";
+      return arrayExpressionFor(slot.items);
     case "object":
       return "z.record(z.unknown())";
   }
+}
+
+function arrayExpressionFor(items: ContentSlot["items"]): string {
+  if (!items) return "z.array(z.record(z.unknown()))";
+  if (typeof items.type === "string") {
+    switch (items.type) {
+      case "string":
+        return "z.array(z.string())";
+      case "number":
+        return "z.array(z.number())";
+      case "boolean":
+        return "z.array(z.boolean())";
+    }
+  }
+  return "z.array(z.record(z.unknown()))";
 }
 
 /**

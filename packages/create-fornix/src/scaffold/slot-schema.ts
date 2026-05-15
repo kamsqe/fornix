@@ -32,7 +32,7 @@ export function buildSlotSchema(
         base = z.boolean();
         break;
       case "array":
-        base = z.array(z.record(z.unknown()));
+        base = buildArrayItemSchema(slot.items);
         break;
       case "object":
         base = z.record(z.unknown());
@@ -44,4 +44,39 @@ export function buildSlotSchema(
     shape[key] = base.optional();
   }
   return z.object(shape);
+}
+
+/**
+ * Read the optional `items` field of an `array` slot to figure out whether
+ * the array holds primitives or object records.
+ *
+ * Two conventions, both used in `block.json` manifests:
+ *   `items: { type: "string" }`        → array of strings
+ *   `items: { icon: {type:"string"},   → array of objects with those fields
+ *             title: {type:"string"} }`
+ */
+function buildArrayItemSchema(
+  items: ContentSlot["items"],
+): z.ZodTypeAny {
+  if (!items) return z.array(z.record(z.unknown()));
+
+  // Convention 1: items declares a single primitive shape via top-level `type`.
+  if (typeof items.type === "string") {
+    switch (items.type) {
+      case "string":
+        return z.array(z.string());
+      case "number":
+        return z.array(z.number());
+      case "boolean":
+        return z.array(z.boolean());
+      default:
+        return z.array(z.record(z.unknown()));
+    }
+  }
+
+  // Convention 2: items is a record of field specs (each value has its own
+  // `type`). Wrap as `z.array(z.record(z.unknown()))` — full per-field
+  // validation would require recursive ContentSlot parsing of `items`'s
+  // record, which the schema doesn't currently model.
+  return z.array(z.record(z.unknown()));
 }

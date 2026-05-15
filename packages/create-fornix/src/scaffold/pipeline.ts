@@ -81,6 +81,14 @@ export function renderToFiles(plan: RenderPlan): FileMap {
   // ── .gitignore ───────────────────────────────────────────
   files[".gitignore"] = loadTemplate("gitignore");
 
+  // ── wrangler.json (Cloudflare Pages) ─────────────────────
+  if (plan.deployTarget === "cloudflare") {
+    files["wrangler.json"] = fillTemplate(loadTemplate("wrangler.json"), {
+      projectName: plan.projectName,
+      compatibilityDate: cloudflareCompatibilityDate(),
+    });
+  }
+
   // ── Block source files (copied as-is) ────────────────────
   for (const block of plan.sectionBlocks) {
     for (const fileSpec of block.manifest.files) {
@@ -160,6 +168,15 @@ function blockToComponentName(name: string): string {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join("");
+}
+
+/**
+ * The day's `compatibility_date` for the generated `wrangler.json`. Locks the
+ * project to today's Cloudflare Workers feature set; users can bump it later.
+ */
+function cloudflareCompatibilityDate(): string {
+  const d = new Date();
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
 }
 
 function relativeFromPages(destination: string): string {

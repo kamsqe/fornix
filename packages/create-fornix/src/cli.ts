@@ -41,6 +41,11 @@ const main = defineCommand({
       description: "Palette preset name (e.g. midnight, neon-tokyo)",
       default: "midnight",
     },
+    deploy: {
+      type: "string",
+      description: "Deploy target (cloudflare | static). Default: static.",
+      default: "static",
+    },
     prompt: {
       type: "string",
       description:
@@ -80,11 +85,19 @@ const main = defineCommand({
       process.exit(1);
     }
 
+    const deployTarget = parseDeployTarget(args.deploy);
+    if (!deployTarget) {
+      process.stderr.write(
+        `error: --deploy must be one of: cloudflare, static (got "${args.deploy}")\n`,
+      );
+      process.exit(1);
+    }
+
     const config: ResolvedConfig = {
       projectName: args.name,
       projectDir,
       renderMode: "static",
-      deployTarget: "static",
+      deployTarget,
       database: "none",
       cssEngine: "vanilla",
       packageManager: "npm",
@@ -130,8 +143,23 @@ const main = defineCommand({
     process.stdout.write(`  cd ${args.name}\n`);
     process.stdout.write(`  npm install\n`);
     process.stdout.write(`  npm run dev\n`);
+
+    if (deployTarget === "cloudflare") {
+      process.stdout.write(`\nDeploy to Cloudflare Pages:\n`);
+      process.stdout.write(`  npm run build\n`);
+      process.stdout.write(
+        `  npx wrangler pages deploy dist --project-name ${args.name}\n`,
+      );
+    }
   },
 });
+
+function parseDeployTarget(
+  value: string,
+): ResolvedConfig["deployTarget"] | null {
+  if (value === "cloudflare" || value === "static") return value;
+  return null;
+}
 
 interface AiSetup {
   provider: AIProvider;

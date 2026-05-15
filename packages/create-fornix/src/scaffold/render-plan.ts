@@ -20,6 +20,9 @@ export interface RenderPlan {
 
   palette: PaletteCss;
 
+  /** Where the generated project will deploy. Drives wrangler.json emission. */
+  deployTarget: "cloudflare" | "vercel" | "netlify" | "static";
+
   layout: {
     title: string;
     description: string;
@@ -144,6 +147,7 @@ export function buildRenderPlan(
     locale: config.defaultLocale,
     locales: config.locales,
     palette,
+    deployTarget: config.deployTarget,
     layout: {
       title: config.projectName,
       description: `Generated with Fornix — ${config.projectName}`,

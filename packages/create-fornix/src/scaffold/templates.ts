@@ -27,7 +27,8 @@ export type TemplateName =
   | "package.json"
   | "tsconfig.json"
   | "content.config.ts"
-  | "gitignore";
+  | "gitignore"
+  | "wrangler.json";
 
 export function loadTemplate(name: TemplateName): string {
   const filename = `${name}.template`;

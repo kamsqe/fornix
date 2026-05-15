@@ -13,7 +13,8 @@ interface LogoItem {
   href?: string;
 }
 
-const entry = await getEntry("sections", "logo-cloud");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/logo-cloud`);
 const { headline = "" } = entry?.data ?? {};
 const logos = (entry?.data?.logos ?? []) as LogoItem[];
 ---

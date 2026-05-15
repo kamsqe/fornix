@@ -6,7 +6,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "hero-video");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/hero-video`);
 const { headline, subheadline, ctaText, ctaHref, videoUrl, posterUrl } = entry?.data ?? {
   headline: "",
   subheadline: "",

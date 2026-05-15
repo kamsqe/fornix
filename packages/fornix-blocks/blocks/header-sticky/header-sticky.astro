@@ -11,7 +11,8 @@ interface NavLink {
   href: string;
 }
 
-const entry = await getEntry("sections", "header-sticky");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/header-sticky`);
 const { brandName, ctaText, ctaHref } = entry?.data ?? {
   brandName: "",
   ctaText: "",

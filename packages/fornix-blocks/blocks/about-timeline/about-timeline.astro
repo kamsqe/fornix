@@ -15,7 +15,8 @@ interface Milestone {
   isCta?: boolean;
 }
 
-const entry = await getEntry("sections", "about-timeline");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/about-timeline`);
 const {
   badge = "",
   headline = "",

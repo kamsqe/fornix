@@ -15,7 +15,8 @@ interface Project {
   href?: string;
 }
 
-const entry = await getEntry("sections", "portfolio-grid");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/portfolio-grid`);
 const {
   badge = "",
   headline = "",

@@ -16,7 +16,8 @@ interface FooterColumn {
   links: FooterLink[];
 }
 
-const entry = await getEntry("sections", "footer-rich");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/footer-rich`);
 const { brandName, brandDescription, copyright } = entry?.data ?? {
   brandName: "",
   brandDescription: "",

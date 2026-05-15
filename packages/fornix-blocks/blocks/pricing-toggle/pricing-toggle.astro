@@ -18,7 +18,8 @@ interface Plan {
   highlighted?: boolean;
 }
 
-const entry = await getEntry("sections", "pricing-toggle");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/pricing-toggle`);
 const {
   badge = "",
   headline = "",

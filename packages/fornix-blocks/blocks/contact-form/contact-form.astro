@@ -8,7 +8,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "contact-form");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/contact-form`);
 const {
   headline,
   description,

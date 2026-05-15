@@ -33,19 +33,33 @@ export function renderToFiles(plan: RenderPlan): FileMap {
     },
   );
 
-  // ── Index page ───────────────────────────────────────────
+  // ── Index pages (one per locale; default at /, others at /{locale}/) ──
   const { blockImports, blockRenders } = renderBlockSlots(plan);
-  files["src/pages/index.astro"] = fillTemplate(loadTemplate("index.astro"), {
-    blockImports,
-    blockRenders,
-    title: plan.layout.title,
-    description: plan.layout.description,
-  });
+  const indexTemplate = loadTemplate("index.astro");
+  for (const locale of plan.locales) {
+    const isDefault = locale === plan.locale;
+    const indexPath = isDefault
+      ? "src/pages/index.astro"
+      : `src/pages/${locale}/index.astro`;
+    files[indexPath] = fillTemplate(indexTemplate, {
+      layoutPath: isDefault
+        ? "../layouts/Layout.astro"
+        : "../../layouts/Layout.astro",
+      blockImports: isDefault
+        ? blockImports
+        : adjustImportsForNestedPage(blockImports),
+      blockRenders,
+      title: plan.layout.title,
+      description: plan.layout.description,
+    });
+  }
 
   // ── astro.config.mjs ─────────────────────────────────────
   files["astro.config.mjs"] = fillTemplate(loadTemplate("astro.config.mjs"), {
     output: "static",
     site: "https://example.com",
+    defaultLocale: plan.locale,
+    localesArray: plan.locales.map((l) => JSON.stringify(l)).join(", "),
   });
 
   // ── package.json ─────────────────────────────────────────
@@ -155,4 +169,12 @@ function relativeFromPages(destination: string): string {
     throw new Error(`Block destination must live under src/: ${destination}`);
   }
   return "../" + destination.slice("src/".length);
+}
+
+/**
+ * Nested-locale pages (`src/pages/{locale}/index.astro`) sit one directory
+ * deeper than `src/pages/index.astro`, so their imports need an extra `../`.
+ */
+function adjustImportsForNestedPage(imports: string): string {
+  return imports.replace(/from "\.\.\//g, 'from "../../');
 }

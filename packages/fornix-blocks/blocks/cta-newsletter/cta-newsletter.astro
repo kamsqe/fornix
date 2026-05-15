@@ -7,7 +7,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "cta-newsletter");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/cta-newsletter`);
 const { headline, description, placeholder, buttonText, privacyText } = entry?.data ?? {
   headline: "",
   description: "",

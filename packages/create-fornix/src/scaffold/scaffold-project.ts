@@ -17,7 +17,7 @@ import {
   renderPaletteCssFromColors,
   type PaletteCss,
 } from "./palette.js";
-import { buildRenderPlan } from "./render-plan.js";
+import { buildRenderPlan, type ContentByLocale } from "./render-plan.js";
 import { renderToFiles, type FileMap } from "./pipeline.js";
 import { writeFiles } from "./writer.js";
 
@@ -87,12 +87,18 @@ export async function scaffoldProject(
       })
     : defaultCopyTrace(blocks, config.locales);
 
-  // Apply generated content to the in-memory block sources. The render plan
-  // reads `defaultContent` directly, so this is the seam where AI lands.
-  const enrichedBlocks = applyCopyTrace(blocks, copyTrace, config.defaultLocale);
+  // Group the trace by (locale, blockName) so the render plan can pick the
+  // right content per page. AI-generated copy lives in `contentByLocale`;
+  // any block-locale combination missing falls back to `block.defaultContent`.
+  const contentByLocale: ContentByLocale = {};
+  for (const entry of copyTrace) {
+    if (entry.source === "default") continue;
+    if (!contentByLocale[entry.locale]) contentByLocale[entry.locale] = {};
+    contentByLocale[entry.locale][entry.blockName] = entry.content;
+  }
 
   // 4. Plan
-  const plan = buildRenderPlan(config, enrichedBlocks, palette);
+  const plan = buildRenderPlan(config, blocks, palette, contentByLocale);
 
   // 5. Project
   const files = renderToFiles(plan);
@@ -125,18 +131,3 @@ function defaultCopyTrace(
   return out;
 }
 
-function applyCopyTrace(
-  blocks: ReadonlyArray<BlockSource>,
-  trace: ReadonlyArray<GeneratedCopyEntry>,
-  primaryLocale: string,
-): BlockSource[] {
-  // Day-4a wires single-locale only — the primary locale's content becomes
-  // the block's `defaultContent`. Multi-locale routing arrives in a later day.
-  return blocks.map((block) => {
-    const entry = trace.find(
-      (t) => t.blockName === block.manifest.name && t.locale === primaryLocale,
-    );
-    if (!entry) return block;
-    return { ...block, defaultContent: entry.content };
-  });
-}

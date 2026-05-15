@@ -6,7 +6,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "auth-login");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/auth-login`);
 const content = entry?.data ?? {
   title: "",
   emailLabel: "",

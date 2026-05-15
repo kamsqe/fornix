@@ -83,6 +83,13 @@ function categoryPriority(category: string): number {
 }
 
 /**
+ * Per-locale content overrides — typically produced by the AI provider and
+ * keyed `[locale][blockName] = content`. Falls back to `block.defaultContent`
+ * when a (locale, block) combination isn't present.
+ */
+export type ContentByLocale = Record<string, Record<string, Record<string, unknown>>>;
+
+/**
  * Pure function: takes the resolved config + loaded block sources and produces
  * the render plan. No I/O, no side effects.
  */
@@ -90,6 +97,7 @@ export function buildRenderPlan(
   config: ResolvedConfig,
   blocks: ReadonlyArray<BlockSource>,
   palette: PaletteCss,
+  contentByLocale: ContentByLocale = {},
 ): RenderPlan {
   // Stable sort by category priority. Section blocks only — layout/integration
   // blocks aren't rendered as sections on index.astro.
@@ -105,19 +113,25 @@ export function buildRenderPlan(
     .map(({ block }) => block);
 
   const contentEntries: Array<RenderPlan["contentEntries"][number]> = [];
-  const isMultiLocale = config.locales.length > 1;
 
+  // Convention: content always lives under `sections/{locale}/{block}.json`,
+  // even for single-locale projects. The block .astro reads the locale via
+  // `Astro.currentLocale` and constructs the entry ID as `{locale}/{block}`.
+  // This eliminates a whole class of "content not found" bugs by treating
+  // single-locale as just multi-locale with N=1.
+  //
+  // For each (locale, block), prefer the AI-supplied per-locale content from
+  // `contentByLocale`, then the block's `defaultContent`, then skip.
   for (const locale of config.locales) {
     for (const block of sectionBlocks) {
-      if (!block.defaultContent) continue;
-      const path = isMultiLocale
-        ? `src/content/${locale}/sections/${block.manifest.name}.json`
-        : `src/content/sections/${block.manifest.name}.json`;
+      const override = contentByLocale[locale]?.[block.manifest.name];
+      const data = override ?? block.defaultContent;
+      if (!data) continue;
       contentEntries.push({
         locale,
         blockName: block.manifest.name,
-        path,
-        data: block.defaultContent,
+        path: `src/content/sections/${locale}/${block.manifest.name}.json`,
+        data,
       });
     }
   }

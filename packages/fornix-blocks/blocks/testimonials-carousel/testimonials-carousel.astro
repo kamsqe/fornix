@@ -14,7 +14,8 @@ interface Testimonial {
   avatar: string;
 }
 
-const entry = await getEntry("sections", "testimonials-carousel");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/testimonials-carousel`);
 const { headline } = entry?.data ?? {
   headline: "",
 };

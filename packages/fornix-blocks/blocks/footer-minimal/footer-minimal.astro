@@ -7,7 +7,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "footer-minimal");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/footer-minimal`);
 const { copyright, tagline, links, navAriaLabel } = entry?.data ?? {
   copyright: "",
   tagline: "",

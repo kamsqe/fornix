@@ -6,7 +6,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "cta-banner");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/cta-banner`);
 const { headline, description, ctaText, ctaHref } = entry?.data ?? {
   headline: "",
   description: "",

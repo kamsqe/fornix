@@ -23,7 +23,8 @@ interface Message {
   verified?: boolean;
 }
 
-const entry = await getEntry("sections", "testimonials-chat");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/testimonials-chat`);
 const {
   badge = "",
   headline = "",

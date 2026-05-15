@@ -14,7 +14,8 @@ interface ContactItem {
   href?: string;
 }
 
-const entry = await getEntry("sections", "contact-split");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/contact-split`);
 const {
   badge = "",
   headline = "",

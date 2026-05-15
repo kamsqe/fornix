@@ -8,5 +8,9 @@
     { "icon": "📍", "label": "Address", "value": "123 Innovation Drive, San Francisco, CA", "href": "" },
     { "icon": "🕐", "label": "Hours", "value": "Mon–Fri, 9 AM – 6 PM PST", "href": "" }
   ],
-  "submitText": "Send Message"
+  "submitText": "Send Message",
+  "nameLabel": "Name",
+  "emailLabel": "Email",
+  "subjectLabel": "Subject",
+  "messageLabel": "Message"
 }

@@ -24,7 +24,11 @@ interface Message {
 }
 
 const entry = await getEntry("sections", "testimonials-chat");
-const { badge = "", headline = "" } = entry?.data ?? {};
+const {
+  badge = "",
+  headline = "",
+  verifiedLabel = "Verified",
+} = entry?.data ?? {};
 const messages = (entry?.data?.messages ?? []) as Message[];
 ---
 
@@ -60,7 +64,7 @@ const messages = (entry?.data?.messages ?? []) as Message[];
                 </div>
               )}
               {m.verified && (
-                <div class="testimonials-chat__verified" title="Verified">
+                <div class="testimonials-chat__verified" title={verifiedLabel}>
                   <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>

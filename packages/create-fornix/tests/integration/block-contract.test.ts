@@ -133,13 +133,20 @@ function checkBlock(name: string): ContractResult {
   }
 
   // 3. Has ai.contentSlots declared (for section/feature blocks — integration
-  //    blocks like analytics-cf/db-d1 legitimately have none)
+  //    blocks like analytics-cf/db-d1 legitimately have none; blocks that
+  //    declare their own `collections` (e.g. blog-mdx, docs-collection) bring
+  //    their own content surface and don't need slots on the sections
+  //    collection)
   const slots = manifest.ai?.contentSlots ?? {};
+  const declaresOwnCollections =
+    Array.isArray(manifest.collections) && manifest.collections.length > 0;
   if (
     manifest.type !== "section" &&
     manifest.type !== "feature"
   ) {
     passes.contentSlotsDeclared = true; // n/a for layout/integration blocks
+  } else if (declaresOwnCollections) {
+    passes.contentSlotsDeclared = true; // block brings its own collection
   } else if (Object.keys(slots).length > 0) {
     passes.contentSlotsDeclared = true;
   } else {
@@ -175,8 +182,26 @@ function checkBlock(name: string): ContractResult {
   // 5. No hardcoded English in .astro template body
   //    (the frontmatter is allowed to mention fields by name; the body
   //    between `---` markers is what we scan)
+  //
+  //    Exemptions — both have a different content contract:
+  //    - layout blocks: visible strings are explicit prop fallbacks the
+  //      page-author overrides
+  //    - page-providing blocks (all files land under `src/pages/`): they
+  //      ship Astro routes whose framing strings are configurable at the
+  //      consumer level, not via a content collection
   const astroFile = manifest.files.find((f) => f.source.endsWith(".astro"));
-  if (astroFile) {
+  // A block is "page-providing" if every .astro it ships lands under
+  // `src/pages/`. Companion files (content schemas, RSS endpoints) can
+  // sit outside src/pages/ without disqualifying the block.
+  const astroFiles = manifest.files.filter((f) =>
+    f.source.endsWith(".astro"),
+  );
+  const isPageProviding =
+    astroFiles.length > 0 &&
+    astroFiles.every((f) => f.destination.startsWith("src/pages/"));
+  if (manifest.type === "layout" || isPageProviding) {
+    passes.noHardcodedEnglishInAstro = true;
+  } else if (astroFile) {
     const astroPath = join(dir, astroFile.source);
     try {
       const astro = readFileSync(astroPath, "utf8");

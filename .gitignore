@@ -39,3 +39,7 @@ astroglass-preview/
 
 # Local agent state
 .claude/
+
+# Playwright failure artifacts (not baselines — those are committed)
+test-results/
+playwright-report/

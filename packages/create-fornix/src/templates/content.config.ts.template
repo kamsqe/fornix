@@ -1,0 +1,11 @@
+import { defineCollection, z } from "astro:content";
+import { glob } from "astro/loaders";
+
+{{schemaDeclarations}}
+
+const sections = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/content/sections" }),
+  schema: {{sectionsSchema}},
+});
+
+export const collections = { sections };

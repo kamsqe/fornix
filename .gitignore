@@ -31,3 +31,11 @@ coverage/
 # Misc
 *.log
 tmp/
+
+# Local scaffold test artifacts
+my-site/
+playground/test-*/
+astroglass-preview/
+
+# Local agent state
+.claude/

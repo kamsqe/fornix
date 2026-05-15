@@ -1,221 +1,158 @@
-import type { BlockManifest, Palette } from "fornix-registry";
-import type { ResolvedConfig } from "../schemas/config.js";
-import type { FileMap } from "./structure-generator.js";
-import type { BlockSourceMap } from "./block-placer.js";
-import type { BlockDefaultContent } from "./content-wiring.js";
-import { ok, err, isOk, type Result } from "../utils/result.js";
-import { validateConfig } from "./config-validator.js";
-import { resolveDependencies } from "./dependency-resolver.js";
-import { generateStructure } from "./structure-generator.js";
-import { generateAstroConfig } from "./config-generators/astro-config.js";
-import { generateTailwindConfig } from "./config-generators/tailwind-config.js";
-import { generatePaletteCSS } from "./config-generators/palette-css.js";
-import { placeBlocks } from "./block-placer.js";
-import { wireContent } from "./content-wiring.js";
-import { wireI18n } from "./i18n-wiring.js";
-import { generateAgentContext } from "./agent-context-generator.js";
+import type { BlockManifest } from "fornix-registry";
 
-// ── Types ────────────────────────────────────────────────
-
-export interface ScaffoldInput {
-  readonly config: ResolvedConfig;
-  readonly manifests: Readonly<Record<string, BlockManifest>>;
-  readonly blockSources: BlockSourceMap;
-  readonly blockDefaultContent: BlockDefaultContent;
-  readonly allPalettes: ReadonlyArray<Palette>;
-}
-
-export interface ScaffoldResult {
-  readonly files: FileMap;
-  readonly resolvedBlockNames: ReadonlyArray<string>;
-}
-
-// ── Public API ───────────────────────────────────────────
+import type { RenderPlan } from "./render-plan.js";
+import { loadTemplate, fillTemplate } from "./templates.js";
+import { zodObjectForSlots, mergeSlots } from "./zod-from-slots.js";
 
 /**
- * Full scaffold pipeline: validates config, resolves dependencies,
- * generates project structure, config files, places blocks,
- * wires content and i18n, generates .env.example, and writes fornix.json.
- *
- * Pure function: config in → files out. No side effects.
+ * Map from project-relative path → UTF-8 file contents.
+ * The single output type of the (pure) scaffold pipeline.
  */
-export function scaffold(
-  input: ScaffoldInput,
-): Result<ScaffoldResult, Error> {
-  const { config, manifests, blockSources, blockDefaultContent, allPalettes } = input;
+export type FileMap = Record<string, string>;
 
-  // 1. Validate config
-  const validationResult = validateConfig(config, manifests);
-  if (!isOk(validationResult)) {
-    const messages = validationResult.error
-      .map((validationError) => validationError.message)
-      .join("; ");
-    return err(new Error(`Config validation failed: ${messages}`));
-  }
-
-  // 2. Resolve dependencies
-  const selectedBlockNames = config.blocks.map((block) => block.name);
-  const dependencyResult = resolveDependencies(selectedBlockNames, manifests);
-  if (!isOk(dependencyResult)) {
-    return err(Object.assign(new Error(dependencyResult.error.message), dependencyResult.error));
-  }
-  const resolvedBlockNames = dependencyResult.value;
-
-  // 3. Generate base structure
+/**
+ * Project a RenderPlan into a FileMap.
+ *
+ * Pure function — no I/O. The result is what `writer.ts` then commits to disk.
+ */
+export function renderToFiles(plan: RenderPlan): FileMap {
   const files: FileMap = {};
 
-  // 4. Resolve block manifests
-  const resolvedManifests = resolvedBlockNames
-    .filter((name) => manifests[name] !== undefined)
-    .map((name) => manifests[name]);
+  // ── Palette ──────────────────────────────────────────────
+  // Lives in `public/` so the Layout's <link rel="stylesheet"> tag finds it
+  // at the URL `/styles/palettes/_current.css` after build.
+  files[`public/styles/palettes/_current.css`] = plan.palette.css;
+  files[`public/styles/palettes/${plan.palette.name}.css`] = plan.palette.css;
 
-  const structureFiles = generateStructure(config, resolvedManifests);
-  Object.assign(files, structureFiles);
-
-
-
-  // 5. Generate astro.config.mjs
-  const astroConfigResult = generateAstroConfig(config, resolvedManifests);
-  if (!isOk(astroConfigResult)) {
-    return err(astroConfigResult.error);
-  }
-  files["astro.config.mjs"] = astroConfigResult.value;
-
-  // 5. Generate tailwind config
-  const tailwindResult = generateTailwindConfig(config);
-  if (!isOk(tailwindResult)) {
-    return err(tailwindResult.error);
-  }
-  if (tailwindResult.value !== null) {
-    files["tailwind.css"] = tailwindResult.value;
-  }
-
-  // 6. Generate palette CSS
-  const paletteResult = generatePaletteCSS(
-    config.palette,
-    config.themeSwitcher,
-    allPalettes.length > 0 ? allPalettes : undefined,
+  // ── Layout ───────────────────────────────────────────────
+  files["src/layouts/Layout.astro"] = fillTemplate(
+    loadTemplate("layout.astro"),
+    {
+      defaultLocale: plan.locale,
+      colorScheme: plan.palette.mode,
+    },
   );
-  if (!isOk(paletteResult)) {
-    return err(paletteResult.error);
-  }
-  Object.assign(files, paletteResult.value.files);
-  if (paletteResult.value.switcherScript) {
-    files["src/scripts/theme-switcher.js"] = paletteResult.value.switcherScript;
-  }
 
-  // 7. Place block files
+  // ── Index page ───────────────────────────────────────────
+  const { blockImports, blockRenders } = renderBlockSlots(plan);
+  files["src/pages/index.astro"] = fillTemplate(loadTemplate("index.astro"), {
+    blockImports,
+    blockRenders,
+    title: plan.layout.title,
+    description: plan.layout.description,
+  });
 
-  const blockPlaceResult = placeBlocks(resolvedManifests, blockSources, config);
-  if (!isOk(blockPlaceResult)) {
-    return err(blockPlaceResult.error);
-  }
-  Object.assign(files, blockPlaceResult.value);
+  // ── astro.config.mjs ─────────────────────────────────────
+  files["astro.config.mjs"] = fillTemplate(loadTemplate("astro.config.mjs"), {
+    output: "static",
+    site: "https://example.com",
+  });
 
-  // 8. Wire content collections
-  const contentResult = wireContent(resolvedManifests, blockDefaultContent, config);
-  if (!isOk(contentResult)) {
-    return err(contentResult.error);
-  }
-  Object.assign(files, contentResult.value);
+  // ── package.json ─────────────────────────────────────────
+  files["package.json"] = fillTemplate(loadTemplate("package.json"), {
+    projectName: plan.projectName,
+    dependencies: renderDependencies(plan.dependencies),
+  });
 
-  // 9. Wire i18n
-  const i18nResult = wireI18n(config, resolvedManifests);
-  if (!isOk(i18nResult)) {
-    return err(i18nResult.error);
-  }
-  Object.assign(files, i18nResult.value);
+  // ── tsconfig.json ────────────────────────────────────────
+  files["tsconfig.json"] = loadTemplate("tsconfig.json");
 
-  // 10. Generate .env.example
-  const envVars = collectEnvVars(resolvedManifests);
-  if (envVars.length > 0) {
-    files[".env.example"] = generateEnvExample(envVars);
-  }
+  // ── content.config.ts ────────────────────────────────────
+  const { schemaDeclarations, sectionsSchema } = renderContentSchema(plan);
+  files["src/content.config.ts"] = fillTemplate(
+    loadTemplate("content.config.ts"),
+    { schemaDeclarations, sectionsSchema },
+  );
 
-  // 11. Write fornix.json (ProjectManifest)
-  files["fornix.json"] = generateProjectManifest(config, resolvedManifests);
+  // ── .gitignore ───────────────────────────────────────────
+  files[".gitignore"] = loadTemplate("gitignore");
 
-  // 12. Generate Agent Context (CLAUDE.md and .cursor/rules/fornix.mdc)
-  const agentContextFiles = generateAgentContext(config, resolvedManifests);
-  Object.assign(files, agentContextFiles);
-
-  return ok({ files, resolvedBlockNames });
-}
-
-// ── .env.example Generator ───────────────────────────────
-
-interface EnvVarEntry {
-  readonly name: string;
-  readonly description: string;
-  readonly required: boolean;
-  readonly blockName: string;
-}
-
-function collectEnvVars(
-  blocks: ReadonlyArray<BlockManifest>,
-): EnvVarEntry[] {
-  const entries: EnvVarEntry[] = [];
-  const seen = new Set<string>();
-
-  for (const block of blocks) {
-    for (const envVar of block.envVars) {
-      if (!seen.has(envVar.name)) {
-        seen.add(envVar.name);
-        entries.push({
-          name: envVar.name,
-          description: envVar.description,
-          required: envVar.required,
-          blockName: block.name,
-        });
+  // ── Block source files (copied as-is) ────────────────────
+  for (const block of plan.sectionBlocks) {
+    for (const fileSpec of block.manifest.files) {
+      const content = block.files[fileSpec.source];
+      if (content === undefined) {
+        throw new Error(
+          `Block "${block.manifest.name}" declares file "${fileSpec.source}" but it wasn't present in the loaded sources.`,
+        );
       }
+      files[fileSpec.destination] = content;
     }
   }
 
-  return entries;
-}
-
-function generateEnvExample(envVars: ReadonlyArray<EnvVarEntry>): string {
-  const lines: string[] = [
-    "# Environment Variables",
-    "# Generated by Fornix — fill in your values",
-    "",
-  ];
-
-  for (const envVar of envVars) {
-    lines.push(`# ${envVar.description} (from ${envVar.blockName})`);
-    lines.push(`${envVar.name}=`);
-    lines.push("");
+  // ── Content entries (JSON) ───────────────────────────────
+  for (const entry of plan.contentEntries) {
+    files[entry.path] = JSON.stringify(entry.data, null, 2) + "\n";
   }
 
-  return lines.join("\n");
+  return files;
 }
 
-// ── Project Manifest Generator ───────────────────────────
+// ── Helpers ──────────────────────────────────────────────
 
-function generateProjectManifest(
-  config: ResolvedConfig,
-  blocks: ReadonlyArray<BlockManifest>,
-): string {
-  const now = new Date().toISOString();
-
-  const manifest = {
-    version: "1.0.0",
-    createdAt: now,
-    createdWith: config.createdWith,
-    renderMode: config.renderMode,
-    deployTarget: config.deployTarget,
-    database: config.database,
-    locales: config.locales,
-    defaultLocale: config.defaultLocale,
-    palette: config.palette,
-    themeSwitcher: config.themeSwitcher,
-    blocks: blocks.map((block) => ({
-      name: block.name,
-      version: block.version,
-      variant: config.blocks.find((selection) => selection.name === block.name)?.variant ?? "default",
-      installedAt: now,
-    })),
+function renderBlockSlots(plan: RenderPlan): {
+  blockImports: string;
+  blockRenders: string;
+} {
+  const imports: string[] = [];
+  const renders: string[] = [];
+  for (const block of plan.sectionBlocks) {
+    const component = blockToComponentName(block.manifest.name);
+    const astroFile = block.manifest.files.find((f) =>
+      f.source.endsWith(".astro"),
+    );
+    if (!astroFile) continue;
+    // The destination path always lives somewhere under `src/`. Compute its
+    // path relative to `src/pages/` (where index.astro lives).
+    const relImport = relativeFromPages(astroFile.destination);
+    imports.push(`import ${component} from "${relImport}";`);
+    renders.push(`  <${component} />`);
+  }
+  return {
+    blockImports: imports.join("\n"),
+    blockRenders: renders.join("\n"),
   };
+}
 
-  return JSON.stringify(manifest, null, 2) + "\n";
+function renderDependencies(deps: Record<string, string>): string {
+  return Object.entries(deps)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, version]) => `    ${JSON.stringify(name)}: ${JSON.stringify(version)}`)
+    .join(",\n");
+}
+
+function renderContentSchema(plan: RenderPlan): {
+  schemaDeclarations: string;
+  sectionsSchema: string;
+} {
+  const perBlock = plan.sectionBlocks
+    .map((b) => b.manifest.ai?.contentSlots)
+    .filter((slots): slots is NonNullable<typeof slots> => !!slots);
+
+  if (perBlock.length === 0) {
+    return { schemaDeclarations: "", sectionsSchema: "z.record(z.unknown())" };
+  }
+
+  const merged = mergeSlots(perBlock);
+  // `.passthrough()` keeps fields not declared in the merged schema. The
+  // alternative — `.strict()` — would reject blocks added in later sessions
+  // whose slots aren't yet in the merged map.
+  const sectionsSchema = `${zodObjectForSlots(merged)}.passthrough()`;
+  return { schemaDeclarations: "", sectionsSchema };
+}
+
+function blockToComponentName(name: string): string {
+  return name
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join("");
+}
+
+function relativeFromPages(destination: string): string {
+  // `src/components/sections/hero-gradient.astro` → `../components/sections/hero-gradient.astro`
+  // since the importer lives at `src/pages/index.astro`.
+  if (!destination.startsWith("src/")) {
+    throw new Error(`Block destination must live under src/: ${destination}`);
+  }
+  return "../" + destination.slice("src/".length);
 }

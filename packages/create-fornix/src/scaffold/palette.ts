@@ -3,9 +3,7 @@ import { PaletteSchema, type Palette } from "fornix-registry";
 
 import { ok, err, type Result } from "../utils/result.js";
 import type { SchemaValidationError } from "../errors.js";
-import { workspacePath } from "./workspace.js";
-
-const PALETTE_ROOT_SEGMENTS = ["packages", "fornix-registry", "palettes"];
+import { palettePath } from "./workspace.js";
 
 /**
  * Load the raw palette JSON for a preset.
@@ -15,7 +13,7 @@ const PALETTE_ROOT_SEGMENTS = ["packages", "fornix-registry", "palettes"];
 export function loadPaletteData(
   paletteName: string,
 ): Result<Palette, SchemaValidationError> {
-  const path = workspacePath(...PALETTE_ROOT_SEGMENTS, `${paletteName}.json`);
+  const path = palettePath(paletteName);
   let raw: string;
   try {
     raw = readFileSync(path, "utf8");
@@ -91,6 +89,12 @@ export function loadPalette(
     css: renderPaletteCss(data.value),
   });
 }
+
+/**
+ * Loader for the palette `.json` file (left for callers that want only the
+ * raw data without rendered CSS). Now an alias for `loadPaletteData` —
+ * removed because all consumers already use `loadPaletteData`.
+ */
 
 export function renderPaletteCss(palette: Palette): string {
   return renderPaletteCssFromColors(palette.colors, palette.mode);

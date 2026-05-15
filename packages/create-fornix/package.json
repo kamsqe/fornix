@@ -1,9 +1,35 @@
 {
   "name": "create-fornix",
-  "version": "0.0.13",
-  "description": "CLI-first Astro + Cloudflare project generator",
+  "version": "0.2.0",
+  "description": "AI-first CLI that scaffolds Astro projects from a curated block library, with per-locale AI-generated copy and Cloudflare Pages deploy support",
   "type": "module",
   "license": "MIT",
+  "author": "kambar <kambar.mirmanov@gmail.com> (https://github.com/kamsqe)",
+  "homepage": "https://github.com/kamsqe/fornix#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kamsqe/fornix.git",
+    "directory": "packages/create-fornix"
+  },
+  "bugs": {
+    "url": "https://github.com/kamsqe/fornix/issues"
+  },
+  "keywords": [
+    "astro",
+    "cloudflare",
+    "cli",
+    "scaffolder",
+    "ai",
+    "anthropic",
+    "claude",
+    "blocks",
+    "i18n",
+    "generator",
+    "create-app"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "bin": {
     "create-fornix": "./dist/cli.js",
     "fornix": "./dist/cli.js"
@@ -12,11 +38,13 @@
     ".": "./dist/index.js"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "dev": "tsup --watch",
@@ -34,25 +62,14 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.78",
-    "@clack/prompts": "^0.9.1",
-    "@modelcontextprotocol/sdk": "^1.27.1",
     "ai": "^6.0.183",
     "citty": "^0.1.6",
-    "defu": "^6.1.4",
-    "fast-glob": "^3.3.3",
-    "giget": "^1.2.3",
-    "magicast": "^0.3.5",
-    "picocolors": "^1.1.0",
-    "pkg-types": "^1.3.0",
     "zod": "^3.24.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@types/node": "^22.10.0",
-    "acorn": "^8.16.0",
-    "execa": "^9.5.0",
     "fornix-registry": "workspace:*",
-    "memfs": "^4.14.0",
     "tsup": "^8.3.0",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0"

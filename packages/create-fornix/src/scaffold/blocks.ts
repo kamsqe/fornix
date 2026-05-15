@@ -7,7 +7,7 @@ import {
 
 import { ok, err, type Result } from "../utils/result.js";
 import type { BlockNotFoundError, SchemaValidationError } from "../errors.js";
-import { workspacePath } from "./workspace.js";
+import { blockPath } from "./workspace.js";
 
 export interface BlockSource {
   manifest: BlockManifest;
@@ -23,12 +23,10 @@ export interface BlockSource {
   defaultContent: Record<string, unknown> | null;
 }
 
-const BLOCK_ROOT_SEGMENTS = ["packages", "fornix-blocks", "blocks"];
-
 export function loadBlock(
   blockName: string,
 ): Result<BlockSource, BlockNotFoundError | SchemaValidationError> {
-  const blockDir = workspacePath(...BLOCK_ROOT_SEGMENTS, blockName);
+  const blockDir = blockPath(blockName);
 
   let manifestRaw: string;
   try {

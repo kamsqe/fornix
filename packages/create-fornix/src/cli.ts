@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
- * Fornix CLI — v2 spine.
+ * Fornix CLI.
  *
- * Day-3 surface: non-interactive, flag-driven scaffold.
- *   create-fornix <name> [--blocks ...] [--palette ...] [--yes]
+ * Surface:
+ *   create-fornix <name> [--blocks ...] [--palette ...] [--prompt "..."] [--yes]
  *
- * Interactive prompts and AI mode are layered on later. Even when those
- * arrive, this flag-driven path is the contract that recipe/AI/manual all
- * eventually project into.
+ * AI mode kicks in automatically when `ANTHROPIC_API_KEY` is set AND
+ * `--prompt` is non-empty. Without one or both, the scaffolder uses each
+ * block's `default-content.json`.
  */
 import { defineCommand, runMain } from "citty";
 import { resolve } from "node:path";
@@ -15,6 +15,8 @@ import { resolve } from "node:path";
 import { scaffoldProject } from "./scaffold/scaffold-project.js";
 import { loadPaletteData } from "./scaffold/palette.js";
 import type { ResolvedConfig } from "./schemas/config.js";
+import { createAnthropicProvider } from "./ai/providers/anthropic.js";
+import type { AIProvider, BrandContext } from "./ai/provider.js";
 
 const main = defineCommand({
   meta: {
@@ -39,6 +41,12 @@ const main = defineCommand({
       description: "Palette preset name (e.g. midnight, neon-tokyo)",
       default: "midnight",
     },
+    prompt: {
+      type: "string",
+      description:
+        "Describe your project. When ANTHROPIC_API_KEY is set, this drives AI copy generation.",
+      default: "",
+    },
     yes: {
       type: "boolean",
       alias: "y",
@@ -49,12 +57,9 @@ const main = defineCommand({
   async run({ args }) {
     const projectDir = resolve(process.cwd(), args.name);
 
-    // Day-3 spine is always non-interactive. The `--yes` flag exists so the
-    // contract stays compatible with the interactive flows to come.
     if (!args.yes) {
-      // No-op for now — surfaced as a one-line note so users aren't surprised.
       process.stderr.write(
-        "Note: day-3 CLI is non-interactive. Pass --yes to silence this message.\n",
+        "Note: CLI is currently non-interactive. Pass --yes to silence this message.\n",
       );
     }
 
@@ -94,10 +99,31 @@ const main = defineCommand({
       createdWith: "manual",
     };
 
-    const result = await scaffoldProject(config);
+    // AI is opt-in via prompt + env. Either missing → defaults.
+    const aiSetup = resolveAiSetup({
+      prompt: args.prompt,
+      projectName: args.name,
+    });
+    if (aiSetup) {
+      process.stdout.write(
+        `→ AI copy enabled via Anthropic (model: ${aiSetup.model})\n`,
+      );
+    }
+
+    const result = await scaffoldProject(config, aiSetup ?? {});
     if (!result.ok) {
       process.stderr.write(`error: ${result.error.message}\n`);
       process.exit(1);
+    }
+
+    if (aiSetup) {
+      const aiCount = result.value.copyTrace.filter(
+        (e) => e.source === "ai",
+      ).length;
+      const fellBack = result.value.copyTrace.length - aiCount;
+      process.stdout.write(
+        `  AI-filled blocks: ${aiCount} · fallback to defaults: ${fellBack}\n`,
+      );
     }
 
     process.stdout.write(`✓ Scaffolded ${args.name} in ${projectDir}\n`);
@@ -106,5 +132,35 @@ const main = defineCommand({
     process.stdout.write(`  npm run dev\n`);
   },
 });
+
+interface AiSetup {
+  provider: AIProvider;
+  brand: BrandContext;
+  model: string;
+}
+
+function resolveAiSetup(opts: {
+  prompt: string;
+  projectName: string;
+}): AiSetup | null {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const description = opts.prompt.trim();
+
+  if (!apiKey || description.length === 0) return null;
+
+  const model = process.env.FORNIX_ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
+  const provider = createAnthropicProvider({ apiKey, model });
+
+  // Day-4b derives brand fields heuristically from the prompt. A later pass
+  // can promote this to a real LLM-driven brand-extraction step.
+  const brand: BrandContext = {
+    name: opts.projectName,
+    description,
+    tone: "clear, specific, professional",
+    industry: "general",
+  };
+
+  return { provider, brand, model };
+}
 
 runMain(main);

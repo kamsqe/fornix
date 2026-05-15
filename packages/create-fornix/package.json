@@ -31,10 +31,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.3.24",
+    "@ai-sdk/anthropic": "^3.0.78",
     "@clack/prompts": "^0.9.1",
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "ai": "^4.3.19",
+    "ai": "^6.0.183",
     "citty": "^0.1.6",
     "defu": "^6.1.4",
     "fast-glob": "^3.3.3",

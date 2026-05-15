@@ -1,8 +1,5 @@
-import { z } from "zod";
-import type { ContentSlot } from "fornix-registry";
-
 import type { BlockSource } from "../scaffold/blocks.js";
-import { zodObjectForSlots } from "../scaffold/zod-from-slots.js";
+import { buildSlotSchema } from "../scaffold/slot-schema.js";
 import type {
   AIProvider,
   BrandContext,
@@ -86,7 +83,7 @@ async function generateOne(
   }
 
   // Validate against a Zod schema derived from the block's slots.
-  const validation = buildRuntimeSchema(slots).safeParse(result.value);
+  const validation = buildSlotSchema(slots).passthrough().safeParse(result.value);
   if (!validation.success) {
     return {
       blockName: block.manifest.name,
@@ -106,45 +103,3 @@ async function generateOne(
   };
 }
 
-/**
- * Runtime Zod schema derived from a block's slot map.
- *
- * Mirrors `zodObjectForSlots` (which emits the same shape as TEXT into the
- * generated `content.config.ts`), but lives in-process so we can validate
- * provider output without invoking `eval`.
- */
-function buildRuntimeSchema(
-  slots: Record<string, ContentSlot>,
-): z.ZodTypeAny {
-  // Keep the textual generator as the source of truth for the *shape*, but
-  // implement a parallel runtime instance here. If a slot type is added to
-  // `ContentSlot`, both will need updating — a small price for not exec'ing
-  // generated code.
-  void zodObjectForSlots; // intentional reference to flag the coupling
-
-  const shape: Record<string, z.ZodTypeAny> = {};
-  for (const [key, slot] of Object.entries(slots)) {
-    let base: z.ZodTypeAny;
-    switch (slot.type) {
-      case "string":
-        base = slot.maxLength !== undefined
-          ? z.string().max(slot.maxLength)
-          : z.string();
-        break;
-      case "number":
-        base = z.number();
-        break;
-      case "boolean":
-        base = z.boolean();
-        break;
-      case "array":
-        base = z.array(z.record(z.unknown()));
-        break;
-      case "object":
-        base = z.record(z.unknown());
-        break;
-    }
-    shape[key] = base.optional();
-  }
-  return z.object(shape).passthrough();
-}

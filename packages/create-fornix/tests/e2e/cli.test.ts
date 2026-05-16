@@ -40,7 +40,7 @@ describe("v2 CLI (built binary)", () => {
 
       // Invoke the actual CLI binary as a subprocess, from a tmp cwd.
       execSync(
-        `node ${JSON.stringify(CLI_BIN)} ${projectName} --blocks hero-gradient,features-grid,footer-minimal --palette neon-tokyo --yes`,
+        `node ${JSON.stringify(CLI_BIN)} ${projectName} --blocks hero-gradient,features-grid,footer-minimal --palette aurora --yes`,
         { cwd: tmp, stdio: "pipe" },
       );
 

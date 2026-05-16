@@ -50,7 +50,7 @@ function makeConfig(): ResolvedConfig {
     locales: ["en"],
     defaultLocale: "en",
     palette: {
-      preset: "midnight",
+      preset: "obsidian",
       colors: {
         primary: "#6366f1",
         secondary: "#818cf8",
@@ -116,7 +116,7 @@ test.afterAll(async () => {
   }
 });
 
-test("midnight + 4 blocks renders without layout regressions", async ({
+test("obsidian + 4 blocks renders without layout regressions", async ({
   page,
 }) => {
   await page.goto(previewUrl, { waitUntil: "networkidle" });
@@ -125,7 +125,7 @@ test("midnight + 4 blocks renders without layout regressions", async ({
   // anything CSS-paint-related.
   await page.evaluate(() => document.fonts.ready);
 
-  await expect(page).toHaveScreenshot("multi-block-midnight-desktop.png", {
+  await expect(page).toHaveScreenshot("multi-block-obsidian-desktop.png", {
     fullPage: true,
   });
 });

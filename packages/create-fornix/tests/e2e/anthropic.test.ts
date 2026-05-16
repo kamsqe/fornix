@@ -40,7 +40,7 @@ function makeBaseConfig(projectDir: string): ResolvedConfig {
     locales: ["en"],
     defaultLocale: "en",
     palette: {
-      preset: "midnight",
+      preset: "obsidian",
       colors: {
         primary: "#6366f1",
         secondary: "#818cf8",

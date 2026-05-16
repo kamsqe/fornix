@@ -7,7 +7,7 @@
  *
  * Matrix: 3 palettes × 3 viewports = 9 baselines per run.
  *
- *   palettes: midnight (dark)   |  neon-tokyo (gradient)  |  corporate-blue (light)
+ *   palettes: obsidian (dark)   |  aurora (gradient)  |  paper (light)
  *   viewports: mobile 375×812   |  tablet 768×1024        |  desktop 1280×720
  *
  * Each palette scaffolds + builds + boots an `astro preview` ONCE in a
@@ -27,7 +27,7 @@ import { scaffoldProject } from "../../src/scaffold/scaffold-project.js";
 import { loadPaletteData } from "../../src/scaffold/palette.js";
 import type { ResolvedConfig } from "../../src/schemas/config.js";
 
-const PALETTES = ["midnight", "neon-tokyo", "corporate-blue"] as const;
+const PALETTES = ["obsidian", "aurora", "paper"] as const;
 const VIEWPORTS = [
   { name: "mobile", width: 375, height: 812 },
   { name: "tablet", width: 768, height: 1024 },

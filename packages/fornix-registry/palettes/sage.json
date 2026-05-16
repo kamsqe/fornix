@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 2,
+  "name": "sage",
+  "displayName": "Sage",
+  "category": "natural-wellness",
+  "mode": "light",
+  "colors": {
+    "primary": "#16a34a",
+    "secondary": "#15803d",
+    "accent": "#f97316",
+    "background": "#f0fdf4",
+    "foreground": "#14532d"
+  },
+  "typography": {
+    "headline": { "family": "'Inter', system-ui, sans-serif", "weight": 700 },
+    "body": { "family": "'Inter', system-ui, sans-serif", "weight": 400 }
+  },
+  "radius": {
+    "sm": "0.5rem",
+    "md": "0.75rem",
+    "lg": "1rem",
+    "full": "9999px"
+  },
+  "motion": {
+    "duration": { "fast": "200ms", "normal": "300ms", "slow": "450ms" },
+    "easing": { "default": "cubic-bezier(0.4, 0, 0.2, 1)" }
+  },
+  "shadow": {
+    "sm": "0 1px 2px rgba(20, 83, 45, 0.06)",
+    "md": "0 4px 12px rgba(20, 83, 45, 0.08)",
+    "lg": "0 16px 48px rgba(20, 83, 45, 0.12)"
+  }
+}

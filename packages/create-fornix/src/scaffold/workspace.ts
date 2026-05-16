@@ -42,7 +42,7 @@ export function blockPath(blockName: string): string {
 }
 
 /**
- * Path to a palette JSON (e.g. `palettePath("midnight")`).
+ * Path to a palette JSON (e.g. `palettePath("obsidian")`).
  * Prefers bundled `dist/palettes/<name>.json`, falls back to workspace.
  */
 export function palettePath(paletteName: string): string {

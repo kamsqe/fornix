@@ -33,7 +33,7 @@ const BLOCKS = [
 ];
 
 function makeConfig(projectDir: string): ResolvedConfig {
-  const data = loadPaletteData("midnight");
+  const data = loadPaletteData("obsidian");
   if (!data.ok) throw new Error("palette load failed");
   return {
     projectName: "visual-interactive",
@@ -46,7 +46,7 @@ function makeConfig(projectDir: string): ResolvedConfig {
     blocks: BLOCKS.map((name) => ({ name, variant: "default" })),
     locales: ["en"],
     defaultLocale: "en",
-    palette: { preset: "midnight", colors: data.value.colors },
+    palette: { preset: "obsidian", colors: data.value.colors },
     themeSwitcher: false,
     createdWith: "manual",
   };

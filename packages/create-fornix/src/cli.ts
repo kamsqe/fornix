@@ -38,8 +38,8 @@ const main = defineCommand({
     },
     palette: {
       type: "string",
-      description: "Palette preset name (e.g. midnight, neon-tokyo)",
-      default: "midnight",
+      description: "Palette preset name (obsidian, paper, fraktur, ember, terracotta, sage, aurora)",
+      default: "obsidian",
     },
     deploy: {
       type: "string",

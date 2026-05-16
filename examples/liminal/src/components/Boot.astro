@@ -39,60 +39,60 @@
     pointer-events: none;
   }
 
-  .boot-inner {
+  #boot .boot-inner {
     width: min(640px, 88vw);
     text-align: left;
   }
 
-  .boot-logo {
+  #boot .boot-logo {
     color: var(--cream-100);
     font-family: ui-monospace, monospace;
-    font-size: clamp(0.5rem, 1.6vw, 0.75rem);
-    line-height: 1.05;
+    font-size: clamp(0.55rem, 1.4vw, 0.78rem);
+    line-height: 1.15;
     white-space: pre;
     margin-bottom: var(--space-m);
     opacity: 0;
-    animation: logo-in 1s var(--ease-out) 0.05s forwards;
+    animation: boot-logo-in 1s var(--ease-out) 0.05s forwards;
   }
 
-  @keyframes logo-in {
+  @keyframes boot-logo-in {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  .boot-stream {
+  #boot .boot-stream {
     min-height: 12em;
     white-space: pre-wrap;
     word-break: break-word;
   }
 
-  .boot-stream .line {
+  #boot .boot-stream .boot-line {
     display: block;
     opacity: 0;
-    animation: line-in 0.25s var(--ease-out) forwards;
+    animation: boot-line-in 0.25s var(--ease-out) forwards;
   }
 
-  .boot-stream .ok { color: var(--cream-100); }
-  .boot-stream .dim { color: var(--cream-400); }
-  .boot-stream .warn { color: var(--blood); }
+  #boot .boot-stream .boot-ok { color: var(--cream-100); }
+  #boot .boot-stream .boot-dim { color: var(--cream-400); }
+  #boot .boot-stream .boot-warn { color: var(--blood); }
 
-  .boot-stream .cursor::after {
+  #boot .boot-stream .boot-cursor::after {
     content: "▍";
-    animation: blink 1s steps(2, end) infinite;
+    animation: boot-blink 1s steps(2, end) infinite;
     margin-left: 2px;
     color: var(--cream-100);
   }
 
-  @keyframes line-in {
+  @keyframes boot-line-in {
     from { opacity: 0; transform: translateY(2px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes blink {
+  @keyframes boot-blink {
     50% { opacity: 0; }
   }
 
-  .boot-hint {
+  #boot .boot-hint {
     margin-top: var(--space-l);
     color: var(--cream-400);
     font-size: var(--step--2);
@@ -100,7 +100,7 @@
     text-transform: uppercase;
   }
 
-  .boot-hint kbd {
+  #boot .boot-hint kbd {
     font-family: inherit;
     border: 1px solid var(--cream-400);
     padding: 1px 6px;
@@ -116,7 +116,6 @@
     const stream = document.getElementById("boot-stream");
     if (!root || !stream) return;
 
-    // Suppress on subsequent loads in same session
     if (sessionStorage.getItem(SKIP_KEY) === "1") {
       root.remove();
       return;
@@ -125,14 +124,14 @@
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const lines: { text: string; klass?: string; delay?: number }[] = [
-      { text: "liminal-os v0.1.0 · cold boot", klass: "dim", delay: 80 },
-      { text: "[ ok ] mounting /shader … flowfield-04", klass: "ok", delay: 220 },
-      { text: "[ ok ] mounting /font   … editorial-fallback", klass: "ok", delay: 180 },
-      { text: "[ ok ] mounting /cursor … halo, blend:diff", klass: "ok", delay: 180 },
-      { text: "[ ok ] linking view-transitions", klass: "ok", delay: 160 },
-      { text: "[ -- ] handshake with anthropic ... skipped", klass: "dim", delay: 220 },
-      { text: "[ ok ] entropy seeded · " + (Math.random().toString(16).slice(2, 10)), klass: "ok", delay: 200 },
-      { text: "you are entering a quiet place.", klass: "ok", delay: 600 },
+      { text: "liminal-os v0.1.0 · cold boot", klass: "boot-dim", delay: 80 },
+      { text: "[ ok ] mounting /shader … flowfield-04", klass: "boot-ok", delay: 220 },
+      { text: "[ ok ] mounting /font   … editorial-fallback", klass: "boot-ok", delay: 180 },
+      { text: "[ ok ] mounting /cursor … halo, blend:diff", klass: "boot-ok", delay: 180 },
+      { text: "[ ok ] linking view-transitions", klass: "boot-ok", delay: 160 },
+      { text: "[ -- ] handshake with anthropic … skipped", klass: "boot-dim", delay: 220 },
+      { text: "[ ok ] entropy seeded · " + Math.random().toString(16).slice(2, 10), klass: "boot-ok", delay: 200 },
+      { text: "you are entering a quiet place.", klass: "boot-ok", delay: 600 },
     ];
 
     const finish = () => {
@@ -149,10 +148,9 @@
     window.addEventListener("keydown", onKey, { once: false });
 
     if (reduced) {
-      // Render all lines instantly, then finish quickly
       for (const l of lines) {
         const el = document.createElement("span");
-        el.className = "line " + (l.klass ?? "");
+        el.className = "boot-line " + (l.klass ?? "");
         el.textContent = l.text;
         stream.appendChild(el);
       }
@@ -164,14 +162,14 @@
     const next = () => {
       if (i >= lines.length) {
         const cur = document.createElement("span");
-        cur.className = "line cursor";
+        cur.className = "boot-line boot-cursor";
         stream.appendChild(cur);
         setTimeout(finish, 700);
         return;
       }
       const l = lines[i++]!;
       const el = document.createElement("span");
-      el.className = "line " + (l.klass ?? "");
+      el.className = "boot-line " + (l.klass ?? "");
       el.textContent = l.text;
       stream.appendChild(el);
       setTimeout(next, l.delay ?? 180);

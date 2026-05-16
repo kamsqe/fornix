@@ -1,0 +1,28 @@
+---
+import { studio } from "../data/studio.ts";
+---
+
+<section class="info" aria-label="Studio information">
+  <div>
+    <h2>Flight Info / About</h2>
+    <dl>
+      <dt>Callsign</dt>
+      <dd><b>{studio.callsign}</b> — {studio.name}</dd>
+      <dt>Base</dt>
+      <dd>{studio.baseLabel} <span style="color:var(--amber-lo)">· {studio.base}</span></dd>
+      <dt>Established</dt>
+      <dd>{studio.established}</dd>
+      <dt>Fleet</dt>
+      <dd>{String(studio.fleet).padStart(2, "0")} aviators</dd>
+      <dt>Comms</dt>
+      <dd><a href={`mailto:${studio.email}`} style="color:var(--amber)">{studio.email}</a></dd>
+    </dl>
+  </div>
+
+  <div class="info__manifest">
+    <h2>Manifest</h2>
+    <ul>
+      {studio.manifest.map((m) => <li>{m}</li>)}
+    </ul>
+  </div>
+</section>

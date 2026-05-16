@@ -1,0 +1,20 @@
+{
+  "name": "departures",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A studio portfolio rendered as a Solari split-flap departures board. Astro template.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "deploy": "astro build && wrangler pages deploy dist --project-name departures"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.78.0"
+  }
+}

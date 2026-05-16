@@ -1,0 +1,737 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   DEPARTURES — global stylesheet
+   ─────────────────────────────────────────────────────────────────────────────
+   No framework. No utilities. One file. Read it top to bottom and you have
+   the whole design system in your head.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* board chrome */
+  --bg:           #07060a;   /* the wall behind the board */
+  --board:        #0e0c0a;   /* the board housing */
+  --face:         #141210;   /* a single flap card face */
+  --face-hi:      #1c1a17;   /* the upper half of a flap, lit slightly */
+  --rule:         #000000;   /* the hinge line that splits a flap */
+  --edge:         #2a2520;   /* card bevel */
+
+  /* phosphors */
+  --amber:        #ffb000;   /* the canonical color of these boards */
+  --amber-hi:     #ffd479;
+  --amber-lo:     #7a5a1f;
+  --paper:        #ffe7c2;   /* off-white, warm */
+  --green:        #3fb950;   /* ON TIME */
+  --red:          #ff4136;   /* DELAYED */
+  --grey:         #8a8278;   /* DEPARTED */
+
+  /* type */
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "JetBrains Mono",
+          "DejaVu Sans Mono", Menlo, Consolas, monospace;
+
+  /* rhythm */
+  --row-h: clamp(54px, 6.6vh, 72px);
+  --gutter: clamp(16px, 3vw, 32px);
+
+  color-scheme: dark only;
+}
+
+/* ──────────── reset ──────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--bg); }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--mono);
+  font-feature-settings: "tnum" 1, "zero" 1, "ss01" 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--paper);
+  line-height: 1.35;
+  min-height: 100vh;
+  /* the wall has a subtle warmth + scanline noise without using an image */
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,176,0,0.04), transparent 60%),
+    repeating-linear-gradient(0deg,
+      rgba(255,255,255,0.012) 0 1px,
+      transparent 1px 3px),
+    var(--bg);
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+
+::selection { background: var(--amber); color: var(--bg); }
+
+/* ──────────── shell ──────────── */
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THE BOARD HEADER
+   The literal top-of-board: studio callsign, local time, and column headers
+   that look like they were silkscreened on glass.
+   ────────────────────────────────────────────────────────────────────────── */
+.head {
+  padding: var(--gutter);
+  border-bottom: 1px solid var(--edge);
+  position: relative;
+}
+.head::after {
+  /* the glass shine across the top of the board */
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,176,0,0.5), transparent);
+}
+
+.head__top {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 1rem; flex-wrap: wrap;
+}
+.callsign {
+  font-size: clamp(14px, 1.4vw, 16px);
+  letter-spacing: 0.18em;
+  color: var(--amber);
+  text-transform: uppercase;
+}
+.callsign b { font-weight: 700; }
+.callsign span { color: var(--amber-lo); margin-left: 0.6ch; }
+
+.clock {
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: var(--paper);
+  letter-spacing: 0.08em;
+  display: flex; gap: 1.5ch; align-items: baseline;
+}
+.clock small { color: var(--amber-lo); font-size: 0.78em; letter-spacing: 0.2em; }
+.clock time { color: var(--amber); }
+
+.head__legend {
+  margin-top: clamp(24px, 4vh, 40px);
+  display: grid;
+  grid-template-columns: 96px 1fr 64px 80px 110px;
+  gap: clamp(8px, 1.6vw, 24px);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: var(--amber-lo);
+  padding: 0 4px 12px;
+  border-bottom: 1px dashed rgba(255,176,0,0.18);
+}
+.head__legend span { text-transform: uppercase; }
+.head__legend span:nth-child(4) { text-align: right; }
+.head__legend span:nth-child(5) { text-align: right; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THE BOARD — list of rows
+   ────────────────────────────────────────────────────────────────────────── */
+.board {
+  list-style: none;
+  margin: 0; padding: 0;
+  background: var(--board);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 96px 1fr 64px 80px 110px;
+  gap: clamp(8px, 1.6vw, 24px);
+  align-items: center;
+  padding: 0 var(--gutter);
+  height: var(--row-h);
+  border-bottom: 1px solid rgba(0,0,0,0.6);
+  position: relative;
+}
+.row::before {
+  /* faint amber phosphor underglow on hover, like the row was lit */
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(255,176,0,0.0), rgba(255,176,0,0.06));
+  opacity: 0; transition: opacity .25s ease;
+  pointer-events: none;
+}
+.row:hover::before, .row:focus-within::before { opacity: 1; }
+
+.row__flight {
+  color: var(--amber-lo);
+  font-size: clamp(11px, 1.05vw, 12px);
+  letter-spacing: 0.18em;
+}
+.row__dest {
+  font-size: clamp(22px, 3.4vw, 38px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--amber);
+  /* phosphor glow */
+  text-shadow:
+    0 0 0.6px var(--amber),
+    0 0 8px rgba(255,176,0,0.35),
+    0 0 22px rgba(255,176,0,0.12);
+}
+.row__dest a { display: inline-block; }
+.row__gate {
+  color: var(--paper);
+  font-size: clamp(13px, 1.2vw, 15px);
+  letter-spacing: 0.16em;
+}
+.row__time {
+  text-align: right;
+  color: var(--paper);
+  font-size: clamp(16px, 1.6vw, 20px);
+  letter-spacing: 0.08em;
+}
+.row__status { text-align: right; }
+
+/* status pill */
+.pill {
+  display: inline-flex; align-items: center; gap: 0.7ch;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 6px 10px 5px;
+  border: 1px solid currentColor;
+  color: var(--amber);
+  white-space: nowrap;
+}
+.pill::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+}
+.pill--ontime    { color: var(--green); }
+.pill--departed  { color: var(--grey); border-color: rgba(138,130,120,0.45); }
+.pill--boarding  { color: var(--amber); animation: pulse 1.6s ease-in-out infinite; }
+.pill--delayed   { color: var(--red); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THE FLIP CHARACTER
+   Each character of every destination is a flap. On load (and on idle), each
+   flap shuffles through random letters and lands on its target. Done with
+   data attributes + a tiny driver script — pure CSS for the look.
+   ────────────────────────────────────────────────────────────────────────── */
+.flip {
+  display: inline-flex;
+  gap: 2px;
+  user-select: none;
+}
+.flap {
+  position: relative;
+  display: inline-block;
+  width: 0.78em;
+  height: 1.18em;
+  line-height: 1.18em;
+  text-align: center;
+  background: var(--face);
+  color: var(--amber);
+  border-radius: 3px;
+  box-shadow:
+    inset 0 0 0 1px var(--edge),
+    inset 0 12px 0 -10px rgba(255,255,255,0.04),
+    0 1px 0 #000;
+  overflow: hidden;
+}
+.flap::after {
+  /* the hinge — a 1px black line through the middle */
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: #000;
+  box-shadow: 0 -1px 0 rgba(255,255,255,0.04);
+  pointer-events: none;
+}
+.flap > i {
+  font-style: normal;
+  display: inline-block;
+  /* per-row stagger via CSS variable set on each flap */
+  animation: flip-in 380ms steps(1, end) both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes flip-in {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  50%  { transform: translateY(0);     opacity: 1; }
+  100% { transform: translateY(0);     opacity: 1; }
+}
+/* the "thunk" — a quick squash at landing, achieved via a second pseudo */
+.flap.is-settling::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 50% 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.5), transparent);
+  animation: thunk 120ms ease-out forwards;
+  pointer-events: none;
+}
+@keyframes thunk {
+  from { transform: scaleY(1);   opacity: 1; }
+  to   { transform: scaleY(0.0); opacity: 0; }
+}
+
+/* a thin space between words inside a flip */
+.flap--space {
+  width: 0.42em;
+  background: transparent;
+  box-shadow: none;
+}
+.flap--space::after { display: none; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FLIGHT INFO ZONE — the studio's vitals, presented as the "About" panel
+   that pretends to be an information desk.
+   ────────────────────────────────────────────────────────────────────────── */
+.info {
+  padding: clamp(32px, 6vh, 64px) var(--gutter);
+  border-top: 1px solid var(--edge);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(24px, 4vw, 64px);
+  align-items: end;
+}
+.info h2 {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--amber-lo);
+  margin: 0 0 14px;
+  font-weight: 500;
+}
+.info dl {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px 16px;
+  margin: 0;
+  font-size: 14px;
+}
+.info dt {
+  color: var(--amber-lo);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 11px;
+  align-self: center;
+}
+.info dd { margin: 0; color: var(--paper); }
+.info dd b { color: var(--amber); font-weight: 600; }
+
+.info__manifest ul {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; gap: 6px;
+  font-size: 15px;
+  color: var(--paper);
+}
+.info__manifest li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: baseline;
+}
+.info__manifest li::before {
+  content: counter(idx, decimal-leading-zero);
+  counter-increment: idx;
+  color: var(--amber-lo);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+}
+.info__manifest ul { counter-reset: idx; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MARQUEE — the LED ticker at the bottom of every page
+   ────────────────────────────────────────────────────────────────────────── */
+.ticker {
+  border-top: 1px solid var(--edge);
+  background: linear-gradient(180deg, #050405, #000);
+  overflow: hidden;
+  position: relative;
+}
+.ticker__inner {
+  display: flex;
+  white-space: nowrap;
+  animation: scroll 90s linear infinite;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  color: var(--amber);
+  padding: 14px 0;
+  /* phosphor */
+  text-shadow: 0 0 8px rgba(255,176,0,0.35);
+}
+.ticker__inner span { padding: 0 3ch; }
+.ticker__inner span::after { content: "■"; margin-left: 3ch; color: var(--amber-lo); }
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   CASE STUDY (flight detail)
+   The board language carries through, just rotated: a single big destination,
+   a manifest of metadata, body copy in a narrow column.
+   ────────────────────────────────────────────────────────────────────────── */
+.flight {
+  padding: clamp(24px, 5vh, 64px) var(--gutter) 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(24px, 4vh, 48px);
+  max-width: 1240px;
+  margin: 0 auto;
+}
+.flight__head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 1rem;
+  border-bottom: 1px dashed rgba(255,176,0,0.18);
+  padding-bottom: clamp(16px, 3vh, 28px);
+}
+.flight__code {
+  font-size: 11px; color: var(--amber-lo);
+  letter-spacing: 0.24em; text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.flight__dest {
+  font-size: clamp(40px, 8vw, 96px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  margin: 0;
+  color: var(--amber);
+  text-shadow:
+    0 0 1px var(--amber),
+    0 0 18px rgba(255,176,0,0.25);
+}
+.flight__back {
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--amber-lo);
+  border: 1px solid var(--edge);
+  padding: 8px 12px;
+  align-self: start;
+}
+.flight__back:hover { color: var(--amber); border-color: var(--amber); }
+
+.flight__manifest {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 24px;
+  font-size: 13px;
+}
+.flight__manifest h3 {
+  font-size: 10px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--amber-lo);
+  margin: 0 0 6px; font-weight: 500;
+}
+.flight__manifest p { margin: 0; color: var(--paper); }
+
+.flight__body {
+  max-width: 64ch;
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.65;
+  color: var(--paper);
+}
+.flight__body p { margin: 0 0 1.1em; }
+.flight__body p:first-child::first-letter {
+  /* the drop cap is set in amber and uppercase — board language */
+  color: var(--amber);
+  font-size: 2.4em;
+  line-height: 0.9;
+  float: left;
+  padding: 4px 10px 0 0;
+}
+
+.flight__remarks {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--amber-hi);
+  border-left: 2px solid var(--amber);
+  padding-left: 12px;
+  margin: 0 0 1.5em;
+  text-transform: uppercase;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   MOBILE — a totally different product.
+   Below 720px, the board collapses and rebuilds as a boarding-pass stack.
+   No flips, no marquee glow. Tactile, paper-y, perforated.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  :root {
+    --paper-color: #f4ead4;  /* the off-white of an actual boarding pass */
+    --paper-ink:   #1a1612;
+    --paper-edge:  #d8c89a;
+  }
+  body {
+    background: #07060a;  /* the airline-seat-back darkness */
+  }
+
+  /* ─── HEADER becomes the airline strip at the top of a stack of passes ─── */
+  .head {
+    padding: 18px 18px 14px;
+    background: linear-gradient(180deg, #07060a 0%, #07060a 80%, transparent);
+  }
+  .head__top { gap: 6px; }
+  .callsign { font-size: 12px; }
+  .clock { font-size: 12px; gap: 0.8ch; }
+  .head__legend { display: none; }
+
+  /* ─── BOARD becomes a stack of physical boarding passes ─── */
+  .board {
+    background: transparent;
+    padding: 0 18px 0;
+    display: grid;
+    gap: 14px;
+  }
+  .row {
+    /* the pass itself */
+    display: grid;
+    grid-template-columns: 1fr 78px;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      "code   stub"
+      "dest   stub"
+      "meta   stub";
+    gap: 8px 0;
+    height: auto;
+    padding: 0;
+    border: none;
+    background: var(--paper-color);
+    color: var(--paper-ink);
+    border-radius: 4px;
+    box-shadow:
+      0 1px 0 rgba(0,0,0,0.4),
+      0 12px 18px -10px rgba(0,0,0,0.5);
+    position: relative;
+    overflow: hidden;
+  }
+  /* perforated tear between body and stub */
+  .row::after {
+    content: "";
+    position: absolute;
+    right: 78px; top: 8px; bottom: 8px;
+    width: 1px;
+    background-image: radial-gradient(circle, var(--paper-ink) 0 0.7px, transparent 1px);
+    background-size: 2px 6px;
+    background-repeat: repeat-y;
+    opacity: 0.35;
+  }
+  .row__flight {
+    grid-area: code;
+    color: var(--paper-ink);
+    opacity: 0.55;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    padding: 14px 16px 0;
+  }
+  .row__dest {
+    grid-area: dest;
+    color: var(--paper-ink);
+    font-size: 30px;
+    letter-spacing: 0.02em;
+    text-shadow: none;  /* no phosphor on paper */
+    padding: 0 16px;
+    line-height: 1;
+  }
+  .row__gate {
+    /* hide the gate text — it appears on the stub instead */
+    display: none;
+  }
+  .row__time {
+    grid-area: meta;
+    text-align: left;
+    color: var(--paper-ink);
+    opacity: 0.7;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    padding: 0 16px 14px;
+  }
+  .row__time::before {
+    content: "DEP ";
+    opacity: 0.5;
+    margin-right: 4px;
+  }
+
+  /* ─── STUB ─── the right-hand tear-off, with gate + status ─── */
+  .row__stub {
+    grid-area: stub;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 4px;
+    padding: 12px 4px;
+    background:
+      linear-gradient(180deg, transparent 0%, transparent 100%),
+      var(--paper-color);
+    text-align: center;
+  }
+  .row__stub small {
+    font-size: 9px; letter-spacing: 0.22em;
+    color: var(--paper-ink); opacity: 0.55;
+    text-transform: uppercase;
+  }
+  .row__stub b {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--paper-ink);
+  }
+
+  /* ─── STATUS on mobile becomes a hand-stamped mark ─── */
+  .row__status {
+    position: absolute;
+    bottom: 10px;
+    right: 96px;
+    text-align: right;
+  }
+  .pill {
+    border: 1.5px solid currentColor;
+    color: var(--paper-ink);
+    background: transparent;
+    font-size: 9px;
+    padding: 3px 6px 2px;
+    letter-spacing: 0.2em;
+    transform: rotate(-4deg);
+    opacity: 0.85;
+  }
+  .pill::before { display: none; }
+  .pill--boarding { color: #b86200; animation: none; }
+  .pill--ontime   { color: #2d6a2d; }
+  .pill--delayed  { color: #a02525; }
+  .pill--departed { color: #5a4f3d; }
+
+  /* the destination's flip on mobile becomes flat — no flap chrome */
+  .flap {
+    background: transparent;
+    box-shadow: none;
+    width: auto;
+    height: auto;
+    line-height: 1;
+    color: inherit;
+  }
+  .flap::after { display: none; }
+  .flap > i { animation: none; }
+  .flip { gap: 0; }
+
+  /* ─── FLIGHT INFO becomes the "passenger info" pass at the top ─── */
+  .info {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 24px 18px;
+    margin: 14px 18px 18px;
+    background: var(--paper-color);
+    color: var(--paper-ink);
+    border-radius: 4px;
+    border-top: none;
+    box-shadow:
+      0 1px 0 rgba(0,0,0,0.4),
+      0 12px 18px -10px rgba(0,0,0,0.5);
+  }
+  .info h2 { color: var(--paper-ink); opacity: 0.55; }
+  .info dt { color: var(--paper-ink); opacity: 0.55; }
+  .info dd { color: var(--paper-ink); }
+  .info dd b { color: var(--paper-ink); }
+  .info__manifest li { color: var(--paper-ink); }
+  .info__manifest li::before { color: var(--paper-ink); opacity: 0.55; }
+
+  /* ─── TICKER hidden on mobile — replaced by a barcode strip ─── */
+  .ticker { display: none; }
+
+  /* the barcode at the foot of the page (mobile-only) */
+  .barcode {
+    display: block;
+    margin: 4px 18px 24px;
+    height: 42px;
+    background:
+      repeating-linear-gradient(90deg,
+        #f4ead4 0 1px,
+        #1a1612 1px 3px,
+        #f4ead4 3px 5px,
+        #1a1612 5px 6px,
+        #f4ead4 6px 9px,
+        #1a1612 9px 11px,
+        #f4ead4 11px 13px,
+        #1a1612 13px 14px);
+    border-radius: 3px;
+    position: relative;
+  }
+  .barcode::after {
+    content: "T7 0001 4178N 0879W " attr(data-when);
+    position: absolute;
+    bottom: -16px; left: 0;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--amber-lo);
+  }
+
+  /* ─── FLIGHT DETAIL on mobile — full boarding pass turned over ─── */
+  .flight {
+    padding: 14px 18px 0;
+    gap: 18px;
+  }
+  .flight__head {
+    grid-template-columns: 1fr;
+    background: var(--paper-color);
+    color: var(--paper-ink);
+    border-radius: 4px;
+    padding: 22px 18px;
+    border: none;
+    box-shadow:
+      0 1px 0 rgba(0,0,0,0.4),
+      0 12px 18px -10px rgba(0,0,0,0.5);
+  }
+  .flight__code { color: var(--paper-ink); opacity: 0.55; margin-bottom: 10px; }
+  .flight__dest {
+    color: var(--paper-ink);
+    text-shadow: none;
+    font-size: 44px;
+    line-height: 1;
+  }
+  .flight__back {
+    color: var(--paper-ink); border-color: var(--paper-edge);
+    margin-top: 18px;
+    display: inline-block;
+    width: auto;
+  }
+  .flight__back:hover { color: var(--paper-ink); border-color: var(--paper-ink); }
+  .flight__manifest {
+    grid-template-columns: 1fr 1fr;
+    background: var(--paper-color);
+    color: var(--paper-ink);
+    border-radius: 4px;
+    padding: 18px;
+  }
+  .flight__manifest h3 { color: var(--paper-ink); opacity: 0.55; }
+  .flight__manifest p { color: var(--paper-ink); }
+  .flight__body { color: var(--paper); padding: 4px 4px 18px; }
+  .flight__remarks { color: var(--amber-hi); }
+  .flight__body p:first-child::first-letter { color: var(--amber); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ACCESSIBILITY — reduce motion
+   ────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .flap > i,
+  .pill--boarding,
+  .ticker__inner {
+    animation: none !important;
+  }
+  /* on reduced-motion, the marquee still shows but doesn't scroll */
+  .ticker__inner { white-space: normal; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   FOCUS — visible, board-themed
+   ────────────────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+@media (max-width: 720px) {
+  :focus-visible { outline-color: var(--paper-edge); }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PRINT — the board prints as a single passenger manifest (because of course)
+   ────────────────────────────────────────────────────────────────────────── */
+@media print {
+  body { background: #fff; color: #000; }
+  .ticker, .barcode { display: none; }
+  .row { color: #000; }
+  .row__dest { color: #000; text-shadow: none; }
+  .pill { border-color: #000; color: #000; }
+}

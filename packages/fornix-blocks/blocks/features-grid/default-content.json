@@ -1,36 +1,37 @@
 {
-  "headline": "Everything You Need",
-  "subheadline": "Powerful features to help you build faster and ship with confidence.",
+  "eyebrow": "What you get",
+  "headline": "Built for teams that ship",
+  "subheadline": "Every feature ties back to one thing: getting code into production faster, with fewer surprises.",
   "features": [
     {
-      "icon": "⚡",
-      "title": "Lightning Fast",
-      "description": "Built on Astro for zero JavaScript by default. Your site loads instantly."
+      "icon": "check",
+      "title": "Atomic preview deploys",
+      "description": "Every PR gets a unique URL with a real environment. Reviewers click, not clone."
     },
     {
-      "icon": "🧩",
-      "title": "Block-Based",
-      "description": "Compose your site from pre-built, tested blocks. Add and remove with a single command."
+      "icon": "arrow-right",
+      "title": "Rollback in one click",
+      "description": "Atomic deploys mean every release is reversible. Bad deploy at 2am? Six seconds to safe."
     },
     {
-      "icon": "🎨",
-      "title": "Beautiful Themes",
-      "description": "Choose from curated palettes or bring your own. Switch themes at runtime."
+      "icon": "star",
+      "title": "Edge-first by default",
+      "description": "Static assets cached at 300+ POPs. Dynamic routes run on workers — no cold starts."
     },
     {
-      "icon": "🌍",
-      "title": "i18n Ready",
-      "description": "Built-in internationalization with content collections organized by locale."
+      "icon": "external-link",
+      "title": "Drop-in CDN",
+      "description": "Point your domain, get TLS, HTTP/3, and Brotli automatically. No nginx tuning required."
     },
     {
-      "icon": "☁️",
-      "title": "Edge Deployed",
-      "description": "Deploy to Cloudflare Workers for global edge performance out of the box."
+      "icon": "mail",
+      "title": "Observability built in",
+      "description": "Request logs, real-user metrics, and error traces — no separate Datadog setup."
     },
     {
-      "icon": "🤖",
-      "title": "AI-Assisted",
-      "description": "Smart scaffolding with AI that understands your project and suggests the right blocks."
+      "icon": "phone",
+      "title": "Support that ships",
+      "description": "Real engineers, real responses. SLAs include actual response times, not portal acknowledgement."
     }
   ]
 }

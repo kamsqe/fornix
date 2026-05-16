@@ -69,7 +69,8 @@ const { sigil, index } = Astro.props;
     }
     .stamp-coord { display: none; }
     .stamp-top { top: var(--space-s); left: var(--space-s); }
-    .stamp-index { top: var(--space-s); }
+    /* The bottom-row nav surfaces current page already; hide the centered numeral */
+    .stamp-index { display: none; }
   }
 </style>
 

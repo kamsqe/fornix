@@ -1,0 +1,22 @@
+---
+import Board from "../layouts/Board.astro";
+import BoardRow from "../components/BoardRow.astro";
+import FlightInfo from "../components/FlightInfo.astro";
+import { flights } from "../data/flights.ts";
+import { studio } from "../data/studio.ts";
+
+const title = `${studio.name} — Departures`;
+const description =
+  "Tower 7. A design and engineering studio. Eight projects on the board, four ready to board.";
+---
+
+<Board title={title} description={description}>
+  <ol class="board" aria-label="Departures">
+    {flights.map((f) => <BoardRow flight={f} />)}
+  </ol>
+
+  <FlightInfo />
+
+  {/* mobile-only barcode footer; CSS hides it on desktop */}
+  <span class="barcode" data-when="DEP" aria-hidden="true"></span>
+</Board>

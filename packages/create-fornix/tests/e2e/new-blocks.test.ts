@@ -54,7 +54,7 @@ function makeConfig(projectDir: string): ResolvedConfig {
 }
 
 describe("v0.3 new blocks (header-sticky + hero-text)", () => {
-  it("scaffolds → installs → builds → renders header + hero with site.config + primitives", async () => {
+  it("header-sticky + hero-text → renders with site.config + primitives", async () => {
     const tmp = mkdtempSync(join(tmpdir(), "fornix-newblocks-"));
     const projectDir = join(tmp, "site");
 
@@ -119,6 +119,65 @@ describe("v0.3 new blocks (header-sticky + hero-text)", () => {
       expect(html).toContain('id="fornix-palette-link"');
       // global.css imported (Tailwind + fonts pipeline)
       expect(html).toMatch(/<link[^>]*rel="stylesheet"/);
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  }, 240_000);
+
+  it("hero-media + features-grid → renders illustration + 6-card grid", async () => {
+    const tmp = mkdtempSync(join(tmpdir(), "fornix-newblocks-hm-"));
+    const projectDir = join(tmp, "site");
+
+    try {
+      const config = makeConfig(projectDir);
+      const result = await scaffoldProject({
+        ...config,
+        blocks: [
+          { name: "hero-media", variant: "default" },
+          { name: "features-grid", variant: "default" },
+        ],
+      });
+      expect(result.ok, JSON.stringify(result, null, 2)).toBe(true);
+
+      // hero-media ships its default illustration to public/illustrations/
+      expect(
+        existsSync(join(projectDir, "public/illustrations/hero-default.svg")),
+      ).toBe(true);
+
+      execSync("npm install --no-audit --no-fund --loglevel=error", {
+        cwd: projectDir,
+        stdio: "pipe",
+      });
+      execSync("npx astro build", { cwd: projectDir, stdio: "pipe" });
+
+      const html = readFileSync(
+        join(projectDir, "dist", "index.html"),
+        "utf8",
+      );
+
+      // ── hero-media ──────────────────────────────────────────
+      expect(html).toContain("The intern your whole team trusts");
+      expect(html).toContain("/illustrations/hero-default.svg");
+      expect(html).toContain("fnx-hero-media");
+
+      // ── features-grid ───────────────────────────────────────
+      expect(html).toContain("Built for teams that ship");
+      // All 6 feature titles render
+      expect(html).toContain("Atomic preview deploys");
+      expect(html).toContain("Rollback in one click");
+      expect(html).toContain("Edge-first by default");
+      expect(html).toContain("Drop-in CDN");
+      expect(html).toContain("Observability built in");
+      expect(html).toContain("Support that ships");
+
+      // Primitive BEM classes prove composition
+      expect(html).toContain("fnx-card--bordered");
+      expect(html).toContain("fnx-icon");
+
+      // The bundled illustration also lands in dist (Astro copies public/)
+      expect(
+        existsSync(join(projectDir, "dist/illustrations/hero-default.svg")),
+      ).toBe(true);
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }

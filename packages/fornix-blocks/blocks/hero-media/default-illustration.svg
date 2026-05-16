@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" role="img" aria-label="Abstract product illustration" preserveAspectRatio="xMidYMid meet">
+  <!-- Soft ambient circles, palette-aware -->
+  <circle cx="100" cy="120" r="100" style="fill: var(--color-primary); opacity: 0.08" />
+  <circle cx="380" cy="240" r="140" style="fill: var(--color-accent); opacity: 0.10" />
+
+  <!-- Primary card body -->
+  <rect x="80" y="200" width="320" height="220" rx="20" style="fill: var(--color-primary)" />
+
+  <!-- Card header strip -->
+  <rect x="104" y="232" width="56" height="8" rx="4" style="fill: var(--color-on-primary); opacity: 0.55" />
+  <rect x="104" y="248" width="120" height="6" rx="3" style="fill: var(--color-on-primary); opacity: 0.35" />
+
+  <!-- Mini chart bars -->
+  <g transform="translate(104, 286)">
+    <rect x="0"   y="44" width="20" height="40" rx="4" style="fill: var(--color-on-primary); opacity: 0.4" />
+    <rect x="28"  y="28" width="20" height="56" rx="4" style="fill: var(--color-on-primary); opacity: 0.5" />
+    <rect x="56"  y="14" width="20" height="70" rx="4" style="fill: var(--color-on-primary); opacity: 0.6" />
+    <rect x="84"  y="34" width="20" height="50" rx="4" style="fill: var(--color-on-primary); opacity: 0.45" />
+    <rect x="112" y="6"  width="20" height="78" rx="4" style="fill: var(--color-on-primary); opacity: 0.75" />
+    <rect x="140" y="22" width="20" height="62" rx="4" style="fill: var(--color-on-primary); opacity: 0.55" />
+    <rect x="168" y="38" width="20" height="46" rx="4" style="fill: var(--color-on-primary); opacity: 0.4" />
+  </g>
+
+  <!-- Floating accent badge -->
+  <rect x="296" y="116" width="116" height="64" rx="14" style="fill: var(--color-accent)" />
+  <rect x="312" y="134" width="36" height="6" rx="3" style="fill: var(--color-on-primary); opacity: 0.5" />
+  <rect x="312" y="148" width="64" height="10" rx="3" style="fill: var(--color-on-primary); opacity: 0.95" />
+  <rect x="312" y="164" width="48" height="6" rx="3" style="fill: var(--color-on-primary); opacity: 0.5" />
+
+  <!-- Decorative dots in upper-left -->
+  <circle cx="120" cy="116" r="4" style="fill: var(--color-foreground); opacity: 0.4" />
+  <circle cx="138" cy="116" r="4" style="fill: var(--color-foreground); opacity: 0.25" />
+  <circle cx="156" cy="116" r="4" style="fill: var(--color-foreground); opacity: 0.15" />
+
+  <!-- Accent micro-pill bottom-right of card -->
+  <rect x="320" y="376" width="56" height="20" rx="10" style="fill: var(--color-on-primary); opacity: 0.95" />
+</svg>

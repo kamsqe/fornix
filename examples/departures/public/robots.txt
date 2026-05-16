@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://departures.pages.dev/sitemap.xml

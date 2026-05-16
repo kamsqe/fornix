@@ -1,39 +1,151 @@
 ---
 /**
- * Features Grid — responsive grid of feature cards.
+ * Features Grid — responsive grid of feature cards (icon + title + description).
  *
- * ALL text is sourced from the content collection (zero hardcoded strings).
- * Content is read from `src/content/sections/features-grid.json`.
+ * Composes: Section, Container, Headline, Eyebrow, Card, Icon.
+ * Reads no site.config — purely content-driven via slots.
+ *
+ * Layout: 3 columns ≥768px, 2 columns ≥640px, 1 column below.
  */
 import { getEntry } from "astro:content";
+import Section from "../primitives/Section.astro";
+import Container from "../primitives/Container.astro";
+import Headline from "../primitives/Headline.astro";
+import Eyebrow from "../primitives/Eyebrow.astro";
+import Card from "../primitives/Card.astro";
+import Icon from "../primitives/Icon.astro";
+import { site } from "../../site.config";
 
-const locale = Astro.currentLocale ?? "en";
+type IconName =
+  | "check"
+  | "arrow-right"
+  | "chevron-down"
+  | "chevron-up"
+  | "external-link"
+  | "menu"
+  | "x"
+  | "play"
+  | "star"
+  | "mail"
+  | "phone"
+  | "map-pin";
+
+interface FeatureItem {
+  icon: IconName;
+  title: string;
+  description: string;
+}
+
+const locale = Astro.currentLocale ?? site.locale.default;
 const entry = await getEntry("sections", `${locale}/features-grid`);
-const { headline, subheadline, features } = entry?.data ?? {
-  headline: "",
-  subheadline: "",
-  features: [],
+const data = (entry?.data ?? {}) as {
+  eyebrow?: string;
+  headline?: string;
+  subheadline?: string;
+  features?: FeatureItem[];
 };
+
+const eyebrow = data.eyebrow ?? "";
+const headline = data.headline ?? "";
+const subheadline = data.subheadline ?? "";
+const features = (data.features ?? []) as FeatureItem[];
 ---
 
-<section class="features-grid">
-  <div class="features-grid__header">
-    <h2 class="features-grid__headline">{headline}</h2>
-    {subheadline && (
-      <p class="features-grid__subheadline">{subheadline}</p>
-    )}
-  </div>
-  <div class="features-grid__cards">
-    {features.map((feature: { icon: string; title: string; description: string }) => (
-      <article class="features-grid__card">
-        <span class="features-grid__icon">{feature.icon}</span>
-        <h3 class="features-grid__title">{feature.title}</h3>
-        <p class="features-grid__description">{feature.description}</p>
-      </article>
-    ))}
-  </div>
-</section>
+<Section variant="alt">
+  <Container size="wide">
+    <header class="fnx-features__header">
+      {eyebrow && <Eyebrow align="center">{eyebrow}</Eyebrow>}
+      {headline && (
+        <Headline level={2} align="center" measure="comfortable">
+          {headline}
+        </Headline>
+      )}
+      {subheadline && <p class="fnx-features__sub">{subheadline}</p>}
+    </header>
+
+    <div class="fnx-features__grid">
+      {features.map((feature) => (
+        <Card variant="bordered" class="fnx-features__card">
+          <div class="fnx-features__icon-wrap">
+            <Icon name={feature.icon} size="1.25rem" />
+          </div>
+          <h3 class="fnx-features__title">{feature.title}</h3>
+          <p class="fnx-features__desc">{feature.description}</p>
+        </Card>
+      ))}
+    </div>
+  </Container>
+</Section>
 
 <style>
-  @import "../../styles/sections/features-grid.css";
+  .fnx-features__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .fnx-features__sub {
+    margin: 0;
+    max-width: 56ch;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+    text-wrap: pretty;
+  }
+
+  .fnx-features__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .fnx-features__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .fnx-features__icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    color: var(--color-primary);
+    border-radius: var(--radius-md);
+  }
+
+  .fnx-features__title {
+    margin: 0;
+    font-family: var(--font-headline);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    line-height: 1.3;
+  }
+
+  .fnx-features__desc {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 640px) {
+    .fnx-features__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .fnx-features__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
 </style>

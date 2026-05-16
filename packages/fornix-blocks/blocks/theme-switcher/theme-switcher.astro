@@ -10,7 +10,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "theme-switcher");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/theme-switcher`);
 const { label } = entry?.data ?? { label: "Theme" };
 ---
 

@@ -13,7 +13,8 @@ interface BentoItem {
   size: string;
 }
 
-const entry = await getEntry("sections", "features-bento");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/features-bento`);
 const { headline, subheadline } = entry?.data ?? {
   headline: "",
   subheadline: "",

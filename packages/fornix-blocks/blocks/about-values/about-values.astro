@@ -18,7 +18,8 @@ interface Value {
   quoteRole?: string;
 }
 
-const entry = await getEntry("sections", "about-values");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/about-values`);
 const {
   badge = "",
   headline = "",

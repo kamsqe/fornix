@@ -1,0 +1,7 @@
+---
+import Layout from "{{layoutPath}}";
+{{blockImports}}
+---
+<Layout title="{{title}}" description="{{description}}">
+{{blockRenders}}
+</Layout>

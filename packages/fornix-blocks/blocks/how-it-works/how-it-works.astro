@@ -14,7 +14,8 @@ interface Step {
   command?: string;
 }
 
-const entry = await getEntry("sections", "how-it-works");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/how-it-works`);
 const {
   badge = "",
   headline = "",

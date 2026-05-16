@@ -18,7 +18,8 @@ interface Plan {
   highlighted?: boolean;
 }
 
-const entry = await getEntry("sections", "pricing-toggle");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/pricing-toggle`);
 const {
   badge = "",
   headline = "",
@@ -26,6 +27,8 @@ const {
   monthlyLabel = "Monthly",
   annualLabel = "Annual",
   annualSavings = "Save 20%",
+  popularBadge = "Most Popular",
+  toggleAriaLabel = "Toggle annual pricing",
 } = entry?.data ?? {};
 const plans = (entry?.data?.plans ?? []) as Plan[];
 const plansJson = JSON.stringify(plans.map(p => ({ monthly: p.monthlyPrice, annual: p.annualPrice })));
@@ -46,7 +49,7 @@ const plansJson = JSON.stringify(plans.map(p => ({ monthly: p.monthlyPrice, annu
           class="pricing-toggle__switch"
           role="switch"
           aria-checked="false"
-          aria-label="Toggle annual pricing"
+          aria-label={toggleAriaLabel}
           data-prices={plansJson}
         >
           <span class="pricing-toggle__switch-thumb"></span>
@@ -62,7 +65,7 @@ const plansJson = JSON.stringify(plans.map(p => ({ monthly: p.monthlyPrice, annu
     <div class="pricing-toggle__grid">
       {plans.map((plan, i) => (
         <div class:list={["pricing-toggle__card", plan.highlighted && "pricing-toggle__card--highlighted"]}>
-          {plan.highlighted && <div class="pricing-toggle__popular">Most Popular</div>}
+          {plan.highlighted && <div class="pricing-toggle__popular">{popularBadge}</div>}
           <h3 class="pricing-toggle__plan-name">{plan.name}</h3>
           <div class="pricing-toggle__price" data-plan-index={i}>
             <span class="pricing-toggle__amount">{plan.monthlyPrice}</span>

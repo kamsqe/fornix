@@ -45,6 +45,7 @@
       "categories": {
         "type": "array",
         "description": "Filter categories (first one is 'All')",
+        "items": { "type": "string" },
         "example": ["All", "Web", "Mobile", "Branding"]
       },
       "projects": {

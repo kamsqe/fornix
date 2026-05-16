@@ -89,7 +89,7 @@
 }
 
 .theme-switcher__option:hover {
-  background: rgba(99, 102, 241, 0.1);
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
   color: var(--color-foreground, #f8fafc);
 }
 

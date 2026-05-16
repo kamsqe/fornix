@@ -14,7 +14,8 @@ interface StatCard {
   description?: string;
 }
 
-const entry = await getEntry("sections", "about-stats");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/about-stats`);
 const {
   badge = "",
   headline = "",

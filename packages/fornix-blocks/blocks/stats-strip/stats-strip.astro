@@ -13,7 +13,8 @@ interface StatItem {
   accent?: boolean;
 }
 
-const entry = await getEntry("sections", "stats-strip");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/stats-strip`);
 const items = (entry?.data?.items ?? []) as StatItem[];
 ---
 

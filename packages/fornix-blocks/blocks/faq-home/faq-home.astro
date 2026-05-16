@@ -12,7 +12,8 @@ interface FaqItem {
   answer: string;
 }
 
-const entry = await getEntry("sections", "faq-home");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/faq-home`);
 const { badge = "", headline = "" } = entry?.data ?? {};
 const items = (entry?.data?.items ?? []) as FaqItem[];
 ---

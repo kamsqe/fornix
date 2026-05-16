@@ -14,12 +14,17 @@ interface ContactItem {
   href?: string;
 }
 
-const entry = await getEntry("sections", "contact-split");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/contact-split`);
 const {
   badge = "",
   headline = "",
   description = "",
   submitText = "Send Message",
+  nameLabel = "Name",
+  emailLabel = "Email",
+  subjectLabel = "Subject",
+  messageLabel = "Message",
 } = entry?.data ?? {};
 const contactItems = (entry?.data?.contactItems ?? []) as ContactItem[];
 ---
@@ -53,19 +58,19 @@ const contactItems = (entry?.data?.contactItems ?? []) as ContactItem[];
     <div class="contact-split__form-wrap">
       <form class="contact-split__form" data-astro-reload>
         <div class="contact-split__field">
-          <label class="contact-split__label" for="contact-name">Name</label>
+          <label class="contact-split__label" for="contact-name">{nameLabel}</label>
           <input class="contact-split__input" type="text" id="contact-name" name="name" required />
         </div>
         <div class="contact-split__field">
-          <label class="contact-split__label" for="contact-email">Email</label>
+          <label class="contact-split__label" for="contact-email">{emailLabel}</label>
           <input class="contact-split__input" type="email" id="contact-email" name="email" required />
         </div>
         <div class="contact-split__field">
-          <label class="contact-split__label" for="contact-subject">Subject</label>
+          <label class="contact-split__label" for="contact-subject">{subjectLabel}</label>
           <input class="contact-split__input" type="text" id="contact-subject" name="subject" />
         </div>
         <div class="contact-split__field">
-          <label class="contact-split__label" for="contact-message">Message</label>
+          <label class="contact-split__label" for="contact-message">{messageLabel}</label>
           <textarea class="contact-split__textarea" id="contact-message" name="message" rows="5" required></textarea>
         </div>
         <button type="submit" class="contact-split__submit">{submitText}</button>

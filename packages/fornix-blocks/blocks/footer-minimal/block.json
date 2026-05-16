@@ -79,6 +79,12 @@
         "description": "Optional short tagline or description below the logo/brand",
         "maxLength": 120,
         "example": "Built with Fornix"
+      },
+      "navAriaLabel": {
+        "type": "string",
+        "description": "Accessible label for the footer nav element (read by screen readers)",
+        "maxLength": 40,
+        "example": "Footer"
       }
     }
   }

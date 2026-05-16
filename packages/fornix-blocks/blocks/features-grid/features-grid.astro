@@ -7,7 +7,8 @@
  */
 import { getEntry } from "astro:content";
 
-const entry = await getEntry("sections", "features-grid");
+const locale = Astro.currentLocale ?? "en";
+const entry = await getEntry("sections", `${locale}/features-grid`);
 const { headline, subheadline, features } = entry?.data ?? {
   headline: "",
   subheadline: "",

@@ -15,7 +15,10 @@
     "test:integration": "pnpm --filter create-fornix run test:integration",
     "test:e2e": "pnpm --filter create-fornix run test:e2e",
     "lint": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "showcase": "node scripts/build-showcase.mjs",
+    "showcase:dev": "node scripts/build-showcase.mjs && cd examples/showcase && npx astro preview",
+    "showcase:deploy": "node scripts/build-showcase.mjs && cd examples/showcase && npx wrangler pages deploy dist --project-name fornix-showcase"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

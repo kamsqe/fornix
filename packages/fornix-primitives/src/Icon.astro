@@ -1,0 +1,110 @@
+---
+/**
+ * Icon — inline-SVG icon from a curated Lucide-inspired set. Sized by
+ * font-size and colored by `currentColor`, so it adapts to whatever
+ * context it lives in.
+ *
+ * Why inline SVG vs a Lucide npm package: scaffolded projects own all the
+ * icon code. Users can edit any glyph, swap in their own, or remove ones
+ * they don't use. No runtime dep, no font loading, ~250B per icon.
+ *
+ * The current set covers the most-common needs across blocks (check,
+ * arrow-right, chevron-down, etc.). Add icons here as needed; the set
+ * grows organically with the block library.
+ */
+type IconName =
+  | "check"
+  | "arrow-right"
+  | "chevron-down"
+  | "chevron-up"
+  | "external-link"
+  | "menu"
+  | "x"
+  | "play"
+  | "star"
+  | "mail"
+  | "phone"
+  | "map-pin";
+
+interface Props {
+  /** Which icon to render. */
+  name: IconName;
+  /** Size in pixels or any CSS length. Defaults to `1em` so the icon flows with surrounding text. */
+  size?: number | string;
+  /** Stroke width (Lucide convention is 2; bump to 1.5 for thinner). */
+  strokeWidth?: number;
+  /** Pass-through class. */
+  class?: string;
+  /** ARIA label — required when the icon is the only conveyance of meaning;
+   *  omit when the icon is decorative (sibling text carries the message). */
+  "aria-label"?: string;
+}
+
+const {
+  name,
+  size = "1em",
+  strokeWidth = 2,
+  class: className = "",
+  "aria-label": ariaLabel,
+} = Astro.props;
+
+const baseProps = {
+  width: size,
+  height: size,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  "stroke-width": strokeWidth,
+  "stroke-linecap": "round" as const,
+  "stroke-linejoin": "round" as const,
+  class: `fnx-icon ${className}`.trim(),
+  role: ariaLabel ? "img" : "presentation",
+  "aria-label": ariaLabel,
+  "aria-hidden": ariaLabel ? undefined : "true",
+};
+---
+
+{name === "check" && (
+  <svg {...baseProps}><polyline points="20 6 9 17 4 12" /></svg>
+)}
+{name === "arrow-right" && (
+  <svg {...baseProps}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+)}
+{name === "chevron-down" && (
+  <svg {...baseProps}><polyline points="6 9 12 15 18 9" /></svg>
+)}
+{name === "chevron-up" && (
+  <svg {...baseProps}><polyline points="18 15 12 9 6 15" /></svg>
+)}
+{name === "external-link" && (
+  <svg {...baseProps}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+)}
+{name === "menu" && (
+  <svg {...baseProps}><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+)}
+{name === "x" && (
+  <svg {...baseProps}><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+)}
+{name === "play" && (
+  <svg {...baseProps} fill="currentColor"><polygon points="6 4 20 12 6 20 6 4" /></svg>
+)}
+{name === "star" && (
+  <svg {...baseProps}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" /></svg>
+)}
+{name === "mail" && (
+  <svg {...baseProps}><rect x="2" y="4" width="20" height="16" rx="2" /><polyline points="22 6 12 13 2 6" /></svg>
+)}
+{name === "phone" && (
+  <svg {...baseProps}><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+)}
+{name === "map-pin" && (
+  <svg {...baseProps}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></svg>
+)}
+
+<style>
+  .fnx-icon {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+</style>

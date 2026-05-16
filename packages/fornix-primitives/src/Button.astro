@@ -1,0 +1,136 @@
+---
+/**
+ * Button — the canonical CTA element. Renders as `<a>` when `href` is set,
+ * `<button>` otherwise. Three visual variants × two sizes.
+ *
+ * Reads from palette tokens:
+ *   --color-primary, --color-on-primary, --color-foreground,
+ *   --color-border, --color-surface, --radius-md, --duration-fast,
+ *   --easing-default, --shadow-sm
+ *
+ * Swap palettes (sharp/snappy/dark vs rounded/springy/warm) and the same
+ * `<Button variant="primary">` looks completely different — that's the point.
+ */
+interface Props {
+  /** Visual treatment. `primary` is the solid filled CTA; `secondary` is an
+   *  outlined complement; `ghost` is text-only for tertiary actions. */
+  variant?: "primary" | "secondary" | "ghost";
+  /** `default` matches body type scale; `lg` is the hero CTA size. */
+  size?: "default" | "lg";
+  /** When set, renders as `<a href>`. Otherwise renders as `<button>`. */
+  href?: string;
+  /** External link hint (sets target + rel). */
+  external?: boolean;
+  /** Optional native button type. */
+  type?: "button" | "submit" | "reset";
+  /** Pass-through class for one-off overrides. */
+  class?: string;
+}
+
+const {
+  variant = "primary",
+  size = "default",
+  href,
+  external = false,
+  type = "button",
+  class: className = "",
+} = Astro.props;
+
+const isLink = typeof href === "string" && href.length > 0;
+const Tag = isLink ? "a" : "button";
+const externalProps = isLink && external
+  ? { target: "_blank", rel: "noopener noreferrer" }
+  : {};
+---
+
+<Tag
+  class:list={[
+    `fnx-button fnx-button--${variant} fnx-button--${size}`,
+    className,
+  ]}
+  href={isLink ? href : undefined}
+  type={isLink ? undefined : type}
+  {...externalProps}
+>
+  <slot />
+</Tag>
+
+<style>
+  .fnx-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: transform var(--duration-fast) var(--easing-default),
+      box-shadow var(--duration-fast) var(--easing-default),
+      background var(--duration-fast) var(--easing-default),
+      color var(--duration-fast) var(--easing-default),
+      border-color var(--duration-fast) var(--easing-default);
+    appearance: none;
+    white-space: nowrap;
+  }
+
+  .fnx-button:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* ── Sizes ─────────────────────────────────────────────────── */
+  .fnx-button--default {
+    padding: 0.625rem 1.125rem;
+    font-size: 0.9375rem;
+  }
+  .fnx-button--lg {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* ── Variants ──────────────────────────────────────────────── */
+  .fnx-button--primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .fnx-button--primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .fnx-button--primary:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .fnx-button--secondary {
+    background: transparent;
+    color: var(--color-foreground);
+    border-color: var(--color-border);
+  }
+  .fnx-button--secondary:hover {
+    border-color: var(--color-foreground);
+    background: var(--color-surface);
+  }
+
+  .fnx-button--ghost {
+    background: transparent;
+    color: var(--color-foreground);
+  }
+  .fnx-button--ghost:hover {
+    background: var(--color-surface);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fnx-button {
+      transition: none;
+    }
+    .fnx-button:hover {
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+/**
+ * Card — surface container used by features grids, pricing tables,
+ * testimonials, and any "panel of related content."
+ *
+ * Reads from palette tokens:
+ *   --color-surface, --color-border, --color-foreground,
+ *   --radius-lg, --shadow-sm, --shadow-md, --duration-normal,
+ *   --easing-default
+ */
+interface Props {
+  /** Visual treatment. `default` is the standard panel; `bordered` adds a
+   *  visible border; `lifted` adds a subtle shadow; `featured` highlights
+   *  with a colored border (e.g. the "Most Popular" pricing card). */
+  variant?: "default" | "bordered" | "lifted" | "featured";
+  /** When true, the card responds to hover (subtle lift + shadow). Use for
+   *  cards that wrap a `<a>` link or have an obvious action. */
+  interactive?: boolean;
+  /** Pass-through class. */
+  class?: string;
+}
+
+const {
+  variant = "default",
+  interactive = false,
+  class: className = "",
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    `fnx-card fnx-card--${variant}`,
+    interactive && "fnx-card--interactive",
+    className,
+  ]}
+>
+  <slot />
+</div>
+
+<style>
+  .fnx-card {
+    background: var(--color-surface);
+    color: var(--color-foreground);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: transform var(--duration-normal) var(--easing-default),
+      box-shadow var(--duration-normal) var(--easing-default),
+      border-color var(--duration-normal) var(--easing-default);
+  }
+
+  @media (min-width: 640px) {
+    .fnx-card {
+      padding: 1.75rem;
+    }
+  }
+
+  .fnx-card--default {
+    /* base background only */
+  }
+  .fnx-card--bordered {
+    border: 1px solid var(--color-border);
+  }
+  .fnx-card--lifted {
+    box-shadow: var(--shadow-sm);
+  }
+  .fnx-card--featured {
+    border: 1.5px solid var(--color-primary);
+    box-shadow: var(--shadow-md);
+  }
+
+  .fnx-card--interactive {
+    cursor: pointer;
+  }
+  .fnx-card--interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fnx-card {
+      transition: none;
+    }
+    .fnx-card--interactive:hover {
+      transform: none;
+    }
+  }
+</style>

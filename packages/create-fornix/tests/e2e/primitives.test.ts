@@ -24,6 +24,10 @@ const REQUIRED_PRIMITIVES = [
   "Section.astro",
   "Headline.astro",
   "Eyebrow.astro",
+  "Button.astro",
+  "Card.astro",
+  "Badge.astro",
+  "Icon.astro",
 ];
 
 function makeConfig(projectDir: string): ResolvedConfig {
@@ -66,7 +70,15 @@ describe("v0.3 primitives emission", () => {
 
       // Themed primitives — must reference palette CSS variables (proves
       // they're actually palette-aware, not just shipping inert markup).
-      const THEMED = new Set(["Section.astro", "Headline.astro", "Eyebrow.astro"]);
+      // Container = layout only. Icon = uses currentColor.
+      const THEMED = new Set([
+        "Section.astro",
+        "Headline.astro",
+        "Eyebrow.astro",
+        "Button.astro",
+        "Card.astro",
+        "Badge.astro",
+      ]);
 
       for (const name of REQUIRED_PRIMITIVES) {
         const path = join(primDir, name);

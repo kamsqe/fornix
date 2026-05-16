@@ -13,6 +13,13 @@ export interface BrandContext {
   tone: string;
   industry: string;
   audience?: string;
+  /**
+   * Archetype the scaffold is built from (saas | agency | portfolio | gym
+   * | restaurant). When set, the AI prompts gain archetype-specific
+   * guidance — a SaaS hero is feature-led, a restaurant hero is
+   * sensory-led, etc. Unset = generic guidance.
+   */
+  archetype?: "saas" | "agency" | "portfolio" | "gym" | "restaurant";
 }
 
 /**

@@ -52,7 +52,7 @@ export function createAnthropicProvider(
           model: anthropic(modelId),
           schema,
           maxOutputTokens,
-          system: buildSystemPrompt(),
+          system: buildSystemPrompt(request.brand.archetype),
           prompt: buildBlockPrompt(request),
         });
         return ok(result.object as CopyResponse);
@@ -71,14 +71,47 @@ export function createAnthropicProvider(
 
 // ── Prompts ──────────────────────────────────────────────
 
-function buildSystemPrompt(): string {
-  return [
+/**
+ * Per-archetype voice guidance. Concrete enough to shape the AI's choices,
+ * short enough to not crowd out the slot schema. Tuned by inspecting the
+ * default-content of each archetype and asking "what makes this one's copy
+ * feel right vs wrong?"
+ */
+const ARCHETYPE_GUIDANCE: Record<NonNullable<CopyRequest["brand"]["archetype"]>, string> = {
+  saas:
+    "This is a SaaS product site. Voice: confident, specific, slightly opinionated. " +
+    "Lead with what the product does, not adjectives. Concrete benefits over abstract value props. " +
+    "Avoid the SaaS-cliché stack: streamline, empower, unlock, revolutionize, supercharge, robust.",
+  agency:
+    "This is an agency / studio site. Voice: editorial, restrained, confident. " +
+    "Show range without bragging. Lean on specifics (client names, project shapes, materials). " +
+    "Avoid 'award-winning', 'passionate', 'creative team' — let the work make those claims.",
+  portfolio:
+    "This is a personal-portfolio site for an individual designer / engineer / creator. " +
+    "Voice: first-person, direct, slightly literary. Show character — what you care about, " +
+    "what you don't take. Specific projects beat generic 'I love clean design' framing.",
+  gym:
+    "This is a fitness / strength-training site. Voice: direct, physical, no-nonsense. " +
+    "Reference real lifts, real schedules, real coaches. Avoid wellness-industry vagueness " +
+    "('your journey', 'community', 'transformation' as nouns) unless backed by specifics.",
+  restaurant:
+    "This is a restaurant / café / food site. Voice: sensory, place-rooted, generous. " +
+    "Reference ingredients, sourcing, room scale, hours, what changes weekly. " +
+    "Avoid 'unique culinary experience' and 'curated' — name dishes, name suppliers, name the room.",
+};
+
+function buildSystemPrompt(archetype?: CopyRequest["brand"]["archetype"]): string {
+  const base = [
     "You write marketing copy for website sections.",
-    "Voice: clear, specific, brand-aligned. Avoid generic SaaS clichés ('streamline', 'empower', 'unlock', 'revolutionize').",
+    "Voice: clear, specific, brand-aligned. Avoid generic clichés.",
     "Honor every constraint: maxLength is a hard limit, not a target.",
     "Match the requested locale precisely. Write idiomatically — do not translate from English.",
     "Every slot is optional. If you cannot produce strong copy for a slot, omit it.",
-  ].join("\n");
+  ];
+  if (archetype && ARCHETYPE_GUIDANCE[archetype]) {
+    base.push("", ARCHETYPE_GUIDANCE[archetype]);
+  }
+  return base.join("\n");
 }
 
 function buildBlockPrompt(request: CopyRequest): string {
@@ -102,6 +135,7 @@ function buildBlockPrompt(request: CopyRequest): string {
     `Industry: ${brand.industry}`,
     `Tone: ${brand.tone}`,
     brand.audience ? `Audience: ${brand.audience}` : "",
+    brand.archetype ? `Archetype: ${brand.archetype}` : "",
     "",
     `Locale: ${locale}`,
     "",
@@ -113,6 +147,10 @@ function buildBlockPrompt(request: CopyRequest): string {
     "",
     "Write copy for each slot. Omit any slot you cannot fill well.",
   ]
-    .filter((line) => line !== "" || true) // keep blank lines
+    .filter((line) => line !== "")
     .join("\n");
 }
+
+// Exported for unit tests — covers the archetype-guidance branching without
+// hitting the live API.
+export const __internals = { buildSystemPrompt, buildBlockPrompt };

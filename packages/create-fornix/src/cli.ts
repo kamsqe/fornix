@@ -30,6 +30,11 @@ import { loadArchetype, archetypeOverlay } from "./scaffold/archetype.js";
 import type { ResolvedConfig } from "./schemas/config.js";
 import { createAnthropicProvider } from "./ai/providers/anthropic.js";
 import type { AIProvider, BrandContext } from "./ai/provider.js";
+import {
+  matchArchetype,
+  resolveMatch,
+  brandFromMatch,
+} from "./ai/archetype-matcher.js";
 
 const main = defineCommand({
   meta: {
@@ -89,11 +94,44 @@ const main = defineCommand({
       );
     }
 
-    // ── Archetype loading (when --archetype is set) ───────────────
-    const archetypeName = args.archetype.trim();
-    const archetypeResult = archetypeName
-      ? loadArchetype(archetypeName)
-      : null;
+    // ── Archetype resolution ──────────────────────────────────────
+    // Three paths to picking an archetype, in priority order:
+    //   1. Explicit `--archetype <name>` flag
+    //   2. AI matcher from `--prompt "..."` (requires ANTHROPIC_API_KEY)
+    //   3. None — fall through to custom block mode
+    let archetypeName = args.archetype.trim();
+    let matchedBrand: BrandContext | null = null;
+
+    if (!archetypeName && args.prompt.trim() && process.env.ANTHROPIC_API_KEY) {
+      process.stdout.write(`→ Matching archetype from prompt…\n`);
+      const matcherResult = await matchArchetype({
+        prompt: args.prompt.trim(),
+        apiKey: process.env.ANTHROPIC_API_KEY,
+        projectName: args.name,
+        model: process.env.FORNIX_ANTHROPIC_MODEL,
+      });
+      if (matcherResult.ok) {
+        const resolved = resolveMatch(matcherResult.value);
+        archetypeName = resolved.archetype;
+        matchedBrand = brandFromMatch(matcherResult.value);
+        const confidence = (matcherResult.value.confidence * 100).toFixed(0);
+        if (resolved.fellBack) {
+          process.stdout.write(
+            `  Low confidence (${confidence}%) — falling back to saas. Override with --archetype if you know better.\n`,
+          );
+        } else {
+          process.stdout.write(
+            `  Matched: ${archetypeName} (${confidence}% confidence) — ${matcherResult.value.reasoning}\n`,
+          );
+        }
+      } else {
+        process.stderr.write(
+          `  Matcher failed: ${matcherResult.error.message}. Continuing with custom block mode.\n`,
+        );
+      }
+    }
+
+    const archetypeResult = archetypeName ? loadArchetype(archetypeName) : null;
     if (archetypeResult && !archetypeResult.ok) {
       process.stderr.write(`error: ${archetypeResult.error.message}\n`);
       process.exit(1);
@@ -162,9 +200,14 @@ const main = defineCommand({
     };
 
     // AI is opt-in via prompt + env. Either missing → defaults.
+    // When the matcher inferred a brand, prefer that over the static fallback.
+    // When an archetype is resolved (either from --archetype or the matcher),
+    // attach its name to the brand so prompts gain archetype-specific guidance.
     const aiSetup = resolveAiSetup({
       prompt: args.prompt,
       projectName: args.name,
+      matchedBrand,
+      archetypeName: isKnownArchetype(archetypeName) ? archetypeName : null,
     });
     if (aiSetup) {
       process.stdout.write(
@@ -259,9 +302,23 @@ interface AiSetup {
   model: string;
 }
 
+type KnownArchetype = NonNullable<BrandContext["archetype"]>;
+
+function isKnownArchetype(name: string): name is KnownArchetype {
+  return (
+    name === "saas" ||
+    name === "agency" ||
+    name === "portfolio" ||
+    name === "gym" ||
+    name === "restaurant"
+  );
+}
+
 function resolveAiSetup(opts: {
   prompt: string;
   projectName: string;
+  matchedBrand: BrandContext | null;
+  archetypeName: KnownArchetype | null;
 }): AiSetup | null {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   const description = opts.prompt.trim();
@@ -271,12 +328,22 @@ function resolveAiSetup(opts: {
   const model = process.env.FORNIX_ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
   const provider = createAnthropicProvider({ apiKey, model });
 
-  const brand: BrandContext = {
+  // Prefer the matcher-inferred brand when present — it has a real
+  // industry/tone/audience rather than the generic fallback.
+  const baseBrand: BrandContext = opts.matchedBrand ?? {
     name: opts.projectName,
     description,
     tone: "clear, specific, professional",
     industry: "general",
   };
+
+  // Attach archetype to whichever brand we picked. When --archetype was
+  // explicit, the matcher didn't run so we set it here. When the matcher
+  // ran, brandFromMatch already set it — overriding with the same value
+  // is a no-op.
+  const brand: BrandContext = opts.archetypeName
+    ? { ...baseBrand, archetype: opts.archetypeName }
+    : baseBrand;
 
   return { provider, brand, model };
 }

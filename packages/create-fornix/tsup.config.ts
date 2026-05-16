@@ -22,10 +22,10 @@ export default defineConfig({
     // to ship alongside the bundled JS.
     await cp("src/templates", join("dist", "templates"), { recursive: true });
 
-    // Blocks and palettes are read from the filesystem at scaffold time, so
-    // a published CLI needs them bundled under `dist/`. The runtime resolver
-    // (workspace.ts) prefers these bundled paths when present, falling back
-    // to the workspace for dev.
+    // Blocks, palettes, and primitives are read from the filesystem at
+    // scaffold time, so a published CLI needs them bundled under `dist/`.
+    // The runtime resolver (workspace.ts) prefers these bundled paths when
+    // present, falling back to the workspace for dev.
     await cp(
       join(REPO_ROOT, "packages", "fornix-blocks", "blocks"),
       join("dist", "blocks"),
@@ -34,6 +34,11 @@ export default defineConfig({
     await cp(
       join(REPO_ROOT, "packages", "fornix-registry", "palettes"),
       join("dist", "palettes"),
+      { recursive: true },
+    );
+    await cp(
+      join(REPO_ROOT, "packages", "fornix-primitives", "src"),
+      join("dist", "primitives"),
       { recursive: true },
     );
 

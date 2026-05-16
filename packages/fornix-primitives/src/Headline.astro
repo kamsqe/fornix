@@ -1,0 +1,74 @@
+---
+/**
+ * Headline — palette-aware heading (`<h1>` / `<h2>` / `<h3>`).
+ *
+ * Uses `--font-headline` and `--font-headline-weight` from the active palette,
+ * so swapping palettes swaps the headline typography (e.g. Inter → Fraunces
+ * serif when changing to the `fraktur` theme).
+ */
+interface Props {
+  /** Semantic level. Use `1` once per page, `2` for sections. */
+  level?: 1 | 2 | 3;
+  /** Horizontal alignment. */
+  align?: "left" | "center";
+  /** Maximum width measured in `ch` (characters). Set lower for editorial readability. */
+  measure?: "comfortable" | "narrow" | "wide";
+  /** Pass-through class. */
+  class?: string;
+}
+
+const {
+  level = 2,
+  align = "left",
+  measure = "comfortable",
+  class: className = "",
+} = Astro.props;
+const Tag = `h${level}` as "h1" | "h2" | "h3";
+---
+
+<Tag
+  class:list={[
+    `fnx-headline fnx-headline--${level} fnx-headline--align-${align} fnx-headline--measure-${measure}`,
+    className,
+  ]}
+>
+  <slot />
+</Tag>
+
+<style>
+  .fnx-headline {
+    font-family: var(--font-headline);
+    font-weight: var(--font-headline-weight, 700);
+    letter-spacing: -0.02em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .fnx-headline--1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.05;
+  }
+  .fnx-headline--2 {
+    font-size: clamp(2rem, 4.5vw, 3.5rem);
+    line-height: 1.1;
+  }
+  .fnx-headline--3 {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    line-height: 1.2;
+  }
+
+  .fnx-headline--align-center {
+    text-align: center;
+    margin-inline: auto;
+  }
+
+  .fnx-headline--measure-narrow {
+    max-width: 18ch;
+  }
+  .fnx-headline--measure-comfortable {
+    max-width: 24ch;
+  }
+  .fnx-headline--measure-wide {
+    max-width: 32ch;
+  }
+</style>

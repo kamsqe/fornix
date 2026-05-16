@@ -57,6 +57,17 @@ export function palettePath(paletteName: string): string {
 }
 
 /**
+ * Path to the primitives directory (containing `Container.astro` et al).
+ * Prefers bundled `dist/primitives/`, falls back to workspace
+ * `packages/fornix-primitives/src/`.
+ */
+export function primitivesDir(): string {
+  const bundled = resolve(HERE, "primitives");
+  if (existsSync(bundled)) return bundled;
+  return workspacePath("packages", "fornix-primitives", "src");
+}
+
+/**
  * Workspace-rooted path. Throws when not running inside the monorepo —
  * callers should prefer `blockPath()` / `palettePath()` which fall back
  * to bundled assets when published.

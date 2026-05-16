@@ -1,0 +1,71 @@
+---
+/**
+ * Section — a `<section>` with consistent vertical rhythm and palette-aware
+ * surface color. Every block's outer element is a Section.
+ *
+ * Variants:
+ *   `default` — uses the page background (default surface)
+ *   `alt`     — uses `--color-surface` for a subtle lift between sections
+ *   `accent`  — uses `--color-primary` background with on-primary foreground
+ *               (rare; used for emphasis bands like a single CTA strip)
+ */
+interface Props {
+  /** Anchor ID — populates the `id` attribute for in-page nav. */
+  id?: string;
+  /** Surface variant. */
+  variant?: "default" | "alt" | "accent";
+  /** Vertical padding density. */
+  density?: "compact" | "default" | "spacious";
+  /** Pass-through class. */
+  class?: string;
+}
+
+const {
+  id,
+  variant = "default",
+  density = "default",
+  class: className = "",
+} = Astro.props;
+---
+
+<section
+  id={id}
+  class:list={[
+    `fnx-section fnx-section--${variant} fnx-section--${density}`,
+    className,
+  ]}
+>
+  <slot />
+</section>
+
+<style>
+  .fnx-section {
+    position: relative;
+    width: 100%;
+  }
+
+  /* ── Surface variants — palette-token based ───────────────────── */
+  .fnx-section--default {
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+  .fnx-section--alt {
+    background: var(--color-surface);
+    color: var(--color-foreground);
+  }
+  .fnx-section--accent {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  /* ── Density — single shared rhythm scale ─────────────────────── */
+  .fnx-section--compact {
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+  }
+  .fnx-section--default {
+    padding-block: clamp(4rem, 7vw, 6rem);
+  }
+  .fnx-section--spacious {
+    padding-block: clamp(6rem, 10vw, 10rem);
+  }
+</style>

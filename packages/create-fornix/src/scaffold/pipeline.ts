@@ -1,8 +1,12 @@
 import type { BlockManifest } from "fornix-registry";
 
 import type { RenderPlan } from "./render-plan.js";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
 import { loadTemplate, fillTemplate } from "./templates.js";
 import { zodObjectForSlots, mergeSlots } from "./zod-from-slots.js";
+import { primitivesDir } from "./workspace.js";
 
 /**
  * Map from project-relative path → UTF-8 file contents.
@@ -93,6 +97,14 @@ export function renderToFiles(plan: RenderPlan): FileMap {
   // ── .gitignore ───────────────────────────────────────────
   files[".gitignore"] = loadTemplate("gitignore");
 
+  // ── Primitives (copied into every scaffold) ──────────────
+  // Every scaffold gets the full primitive set under
+  // `src/components/primitives/`. Blocks (once rewritten) import siblings:
+  //   import Container from "../primitives/Container.astro"
+  for (const [name, contents] of Object.entries(loadPrimitives())) {
+    files[`src/components/primitives/${name}`] = contents;
+  }
+
   // ── wrangler.json (Cloudflare Pages) ─────────────────────
   if (plan.deployTarget === "cloudflare") {
     files["wrangler.json"] = fillTemplate(loadTemplate("wrangler.json"), {
@@ -180,6 +192,21 @@ function blockToComponentName(name: string): string {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join("");
+}
+
+/**
+ * Read every `.astro` (and supporting `.css` / `.ts`) file from the bundled
+ * primitives directory. Returned as a map of filename → contents.
+ */
+function loadPrimitives(): Record<string, string> {
+  const dir = primitivesDir();
+  const out: Record<string, string> = {};
+  for (const entry of readdirSync(dir)) {
+    if (entry === ".gitkeep") continue;
+    if (!/\.(astro|css|ts)$/.test(entry)) continue;
+    out[entry] = readFileSync(join(dir, entry), "utf8");
+  }
+  return out;
 }
 
 /**

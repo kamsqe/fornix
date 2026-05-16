@@ -140,6 +140,31 @@ describe("v0.3 saas archetype", () => {
       // Footer columns from archetype
       expect(homeHtml).toContain("Changelog"); // Product column
       expect(homeHtml).toContain("Customers"); // Company column
+
+      // ── AI-editor context files emitted on disk ─────────
+      // AGENTS.md is the canonical onboarding artifact for any agent
+      // (Claude Code, Cursor, etc.) opening this scaffolded project.
+      expect(existsSync(join(projectDir, "AGENTS.md"))).toBe(true);
+      expect(existsSync(join(projectDir, "CLAUDE.md"))).toBe(true);
+      expect(existsSync(join(projectDir, ".cursor/rules/fornix.mdc"))).toBe(true);
+      expect(existsSync(join(projectDir, ".fornix/project.json"))).toBe(true);
+
+      const agentsMd = readFileSync(join(projectDir, "AGENTS.md"), "utf8");
+      expect(agentsMd).toContain("Helix"); // brand
+      expect(agentsMd).toContain("`saas`"); // archetype
+      expect(agentsMd).toContain("`obsidian`"); // palette
+      expect(agentsMd).toContain("`hero-text`"); // a block this project installed
+
+      const manifest = JSON.parse(
+        readFileSync(join(projectDir, ".fornix/project.json"), "utf8"),
+      );
+      expect(manifest.brand).toBe("Helix");
+      expect(manifest.archetype).toBe("saas");
+      expect(manifest.palette).toBe("obsidian");
+      expect(manifest.pages.map((p: { slug: string }) => p.slug)).toEqual([
+        "",
+        "pricing",
+      ]);
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }

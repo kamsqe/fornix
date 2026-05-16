@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { loadTemplate, fillTemplate } from "./templates.js";
 import { zodObjectForSlots, mergeSlots } from "./zod-from-slots.js";
 import { primitivesDir } from "./workspace.js";
+import { renderAiContextFiles } from "./agents-context.js";
 
 /**
  * Map from project-relative path → UTF-8 file contents.
@@ -115,6 +116,13 @@ export function renderToFiles(plan: RenderPlan): FileMap {
 
   // ── .gitignore ───────────────────────────────────────────
   files[".gitignore"] = loadTemplate("gitignore");
+
+  // ── AI-editor context files (AGENTS.md, CLAUDE.md, Cursor rules,
+  //    machine-readable manifest under `.fornix/`). Lets Claude Code,
+  //    Cursor, etc. onboard the project in a single read. ───────────
+  for (const [path, contents] of Object.entries(renderAiContextFiles(plan))) {
+    files[path] = contents;
+  }
 
   // ── Primitives (copied into every scaffold) ──────────────
   // Every scaffold gets the full primitive set under

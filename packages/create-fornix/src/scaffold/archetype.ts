@@ -92,10 +92,19 @@ export function archetypeOverlay(
     contentByLocale[locale] = { ...archetype.content };
   }
 
+  // Stamp the archetype name into the site config so downstream consumers
+  // (AGENTS.md emitter, .fornix/project.json manifest, future `fornix add`
+  // subcommands) can identify which archetype the project was built from.
+  // Authors can omit `site.archetype` in the JSON; we add it here.
+  const site: Partial<SiteConfig> = {
+    ...archetype.site,
+    archetype: archetype.site.archetype ?? archetype.name,
+  };
+
   return {
     pages,
     blockNames: Array.from(blockNamesSet),
-    site: archetype.site,
+    site,
     contentByLocale,
   };
 }

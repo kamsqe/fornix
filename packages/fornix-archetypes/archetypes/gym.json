@@ -1,0 +1,342 @@
+{
+  "schemaVersion": 1,
+  "name": "gym",
+  "displayName": "Gym",
+  "description": "Boutique strength gym. High-contrast ember palette with bold display type. Home + Classes + Pricing + Contact, with stats-strip social proof and pricing tiers.",
+  "palette": "ember",
+
+  "site": {
+    "name": "Iron Forge",
+    "tagline": "A serious gym for people who lift heavy and live well.",
+    "logo": { "type": "monogram", "text": "IF" },
+    "nav": [
+      { "label": "Classes", "href": "/classes" },
+      { "label": "Pricing", "href": "/pricing" },
+      { "label": "Coaches", "href": "/coaches" },
+      { "label": "Contact", "href": "/contact" }
+    ],
+    "ctaPrimary": { "text": "Start free week", "href": "/signup" },
+    "ctaSecondary": { "text": "Book a tour", "href": "/tour" },
+    "social": {
+      "instagram": "ironforge.gym",
+      "youtube": "@ironforge",
+      "twitter": "ironforgegym"
+    },
+    "contact": {
+      "email": "hello@ironforge.gym",
+      "phone": "+1 (415) 555-0117",
+      "address": "1411 Folsom Street, San Francisco, CA 94103"
+    },
+    "legal": {
+      "copyright": "© 2026 Iron Forge Strength Co.",
+      "privacyHref": "/privacy",
+      "termsHref": "/terms"
+    },
+    "meta": {
+      "twitterHandle": "ironforgegym"
+    }
+  },
+
+  "pages": [
+    {
+      "slug": "",
+      "title": "Iron Forge — A serious strength gym in San Francisco",
+      "description": "Olympic platforms, real coaches, and a 5-block radius of people who actually know your name. Free first week, no pressure.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-media" },
+        { "name": "stats-strip" },
+        { "name": "how-it-works" },
+        { "name": "testimonials-grid" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "classes",
+      "title": "Classes — Iron Forge",
+      "description": "Six class formats, six days a week. Every session capped at 12 people with two coaches on the floor.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "features-grid" },
+        { "name": "testimonials-grid" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "pricing",
+      "title": "Pricing — Iron Forge",
+      "description": "Monthly memberships with no annual contract. Five-day free trial, then choose your cadence.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "pricing-table" },
+        { "name": "faq" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "contact",
+      "title": "Contact — Iron Forge",
+      "description": "Visit us at 1411 Folsom, or email hello@ironforge.gym.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-text" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    }
+  ],
+
+  "content": {
+    "hero-media": {
+      "eyebrow": "Open daily, 5am — 10pm",
+      "headline": "A serious gym for people who lift heavy and live well",
+      "subheadline": "Olympic platforms, calibrated plates, real coaching, and a 5-block radius of people who actually know your name. Your first week is free; we'd rather you join because you want to.",
+      "primaryCtaText": "Start free week",
+      "primaryCtaHref": "/signup",
+      "secondaryCtaText": "Book a tour",
+      "secondaryCtaHref": "/tour",
+      "mediaAlt": "Iron Forge main floor: four Eleiko platforms with calibrated plates, racks of competition kettlebells, and natural light from the south windows.",
+      "mediaPlacement": "right"
+    },
+
+    "stats-strip": {
+      "stats": [
+        { "value": "1,400", "label": "Active members", "accent": true },
+        { "value": "12", "label": "Coaches on staff" },
+        { "value": "94%", "label": "Member retention, 12 months" },
+        { "value": "4.9★", "label": "Rated by 320+ reviews" }
+      ]
+    },
+
+    "how-it-works": {
+      "eyebrow": "Joining is simple",
+      "headline": "Three steps. Lift this week.",
+      "subheadline": "We've never asked anyone to fill out a 14-page intake form, and we never will.",
+      "steps": [
+        {
+          "icon": "external-link",
+          "title": "1. Book a tour",
+          "description": "Stop by any weekday for a 20-minute walkthrough. Meet a coach. See if the room feels right. No sales pitch."
+        },
+        {
+          "icon": "check",
+          "title": "2. Take the free week",
+          "description": "Five days, any classes, any time. We'll match you to a coach for your first session and give you the keys to the schedule."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "3. Pick a plan",
+          "description": "Three monthly options, no contracts, pause any time. Pick what fits and start the work."
+        }
+      ]
+    },
+
+    "testimonials-grid": {
+      "eyebrow": "Members",
+      "headline": "What our community says",
+      "subheadline": "Real members. Real names. Real lifts.",
+      "items": [
+        {
+          "quote": "I tried four gyms in this part of the city. Iron Forge is the only one where the coaches actually watch the lifts and call out cues. I'm 38 and lifting better than I did at 25.",
+          "author": "Maya Patel",
+          "role": "Member since 2024",
+          "rating": 5
+        },
+        {
+          "quote": "The community is the whole thing. Five mornings a week with the same dozen people, watching each other PR — that's what I pay for.",
+          "author": "Diego Romero",
+          "role": "Member since 2023",
+          "rating": 5
+        },
+        {
+          "quote": "I had a serious back injury in 2022. The Iron Forge coaches built me a 6-month return plan with my PT. I'm back to deadlifting bodyweight × 2. I'd never have gotten there at a Globo gym.",
+          "author": "Soren Mikkelsen",
+          "role": "Member since 2022",
+          "rating": 5
+        }
+      ]
+    },
+
+    "cta-strip": {
+      "headline": "Five days, no card, no follow-up sales call",
+      "subheadline": "If you don't love it, ghost us — we promise no awkward emails. If you love it, we'll see you Monday.",
+      "primaryCtaText": "Claim free week",
+      "primaryCtaHref": "/signup",
+      "secondaryCtaText": "Take the tour first",
+      "secondaryCtaHref": "/tour",
+      "variant": "accent"
+    },
+
+    "footer-columns": {
+      "tagline": "Iron Forge Strength Co. — A serious gym in San Francisco. Open daily 5am — 10pm.",
+      "columns": [
+        {
+          "title": "Gym",
+          "links": [
+            { "label": "Classes", "href": "/classes" },
+            { "label": "Pricing", "href": "/pricing" },
+            { "label": "Coaches", "href": "/coaches" },
+            { "label": "Schedule", "href": "/schedule" }
+          ]
+        },
+        {
+          "title": "Visit",
+          "links": [
+            { "label": "1411 Folsom Street", "href": "https://maps.google.com/?q=1411+Folsom+San+Francisco" },
+            { "label": "Mon — Fri · 5am to 10pm", "href": "/hours" },
+            { "label": "Sat — Sun · 7am to 8pm", "href": "/hours" },
+            { "label": "Get directions", "href": "https://maps.google.com/?q=1411+Folsom+San+Francisco" }
+          ]
+        },
+        {
+          "title": "More",
+          "links": [
+            { "label": "Personal training", "href": "/personal-training" },
+            { "label": "Open gym", "href": "/open-gym" },
+            { "label": "Workshops", "href": "/workshops" },
+            { "label": "FAQ", "href": "/pricing#faq" }
+          ]
+        }
+      ]
+    },
+
+    "features-grid": {
+      "eyebrow": "Class formats",
+      "headline": "Six ways to train at Iron Forge",
+      "subheadline": "Every class is capped at 12 with two coaches on the floor. Pick a format, build a habit, get strong.",
+      "features": [
+        {
+          "icon": "star",
+          "title": "Strength · 60 min",
+          "description": "Linear-progression barbell work. Squat, bench, deadlift, press, in 4-week blocks with a percentage-based template."
+        },
+        {
+          "icon": "check",
+          "title": "Engine · 45 min",
+          "description": "Conditioning built around an erg, a sled, and a kettlebell. Aerobic base by Tuesday, threshold work by Friday."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Olympic Lifts · 75 min",
+          "description": "Snatch and clean & jerk technical work. Three coaches on the floor for this one. Bring your knee sleeves."
+        },
+        {
+          "icon": "external-link",
+          "title": "Beginner Foundations · 60 min",
+          "description": "Twelve-week onramp for new lifters. By the end you've squatted, benched, deadlifted, and pressed under load."
+        },
+        {
+          "icon": "mail",
+          "title": "Mobility · 30 min",
+          "description": "Joint health and breath work. Tuesday and Saturday mornings. The class your future self thanks you for."
+        },
+        {
+          "icon": "play",
+          "title": "Open Gym",
+          "description": "Run your own program with a coach available for cues. Members get unlimited open-gym access on all plans."
+        }
+      ]
+    },
+
+    "pricing-table": {
+      "eyebrow": "Memberships",
+      "headline": "Pick a cadence, start the work",
+      "subheadline": "No annual contracts. Pause any time. Five-day free trial included on all plans.",
+      "popularBadge": "Most Popular",
+      "plans": [
+        {
+          "name": "Drop-in",
+          "price": "$30",
+          "period": "/class",
+          "description": "Visiting town or testing the room. Pay per session.",
+          "features": [
+            "Any single class",
+            "All coaching included",
+            "No commitment",
+            "Five-day free trial available"
+          ],
+          "ctaText": "Book a class",
+          "ctaHref": "/signup?plan=dropin",
+          "highlighted": false
+        },
+        {
+          "name": "Unlimited",
+          "price": "$240",
+          "period": "/month",
+          "description": "The standard membership. Train as much as you want.",
+          "features": [
+            "Unlimited classes",
+            "Unlimited open gym",
+            "Quarterly programming reviews",
+            "Member events + workshops",
+            "Pause for up to 60 days/year"
+          ],
+          "ctaText": "Start free week",
+          "ctaHref": "/signup?plan=unlimited",
+          "highlighted": true
+        },
+        {
+          "name": "Coached",
+          "price": "$640",
+          "period": "/month",
+          "description": "For lifters with specific goals. Custom programming, weekly check-ins.",
+          "features": [
+            "Everything in Unlimited",
+            "Custom monthly programming",
+            "Weekly 1:1 with a coach",
+            "Video review of key lifts",
+            "Nutrition framework + macros",
+            "Quarterly testing day"
+          ],
+          "ctaText": "Apply for coached",
+          "ctaHref": "/contact?topic=coached",
+          "highlighted": false
+        }
+      ]
+    },
+
+    "faq": {
+      "eyebrow": "Honest answers",
+      "headline": "Questions before joining",
+      "subheadline": "If your situation isn't here, email hello@ironforge.gym — a human replies same-day.",
+      "items": [
+        {
+          "question": "I've never lifted with a barbell. Will I survive?",
+          "answer": "Yes — start with Beginner Foundations. Twelve weeks, two classes a week, structured progression. By week 4 you'll be doing all four lifts. By week 12 you'll be ready for any class."
+        },
+        {
+          "question": "Do I need to bring my own equipment?",
+          "answer": "No. Belts, sleeves, straps, chalk — all here. If you have your own shoes, bring them; otherwise borrow a pair until you decide what feels right."
+        },
+        {
+          "question": "What if I get injured?",
+          "answer": "We work with three PTs in the neighborhood and have built return-to-lift plans with all of them. If you're rehabbing, tell your coach — we modify, we don't push through."
+        },
+        {
+          "question": "Can I pause my membership?",
+          "answer": "Up to 60 days per year, no questions asked. Travel, injury, life — just message and we pause. You don't lose your spot."
+        },
+        {
+          "question": "Are there annual contracts?",
+          "answer": "No. Month-to-month, cancel any time from your account. We'd rather you stay because we're good than because you're locked in."
+        },
+        {
+          "question": "Is this a CrossFit gym?",
+          "answer": "No. We share some lineage but our programming is more focused: classical strength training plus aerobic conditioning, no high-rep Olympic lifts under fatigue. Quieter, more technical, fewer screams."
+        }
+      ]
+    },
+
+    "hero-text": {
+      "eyebrow": "Visit us",
+      "headline": "Come see the room",
+      "subheadline": "1411 Folsom Street. Five blocks from the Civic Center BART. Free 20-minute tours weekdays, no booking required — just walk in.",
+      "primaryCtaText": "Book a tour",
+      "primaryCtaHref": "/tour",
+      "secondaryCtaText": "Email us",
+      "secondaryCtaHref": "mailto:hello@ironforge.gym"
+    }
+  }
+}

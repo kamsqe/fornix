@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "name": "portfolio",
+  "displayName": "Portfolio",
+  "description": "Independent designer portfolio. Editorial dark palette with display type. Home + Projects + Contact, with bento case studies and a personal voice throughout.",
+  "palette": "fraktur",
+
+  "site": {
+    "name": "Lior Halevi",
+    "tagline": "Independent product designer working on tools for serious people.",
+    "logo": { "type": "monogram", "text": "LH" },
+    "nav": [
+      { "label": "Projects", "href": "/projects" },
+      { "label": "Writing", "href": "/writing" },
+      { "label": "Contact", "href": "/contact" }
+    ],
+    "ctaPrimary": { "text": "Hire me", "href": "/contact" },
+    "ctaSecondary": { "text": "See projects", "href": "/projects" },
+    "social": {
+      "twitter": "liorhalevi",
+      "github": "liorhalevi",
+      "linkedin": "in/liorhalevi",
+      "bluesky": "liorhalevi.bsky.social"
+    },
+    "contact": {
+      "email": "lior@halevi.studio"
+    },
+    "legal": {
+      "copyright": "© 2026 Lior Halevi"
+    },
+    "meta": {
+      "twitterHandle": "liorhalevi"
+    }
+  },
+
+  "pages": [
+    {
+      "slug": "",
+      "title": "Lior Halevi — Product designer",
+      "description": "Twelve years designing tools for engineers, traders, and researchers. Currently available for new projects starting Q3 2026.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-text" },
+        { "name": "features-bento" },
+        { "name": "testimonials-grid" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "projects",
+      "title": "Projects — Lior Halevi",
+      "description": "Selected client work and personal projects. Each entry has its own writeup with process, decisions, and what didn't work.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "features-grid" },
+        { "name": "testimonials-grid" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "contact",
+      "title": "Contact — Lior Halevi",
+      "description": "Let's see if there's a fit. Email is best.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "faq" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    }
+  ],
+
+  "content": {
+    "hero-text": {
+      "eyebrow": "Available Q3 2026",
+      "headline": "Tools for serious people, designed with care",
+      "subheadline": "I'm Lior. Twelve years designing software for people who use it eight hours a day — engineers, traders, researchers, builders. Currently taking on two new projects.",
+      "primaryCtaText": "See projects",
+      "primaryCtaHref": "/projects",
+      "secondaryCtaText": "Get in touch",
+      "secondaryCtaHref": "/contact"
+    },
+
+    "features-bento": {
+      "eyebrow": "Selected work",
+      "headline": "Eight projects worth showing",
+      "subheadline": "I pick a few projects each year that fit my craft. Here's a slice of what I've shipped.",
+      "features": [
+        {
+          "icon": "star",
+          "title": "Sextant — terminal-first trading platform",
+          "description": "Eighteen months designing a vim-keys-first interface for systematic traders. From order flow to chart annotations, every primitive was custom. Sextant closed a $30M Series B in March.",
+          "span": "large"
+        },
+        {
+          "icon": "check",
+          "title": "Helix — calendar discipline",
+          "description": "Three-month engagement on the focus rules UI. Shipped 12 weeks ahead of plan.",
+          "span": "default"
+        },
+        {
+          "icon": "external-link",
+          "title": "Lexura — analytics IDE",
+          "description": "Query editor, viz library, dashboard system. The whole notebook surface.",
+          "span": "default"
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Vault HQ — secrets manager",
+          "description": "Redesigned the rotation flow that handles 4M secrets/month. Cut p99 task time from 6 minutes to 38 seconds.",
+          "span": "large"
+        }
+      ]
+    },
+
+    "testimonials-grid": {
+      "eyebrow": "What people say",
+      "headline": "From the folks who've actually shipped with me",
+      "subheadline": "Honest words from past clients. Some of these are quoted from public posts; the rest I asked for permission.",
+      "items": [
+        {
+          "quote": "Lior thinks in product, not in screens. Half the engagement was redesigning workflows — the visual layer was the easy part.",
+          "author": "Maya Patel",
+          "role": "VP Eng",
+          "company": "Lexura",
+          "rating": 5
+        },
+        {
+          "quote": "Best designer I've worked with for keyboard-driven interfaces. He defaults to power users and makes the casual path emerge from that.",
+          "author": "Anya Kowalski",
+          "role": "Co-founder",
+          "company": "Sextant",
+          "rating": 5
+        },
+        {
+          "quote": "Showed up with a Figma file the first week and a working prototype the second. The pace was honestly intimidating.",
+          "author": "Diego Romero",
+          "role": "CTO",
+          "company": "Bloom Studio",
+          "rating": 5
+        }
+      ]
+    },
+
+    "cta-strip": {
+      "headline": "Hire me for your next project",
+      "subheadline": "I work in 3- and 6-month engagements. Email me with what you're building and where you're stuck — I reply within two days.",
+      "primaryCtaText": "Email me",
+      "primaryCtaHref": "mailto:lior@halevi.studio",
+      "secondaryCtaText": "See projects first",
+      "secondaryCtaHref": "/projects",
+      "variant": "accent"
+    },
+
+    "footer-columns": {
+      "tagline": "Independent product designer. Tel Aviv → Berlin → wherever the work is. Available for new projects from Q3 2026.",
+      "columns": [
+        {
+          "title": "Work",
+          "links": [
+            { "label": "Projects", "href": "/projects" },
+            { "label": "Writing", "href": "/writing" },
+            { "label": "CV", "href": "/cv.pdf" },
+            { "label": "Speaking", "href": "/speaking" }
+          ]
+        },
+        {
+          "title": "Elsewhere",
+          "links": [
+            { "label": "Twitter", "href": "https://twitter.com/liorhalevi" },
+            { "label": "GitHub", "href": "https://github.com/liorhalevi" },
+            { "label": "Bluesky", "href": "https://bsky.app/profile/liorhalevi.bsky.social" },
+            { "label": "Read.cv", "href": "https://read.cv/liorhalevi" }
+          ]
+        },
+        {
+          "title": "Contact",
+          "links": [
+            { "label": "lior@halevi.studio", "href": "mailto:lior@halevi.studio" },
+            { "label": "Book a 30-min call", "href": "/contact" },
+            { "label": "Newsletter (monthly)", "href": "/newsletter" }
+          ]
+        }
+      ]
+    },
+
+    "features-grid": {
+      "eyebrow": "All projects",
+      "headline": "Twelve years of selected work",
+      "subheadline": "Projects I'm willing to talk about publicly. Older client work under NDA isn't listed.",
+      "features": [
+        {
+          "icon": "star",
+          "title": "Sextant Trading Terminal",
+          "description": "2024–2026 · Lead designer · Vim-keys-first trading platform. Order flow, chart annotations, position management — every primitive custom."
+        },
+        {
+          "icon": "external-link",
+          "title": "Helix Calendar",
+          "description": "2025 · Engagement · Focus-rules UI, daily brief composer, settings architecture. Shipped 12 weeks ahead of plan."
+        },
+        {
+          "icon": "check",
+          "title": "Lexura Analytics",
+          "description": "2023–2024 · Lead designer · Notebook IDE, query editor, viz library, dashboard system. Powers 600+ data teams."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Vault HQ",
+          "description": "2023 · Engagement · Secrets manager rotation flow. Cut p99 task time from 6 minutes to 38 seconds."
+        },
+        {
+          "icon": "mail",
+          "title": "Föregång Magazine",
+          "description": "2022 · Lead designer · Quarterly print magazine with editorial website. The pages still hold up."
+        },
+        {
+          "icon": "play",
+          "title": "Iron Forge App",
+          "description": "2021 · Engagement · Workout-tracking app for serious lifters. Vim-style command palette for set entry."
+        }
+      ]
+    },
+
+    "faq": {
+      "eyebrow": "Before you write",
+      "headline": "Questions before we talk",
+      "subheadline": "Save us both time. If your situation isn't here, write anyway — but mention which of these is closest to your case.",
+      "items": [
+        {
+          "question": "What kinds of projects do you take on?",
+          "answer": "Tools for people who use them every day at work. Engineering tools, trading interfaces, analytics surfaces, developer products. I don't work on consumer apps, marketing pages, or sites that exist to advertise services."
+        },
+        {
+          "question": "What's your rate?",
+          "answer": "€11,000/week for full-time engagements. Three-month minimum. I send a real estimate after the first conversation; rate-sheet questions before scope are usually a sign of a bad fit."
+        },
+        {
+          "question": "Do you work in-person?",
+          "answer": "I'm based in Berlin. I travel for kickoff and one mid-engagement week. Otherwise remote — async-first, Loom-heavy, occasional pair sessions."
+        },
+        {
+          "question": "Will you sign an NDA?",
+          "answer": "Yes, gladly. I sign yours; I don't have my own. I'm careful about what I show publicly — half my best work isn't on this site for that reason."
+        },
+        {
+          "question": "Do you do logos?",
+          "answer": "No. I'm a product designer; I refer brand work to studios I trust (Atelier North in Stockholm is excellent)."
+        },
+        {
+          "question": "How do you decide which projects to take?",
+          "answer": "Three filters: is the product for people who use it 8 hours a day, are the founders technical, and would I install it on my own machine. If all three are yes, I'm probably interested."
+        }
+      ]
+    }
+  }
+}

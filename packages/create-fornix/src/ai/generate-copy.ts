@@ -19,6 +19,14 @@ export interface GenerateCopyOptions {
   blocks: ReadonlyArray<BlockSource>;
   brand: BrandContext;
   locales: ReadonlyArray<string>;
+  /**
+   * Fires once per (block × locale) when that call resolves (success OR
+   * fallback). The argument is the GeneratedCopyEntry that was produced.
+   * `index` and `total` let callers render a progress meter.
+   *
+   * Callbacks must not throw — they're called inside a `.then()` chain.
+   */
+  onTick?: (event: { entry: GeneratedCopyEntry; index: number; total: number }) => void;
 }
 
 /**
@@ -34,13 +42,27 @@ export interface GenerateCopyOptions {
 export async function generateCopyForBlocks(
   options: GenerateCopyOptions,
 ): Promise<GeneratedCopyEntry[]> {
-  const tasks: Promise<GeneratedCopyEntry>[] = [];
-
+  const pairs: Array<{ block: BlockSource; locale: string }> = [];
   for (const locale of options.locales) {
     for (const block of options.blocks) {
-      tasks.push(generateOne(options.provider, block, locale, options.brand));
+      pairs.push({ block, locale });
     }
   }
+  const total = pairs.length;
+
+  let completed = 0;
+  const tasks = pairs.map(async ({ block, locale }) => {
+    const entry = await generateOne(options.provider, block, locale, options.brand);
+    if (options.onTick) {
+      completed += 1;
+      try {
+        options.onTick({ entry, index: completed, total });
+      } catch {
+        // Tick callbacks must not interrupt generation — swallow.
+      }
+    }
+    return entry;
+  });
 
   return Promise.all(tasks);
 }

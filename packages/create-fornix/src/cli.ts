@@ -35,6 +35,7 @@ import {
   resolveMatch,
   brandFromMatch,
 } from "./ai/archetype-matcher.js";
+import { estimateCost, formatEstimate } from "./ai/cost-estimate.js";
 
 const main = defineCommand({
   meta: {
@@ -209,11 +210,6 @@ const main = defineCommand({
       matchedBrand,
       archetypeName: isKnownArchetype(archetypeName) ? archetypeName : null,
     });
-    if (aiSetup) {
-      process.stdout.write(
-        `→ AI copy enabled via Anthropic (model: ${aiSetup.model})\n`,
-      );
-    }
     if (archetype) {
       process.stdout.write(
         `→ Archetype: ${archetype.displayName} (${archetype.pages.length} page${archetype.pages.length === 1 ? "" : "s"}, palette: ${palette.name})\n`,
@@ -225,10 +221,39 @@ const main = defineCommand({
       ? archetypeOverlay(archetype, ["en"])
       : null;
 
+    // AI cost preview — emitted before any work starts so the user can
+    // ctrl-C if the estimate isn't worth it. The matcher already ran
+    // above (one call counted separately); we add the copy calls now.
+    if (aiSetup) {
+      const uniqueBlockNames = new Set(blocks.map((b) => b.name));
+      const copyCalls = uniqueBlockNames.size * config.locales.length;
+      const estimate = estimateCost({
+        copyCalls,
+        includesMatcher: matchedBrand !== null,
+        model: aiSetup.model,
+      });
+      process.stdout.write(
+        `→ AI copy: ${formatEstimate(estimate, aiSetup.model)}\n`,
+      );
+    }
+
     const result = await scaffoldProject(config, {
       ...(aiSetup ?? {}),
       archetypeContent: overlay?.contentByLocale,
       siteConfigOverrides: overlay?.site,
+      onAiTick: aiSetup
+        ? ({ entry, index, total }) => {
+            const status =
+              entry.source === "ai"
+                ? "✓"
+                : entry.source === "ai-validation-failed"
+                  ? "!"
+                  : "·";
+            process.stderr.write(
+              `  ${status} [${index}/${total}] ${entry.blockName} (${entry.locale})\n`,
+            );
+          }
+        : undefined,
     });
     if (!result.ok) {
       process.stderr.write(`error: ${result.error.message}\n`);

@@ -51,6 +51,16 @@ export interface ScaffoldOptions {
    * before site.config.ts is written.
    */
   siteConfigOverrides?: Partial<SiteConfig>;
+  /**
+   * Fires once per (block × locale) AI call when that call resolves
+   * (success OR fallback). The CLI uses this to print a progress tick.
+   * No-op when no provider is in use.
+   */
+  onAiTick?: (event: {
+    entry: GeneratedCopyEntry;
+    index: number;
+    total: number;
+  }) => void;
 }
 
 /**
@@ -105,6 +115,7 @@ export async function scaffoldProject(
         blocks,
         brand: options.brand,
         locales: config.locales,
+        onTick: options.onAiTick,
       })
     : defaultCopyTrace(blocks, config.locales);
 

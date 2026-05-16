@@ -33,6 +33,11 @@ export function renderToFiles(plan: RenderPlan): FileMap {
     },
   );
 
+  // ── global.css (Tailwind v4 + palette-aware font imports) ────
+  files["src/styles/global.css"] = fillTemplate(loadTemplate("global.css"), {
+    fontImports: renderFontImports(plan.palette.name),
+  });
+
   // ── Index pages (one per locale; default at /, others at /{locale}/) ──
   const { blockImports, blockRenders } = renderBlockSlots(plan);
   const indexTemplate = loadTemplate("index.astro");
@@ -175,6 +180,34 @@ function blockToComponentName(name: string): string {
     .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join("");
+}
+
+/**
+ * Render the @import block for the global.css template based on which
+ * palette is loaded. Inter is always pulled in; the headline font (if any)
+ * is added per palette.
+ *
+ * Kept in lockstep with `render-plan.ts::fontsourceDepsForPaletteName`.
+ */
+function renderFontImports(paletteName: string): string {
+  const lines: string[] = [
+    `@import "@fontsource/inter/400.css";`,
+    `@import "@fontsource/inter/600.css";`,
+    `@import "@fontsource/inter/700.css";`,
+    `@import "@fontsource/inter/800.css";`,
+  ];
+  switch (paletteName) {
+    case "fraktur":
+      lines.push(`@import "@fontsource/fraunces/600.css";`);
+      break;
+    case "ember":
+      lines.push(`@import "@fontsource/archivo-black/400.css";`);
+      break;
+    case "terracotta":
+      lines.push(`@import "@fontsource/dm-serif-display/400.css";`);
+      break;
+  }
+  return lines.join("\n");
 }
 
 /**

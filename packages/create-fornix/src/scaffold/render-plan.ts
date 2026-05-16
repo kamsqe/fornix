@@ -148,7 +148,7 @@ export function buildRenderPlan(
     }
   }
 
-  const dependencies = mergeDependencies(blocks);
+  const dependencies = mergeDependencies(blocks, palette);
 
   return {
     projectName: config.projectName,
@@ -208,20 +208,86 @@ function monogramFrom(name: string): string {
   return (words[0] + words[1]).slice(0, 2);
 }
 
+/**
+ * Map from a font family (as it appears in palette typography) to its
+ * `@fontsource` package name. Only listed families are recognized;
+ * anything else falls through (the user can install it themselves).
+ */
+const FONTSOURCE_PACKAGES: Record<string, string> = {
+  inter: "@fontsource/inter",
+  fraunces: "@fontsource/fraunces",
+  "dm serif display": "@fontsource/dm-serif-display",
+  "archivo black": "@fontsource/archivo-black",
+};
+
+/**
+ * Inspect a CSS font-family string (e.g. `"'DM Serif Display', Georgia, serif"`)
+ * and return the matching `@fontsource` package name if any.
+ */
+function fontsourcePackageFor(familyString: string): string | null {
+  const normalized = familyString.toLowerCase();
+  for (const [needle, pkg] of Object.entries(FONTSOURCE_PACKAGES)) {
+    if (normalized.includes(needle)) return pkg;
+  }
+  return null;
+}
+
 function mergeDependencies(
   blocks: ReadonlyArray<BlockSource>,
+  palette: PaletteCss,
 ): Record<string, string> {
-  const merged: Record<string, string> = { astro: "^5.0.0" };
+  const merged: Record<string, string> = {
+    astro: "^5.0.0",
+    tailwindcss: "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+  };
+
+  // Every scaffold needs Inter (it's the body default everywhere). Headline
+  // font may be different per palette — derive from the palette's typography
+  // declaration. Note: the palette object carries only the rendered CSS
+  // string here, so we fall back to including Inter; archetype-aware
+  // dependency resolution lives a layer up.
+  merged["@fontsource/inter"] = "^5.0.0";
+
+  // Block-declared deps win on conflict (last-write-wins; semver merge is
+  // a later concern).
   for (const block of blocks) {
     for (const [name, version] of Object.entries(block.manifest.dependencies)) {
-      const existing = merged[name];
-      if (existing && existing !== version) {
-        // Day 1: last-write-wins. A future pass should reconcile semver ranges.
-        merged[name] = version;
-      } else {
-        merged[name] = version;
-      }
+      merged[name] = version;
     }
   }
+
+  // Palette name → font package(s). `palette` here is the rendered `PaletteCss`,
+  // not the raw JSON; we sniff its name → known map. (Cleaner alternative:
+  // pass the raw `Palette` into `buildRenderPlan` so we can read typography
+  // directly. Day 4 cleanup.)
+  for (const pkg of fontsourceDepsForPaletteName(palette.name)) {
+    merged[pkg] = "^5.0.0";
+  }
+
   return merged;
 }
+
+/**
+ * Map palette name → headline font @fontsource package (if any beyond Inter).
+ * Inter is always installed (added separately above).
+ */
+function fontsourceDepsForPaletteName(paletteName: string): string[] {
+  switch (paletteName) {
+    case "fraktur":
+      return ["@fontsource/fraunces"];
+    case "ember":
+      return ["@fontsource/archivo-black"];
+    case "terracotta":
+      return ["@fontsource/dm-serif-display"];
+    case "obsidian":
+    case "paper":
+    case "sage":
+    case "aurora":
+    default:
+      return []; // Inter only (already added)
+  }
+}
+
+// Exported for the future archetype-aware dep merger.
+export { fontsourcePackageFor };

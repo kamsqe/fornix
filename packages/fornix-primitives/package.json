@@ -1,0 +1,11 @@
+{
+  "name": "fornix-primitives",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Astro UI primitives consumed by Fornix blocks. Copied into scaffolded projects (shadcn-style) — never an npm runtime dep.",
+  "type": "module",
+  "license": "MIT",
+  "files": [
+    "src"
+  ]
+}

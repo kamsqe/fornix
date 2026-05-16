@@ -1,8 +1,0 @@
-{
-  "name": "test-flagdriven",
-  "compatibility_date": "2025-02-14",
-  "pages_build_output_dir": "dist",
-  "observability": {
-    "enabled": true
-  }
-}

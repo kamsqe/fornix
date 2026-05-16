@@ -132,12 +132,26 @@ export function renderToFiles(plan: RenderPlan): FileMap {
     files[`src/components/primitives/${name}`] = contents;
   }
 
-  // ── wrangler.json (Cloudflare Pages) ─────────────────────
-  if (plan.deployTarget === "cloudflare") {
-    files["wrangler.json"] = fillTemplate(loadTemplate("wrangler.json"), {
-      projectName: plan.projectName,
-      compatibilityDate: cloudflareCompatibilityDate(),
-    });
+  // ── Deploy-target config (one of: cloudflare, vercel, netlify, static)
+  //    Emit the platform-specific file the user's deploy target needs.
+  //    `static` emits nothing — the dist/ folder is the artifact and
+  //    the user uploads it wherever (S3, GitHub Pages, nginx, etc.).
+  switch (plan.deployTarget) {
+    case "cloudflare":
+      files["wrangler.json"] = fillTemplate(loadTemplate("wrangler.json"), {
+        projectName: plan.projectName,
+        compatibilityDate: cloudflareCompatibilityDate(),
+      });
+      break;
+    case "vercel":
+      files["vercel.json"] = loadTemplate("vercel.json");
+      break;
+    case "netlify":
+      files["netlify.toml"] = loadTemplate("netlify.toml");
+      break;
+    case "static":
+      // No platform file — the dist/ output is portable.
+      break;
   }
 
   // ── Block source files (copied once across all pages) ───

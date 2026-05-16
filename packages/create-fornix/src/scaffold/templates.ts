@@ -29,6 +29,8 @@ export type TemplateName =
   | "content.config.ts"
   | "gitignore"
   | "wrangler.json"
+  | "vercel.json"
+  | "netlify.toml"
   | "site.config.ts"
   | "global.css";
 

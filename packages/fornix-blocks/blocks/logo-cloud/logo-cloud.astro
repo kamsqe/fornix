@@ -1,11 +1,15 @@
 ---
 /**
- * Logo Cloud — partner/client logo showcase with optional image or text fallback.
+ * Logo Cloud — horizontal strip of customer/partner logos.
  *
- * ALL text is sourced from the content collection (zero hardcoded strings).
- * Content is read from `src/content/sections/logo-cloud.json`.
+ * Composes: Section, Container.
+ * Defaults to text-based wordmarks (styled like brand marks) so a fresh
+ * scaffold renders cleanly without needing real logo images.
  */
 import { getEntry } from "astro:content";
+import Section from "../primitives/Section.astro";
+import Container from "../primitives/Container.astro";
+import { site } from "../../site.config";
 
 interface LogoItem {
   name: string;
@@ -13,29 +17,119 @@ interface LogoItem {
   href?: string;
 }
 
-const locale = Astro.currentLocale ?? "en";
+const locale = Astro.currentLocale ?? site.locale.default;
 const entry = await getEntry("sections", `${locale}/logo-cloud`);
-const { headline = "" } = entry?.data ?? {};
-const logos = (entry?.data?.logos ?? []) as LogoItem[];
+const data = (entry?.data ?? {}) as {
+  label?: string;
+  logos?: LogoItem[];
+};
+
+const label = data.label ?? "";
+const logos = (data.logos ?? []) as LogoItem[];
 ---
 
-<section class="logo-cloud">
-  {headline && (
-    <p class="logo-cloud__headline">{headline}</p>
-  )}
-  <div class="logo-cloud__grid">
-    {logos.map((logo) => {
-      const inner = logo.src
-        ? <img src={logo.src} alt={logo.name} class="logo-cloud__img" loading="lazy" />
-        : <span class="logo-cloud__text">{logo.name}</span>;
-
-      return logo.href
-        ? <a href={logo.href} class="logo-cloud__item" target="_blank" rel="noopener noreferrer">{inner}</a>
-        : <div class="logo-cloud__item">{inner}</div>;
-    })}
-  </div>
-</section>
+<Section density="compact">
+  <Container size="wide">
+    {label && (
+      <p class="fnx-logos__label">{label}</p>
+    )}
+    <ul class="fnx-logos__list">
+      {logos.map((logo) => (
+        <li class="fnx-logos__item">
+          {logo.href ? (
+            <a
+              href={logo.href}
+              class="fnx-logos__link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {logo.src
+                ? <img src={logo.src} alt={logo.name} class="fnx-logos__img" loading="lazy" />
+                : <span class="fnx-logos__wordmark">{logo.name}</span>
+              }
+            </a>
+          ) : (
+            logo.src
+              ? <img src={logo.src} alt={logo.name} class="fnx-logos__img" loading="lazy" />
+              : <span class="fnx-logos__wordmark">{logo.name}</span>
+          )}
+        </li>
+      ))}
+    </ul>
+  </Container>
+</Section>
 
 <style>
-  @import "../../styles/sections/logo-cloud.css";
+  .fnx-logos__label {
+    margin: 0 0 1.5rem;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-foreground) 50%, transparent);
+  }
+
+  .fnx-logos__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 2.25rem 3rem;
+  }
+
+  .fnx-logos__item {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .fnx-logos__link {
+    display: inline-flex;
+    align-items: center;
+    opacity: 0.6;
+    transition: opacity var(--duration-fast) var(--easing-default);
+  }
+  .fnx-logos__link:hover {
+    opacity: 1;
+  }
+
+  .fnx-logos__wordmark {
+    font-family: var(--font-headline);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+    transition: color var(--duration-fast) var(--easing-default);
+  }
+  .fnx-logos__link:hover .fnx-logos__wordmark,
+  .fnx-logos__item:hover .fnx-logos__wordmark {
+    color: var(--color-foreground);
+  }
+
+  .fnx-logos__img {
+    height: 1.75rem;
+    width: auto;
+    object-fit: contain;
+    filter: grayscale(100%) brightness(0.9);
+    transition: filter var(--duration-fast) var(--easing-default),
+      opacity var(--duration-fast) var(--easing-default);
+    opacity: 0.75;
+  }
+  .fnx-logos__img:hover,
+  .fnx-logos__link:hover .fnx-logos__img {
+    filter: grayscale(0%);
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fnx-logos__link,
+    .fnx-logos__wordmark,
+    .fnx-logos__img {
+      transition: none;
+    }
+  }
 </style>

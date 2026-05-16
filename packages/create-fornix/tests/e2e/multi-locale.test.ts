@@ -25,9 +25,9 @@ import {
 } from "../../src/index.js";
 
 const EN_HEADLINE = "Ship faster with confidence";
-const EN_FOOTER = "© 2026 Lexura Legal Inc.";
+const EN_FOOTER_TAGLINE = "© 2026 Lexura Legal Inc.";
 const ES_HEADLINE = "Lanza más rápido con confianza";
-const ES_FOOTER = "© 2026 Lexura Legal Inc. — España";
+const ES_FOOTER_TAGLINE = "© 2026 Lexura Legal Inc. — España";
 
 function makeConfig(projectDir: string): ResolvedConfig {
   return {
@@ -39,8 +39,8 @@ function makeConfig(projectDir: string): ResolvedConfig {
     cssEngine: "vanilla",
     packageManager: "npm",
     blocks: [
-      { name: "hero-gradient", variant: "default" },
-      { name: "footer-minimal", variant: "default" },
+      { name: "hero-text", variant: "default" },
+      { name: "footer-columns", variant: "default" },
     ],
     locales: ["en", "es"],
     defaultLocale: "en",
@@ -75,32 +75,28 @@ describe("v2 multi-locale", () => {
       // Mock provider with locale-keyed responses. Key form `{block}:{locale}`
       // overrides the generic `{block}` key.
       const provider = createMockProvider({
-        "hero-gradient:en": {
+        "hero-text:en": {
+          eyebrow: "Beta",
           headline: EN_HEADLINE,
           subheadline: "Lexura resolves commercial disputes in days, not months.",
-          ctaText: "Start a case",
-          ctaHref: "#start",
-          badge: "Beta",
+          primaryCtaText: "Start a case",
+          primaryCtaHref: "#start",
         },
-        "hero-gradient:es": {
+        "hero-text:es": {
+          eyebrow: "Beta",
           headline: ES_HEADLINE,
           subheadline:
             "Lexura resuelve disputas comerciales en días, no meses.",
-          ctaText: "Iniciar un caso",
-          ctaHref: "#start",
-          badge: "Beta",
+          primaryCtaText: "Iniciar un caso",
+          primaryCtaHref: "#start",
         },
-        "footer-minimal:en": {
-          copyright: EN_FOOTER,
-          tagline: "Built for legal teams.",
+        "footer-columns:en": {
+          tagline: EN_FOOTER_TAGLINE,
           navAriaLabel: "Footer",
-          links: [],
         },
-        "footer-minimal:es": {
-          copyright: ES_FOOTER,
-          tagline: "Hecho para equipos legales.",
+        "footer-columns:es": {
+          tagline: ES_FOOTER_TAGLINE,
           navAriaLabel: "Pie",
-          links: [],
         },
       });
 
@@ -114,12 +110,12 @@ describe("v2 multi-locale", () => {
       // Content was written under sections/{locale}/{block}.json
       expect(
         existsSync(
-          join(projectDir, "src/content/sections/en/hero-gradient.json"),
+          join(projectDir, "src/content/sections/en/hero-text.json"),
         ),
       ).toBe(true);
       expect(
         existsSync(
-          join(projectDir, "src/content/sections/es/hero-gradient.json"),
+          join(projectDir, "src/content/sections/es/hero-text.json"),
         ),
       ).toBe(true);
 
@@ -142,7 +138,7 @@ describe("v2 multi-locale", () => {
         "utf8",
       );
       expect(enHtml).toContain(EN_HEADLINE);
-      expect(enHtml).toContain(EN_FOOTER);
+      expect(enHtml).toContain(EN_FOOTER_TAGLINE);
       expect(enHtml).not.toContain(ES_HEADLINE);
 
       // Spanish page (at /es/)
@@ -151,7 +147,7 @@ describe("v2 multi-locale", () => {
         "utf8",
       );
       expect(esHtml).toContain(ES_HEADLINE);
-      expect(esHtml).toContain(ES_FOOTER);
+      expect(esHtml).toContain(ES_FOOTER_TAGLINE);
       expect(esHtml).not.toContain(EN_HEADLINE);
 
       // Palette CSS linked in both

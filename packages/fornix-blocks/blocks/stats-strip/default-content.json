@@ -1,9 +1,8 @@
 {
-  "items": [
-    { "value": "10K+", "label": "Active Users", "accent": true },
-    { "value": "99.9%", "label": "Uptime", "accent": false },
-    { "value": "150+", "label": "Countries", "accent": false },
-    { "value": "4.9", "label": "Star Rating", "accent": false },
-    { "value": "24/7", "label": "Support", "accent": true }
+  "stats": [
+    { "value": "12k+", "label": "Active projects", "accent": true },
+    { "value": "99.99%", "label": "Uptime, last 12 months" },
+    { "value": "42 ms", "label": "P95 edge response time" },
+    { "value": "4.8★", "label": "Rated by 300+ teams" }
   ]
 }

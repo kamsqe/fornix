@@ -1,77 +1,177 @@
 ---
 /**
- * How It Works — numbered process steps with connector arrows.
+ * How It Works — 3-step process with numbered cards.
  *
- * ALL text is sourced from the content collection (zero hardcoded strings).
- * Content is read from `src/content/sections/how-it-works.json`.
+ * Composes: Section, Container, Headline, Eyebrow, Card, Icon.
+ *
+ * Visual: each step is a Card with a circular numbered badge top-left.
+ * The number is the visual anchor; the optional icon complements it.
  */
 import { getEntry } from "astro:content";
+import Section from "../primitives/Section.astro";
+import Container from "../primitives/Container.astro";
+import Headline from "../primitives/Headline.astro";
+import Eyebrow from "../primitives/Eyebrow.astro";
+import Card from "../primitives/Card.astro";
+import Icon from "../primitives/Icon.astro";
+import { site } from "../../site.config";
+
+type IconName =
+  | "check" | "arrow-right" | "chevron-down" | "chevron-up"
+  | "external-link" | "menu" | "x" | "play" | "star"
+  | "mail" | "phone" | "map-pin";
 
 interface Step {
-  icon: string;
   title: string;
   description: string;
-  command?: string;
+  icon?: IconName;
 }
 
-const locale = Astro.currentLocale ?? "en";
+const locale = Astro.currentLocale ?? site.locale.default;
 const entry = await getEntry("sections", `${locale}/how-it-works`);
-const {
-  badge = "",
-  headline = "",
-  subheadline = "",
-} = entry?.data ?? {};
-const steps = (entry?.data?.steps ?? []) as Step[];
+const data = (entry?.data ?? {}) as {
+  eyebrow?: string;
+  headline?: string;
+  subheadline?: string;
+  steps?: Step[];
+};
+
+const eyebrow = data.eyebrow ?? "";
+const headline = data.headline ?? "";
+const subheadline = data.subheadline ?? "";
+const steps = (data.steps ?? []) as Step[];
 ---
 
-<section class="how-it-works">
-  <div class="how-it-works__inner">
-    <!-- Header -->
-    <div class="how-it-works__header">
-      {badge && (
-        <span class="how-it-works__badge">{badge}</span>
+<Section>
+  <Container size="wide">
+    <header class="fnx-how__header">
+      {eyebrow && <Eyebrow align="center">{eyebrow}</Eyebrow>}
+      {headline && (
+        <Headline level={2} align="center" measure="comfortable">
+          {headline}
+        </Headline>
       )}
-      <h2 class="how-it-works__headline">{headline}</h2>
-      {subheadline && (
-        <p class="how-it-works__subheadline">{subheadline}</p>
-      )}
-    </div>
+      {subheadline && <p class="fnx-how__sub">{subheadline}</p>}
+    </header>
 
-    <!-- Steps Grid -->
-    <div class="how-it-works__grid">
-      {steps.map((step, i) => (
-        <div class="how-it-works__step" style={`animation-delay: ${i * 120}ms`}>
-          {/* Connector arrow (not on last step) */}
-          {i < steps.length - 1 && (
-            <div class="how-it-works__connector" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
+    <ol class="fnx-how__list" data-count={steps.length}>
+      {steps.map((step, idx) => (
+        <li class="fnx-how__item">
+          <Card variant="bordered" class="fnx-how__card">
+            <div class="fnx-how__step-top">
+              <span class="fnx-how__number" aria-hidden="true">{idx + 1}</span>
+              {step.icon && (
+                <span class="fnx-how__icon" aria-hidden="true">
+                  <Icon name={step.icon} size="1.125rem" />
+                </span>
+              )}
             </div>
-          )}
-
-          {/* Step number + icon */}
-          <div class="how-it-works__top">
-            <span class="how-it-works__number">{String(i + 1).padStart(2, "0")}</span>
-            <div class="how-it-works__icon">{step.icon}</div>
-          </div>
-
-          {/* Content */}
-          <div class="how-it-works__content">
-            <h3 class="how-it-works__title">{step.title}</h3>
-            <p class="how-it-works__description">{step.description}</p>
-            {step.command && (
-              <div class="how-it-works__command">
-                <span class="how-it-works__prompt">❯</span> {step.command}
-              </div>
-            )}
-          </div>
-        </div>
+            <h3 class="fnx-how__title">{step.title}</h3>
+            <p class="fnx-how__desc">{step.description}</p>
+          </Card>
+        </li>
       ))}
-    </div>
-  </div>
-</section>
+    </ol>
+  </Container>
+</Section>
 
 <style>
-  @import "../../styles/sections/how-it-works.css";
+  .fnx-how__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .fnx-how__sub {
+    margin: 0;
+    max-width: 52ch;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+  }
+
+  .fnx-how__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: how-step;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .fnx-how__item {
+    counter-increment: how-step;
+  }
+
+  .fnx-how__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    height: 100%;
+  }
+
+  .fnx-how__step-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .fnx-how__number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-full);
+    font-family: var(--font-headline);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .fnx-how__icon {
+    color: color-mix(in srgb, var(--color-foreground) 50%, transparent);
+  }
+
+  .fnx-how__title {
+    margin: 0;
+    font-family: var(--font-headline);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .fnx-how__desc {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+  }
+
+  @media (min-width: 768px) {
+    .fnx-how__list {
+      gap: 1.5rem;
+    }
+    .fnx-how__list[data-count="2"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .fnx-how__list[data-count="3"] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .fnx-how__list[data-count="4"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .fnx-how__list[data-count="4"] {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
 </style>

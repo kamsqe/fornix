@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "name": "testimonials-grid",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Grid of testimonial quote cards with author name, role/company, and optional avatar. Replaces three v1 testimonials variants (wall/carousel/chat) with one composable block.",
+  "category": "testimonials",
+  "tags": ["testimonials", "social-proof", "v0.3"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "testimonials-grid.astro",
+      "destination": "src/components/sections/testimonials-grid.astro"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use to surface 3–6 real customer quotes. Best placed between features and pricing or just above the final CTA. Avatar fallback is auto-generated initials, so missing photos look intentional, not broken.",
+    "whenNotToUse": "Don't fake testimonials — quotes should be from real people who consented. If you don't have any yet, replace with a `cta-strip` or omit the block entirely.",
+    "pairsWith": ["features-grid", "pricing-table", "cta-strip"],
+    "contentSlots": {
+      "eyebrow": {
+        "type": "string",
+        "description": "Optional pre-headline label.",
+        "maxLength": 40,
+        "example": "Loved by builders"
+      },
+      "headline": {
+        "type": "string",
+        "description": "Section headline.",
+        "maxLength": 80,
+        "example": "Built for people who actually ship"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Optional one-line elaboration.",
+        "maxLength": 200,
+        "example": "Quotes pulled from interviews with teams currently in production."
+      },
+      "items": {
+        "type": "array",
+        "description": "Testimonials. Each has a quote, author name, optional role/company/avatar/rating.",
+        "minItems": 2,
+        "maxItems": 9,
+        "items": {
+          "quote": { "type": "string" },
+          "author": { "type": "string" },
+          "role": { "type": "string" },
+          "company": { "type": "string" },
+          "avatar": { "type": "string" },
+          "rating": { "type": "number" }
+        },
+        "example": [
+          {
+            "quote": "Switched from Next on Vercel — preview deploys are actually atomic now.",
+            "author": "Maya Patel",
+            "role": "Eng Lead",
+            "company": "Lexura"
+          }
+        ]
+      }
+    }
+  }
+}

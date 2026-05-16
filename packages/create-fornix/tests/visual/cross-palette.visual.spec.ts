@@ -34,7 +34,13 @@ const VIEWPORTS = [
   { name: "desktop", width: 1280, height: 720 },
 ] as const;
 
-const BLOCKS = ["hero-gradient", "features-grid", "cta-banner", "footer-minimal"];
+const BLOCKS = [
+  "header-sticky",
+  "hero-text",
+  "features-grid",
+  "cta-strip",
+  "footer-columns",
+];
 
 function makeConfig(
   palette: (typeof PALETTES)[number],

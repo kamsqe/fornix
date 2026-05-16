@@ -1,11 +1,18 @@
 ---
 /**
- * Stats Strip — horizontal social-proof metrics with count-up animation.
+ * Stats Strip — band of big-number statistics. Static (no counter animation).
  *
- * ALL text is sourced from the content collection (zero hardcoded strings).
- * Content is read from `src/content/sections/stats-strip.json`.
+ * Composes: Section, Container.
+ *
+ * Why no animation: the v1 counter-up pattern relied on IntersectionObserver
+ * firing reliably for sections rendered above the fold — it didn't, so users
+ * saw "0" stuck in production. The new version renders the final value at
+ * page load. Animation is an opt-in v0.4 enhancement.
  */
 import { getEntry } from "astro:content";
+import Section from "../primitives/Section.astro";
+import Container from "../primitives/Container.astro";
+import { site } from "../../site.config";
 
 interface StatItem {
   value: string;
@@ -13,76 +20,87 @@ interface StatItem {
   accent?: boolean;
 }
 
-const locale = Astro.currentLocale ?? "en";
+const locale = Astro.currentLocale ?? site.locale.default;
 const entry = await getEntry("sections", `${locale}/stats-strip`);
-const items = (entry?.data?.items ?? []) as StatItem[];
+const data = (entry?.data ?? {}) as {
+  stats?: StatItem[];
+};
+
+const stats = (data.stats ?? []) as StatItem[];
 ---
 
-<section class="stats-strip">
-  <div class="stats-strip__inner">
-    {items.map((stat, i) => (
-      <div
-        class:list={["stats-strip__item", stat.accent && "stats-strip__item--accent"]}
-        style={`animation-delay: ${i * 0.1}s`}
-      >
-        <span
-          class="stats-strip__value"
-          {...(stat.value.match(/^\d/) ? { "data-count": stat.value } : {})}
-        >
-          {stat.value.match(/^\d/) ? "0" : stat.value}
-        </span>
-        <span class="stats-strip__label">{stat.label}</span>
-      </div>
-    ))}
-  </div>
-</section>
-
-<script>
-  function initStatsCountUp() {
-    const strip = document.querySelector(".stats-strip");
-    if (!strip) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            strip.classList.add("in-view");
-
-            strip.querySelectorAll("[data-count]").forEach((el) => {
-              const target = el.getAttribute("data-count") || "0";
-              const numMatch = target.match(/^(\d+)/);
-              if (!numMatch) return;
-
-              const end = parseInt(numMatch[1], 10);
-              const suffix = target.replace(/^\d+/, "");
-              const duration = 1200;
-              const startTime = performance.now();
-
-              function tick(now: number) {
-                const elapsed = now - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                const current = Math.round(end * eased);
-                el.textContent = current + suffix;
-                if (progress < 1) requestAnimationFrame(tick);
-              }
-              requestAnimationFrame(tick);
-            });
-
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    observer.observe(strip);
-  }
-
-  initStatsCountUp();
-  document.addEventListener("astro:after-swap", initStatsCountUp);
-</script>
+<Section variant="alt" density="compact">
+  <Container size="wide">
+    <ul class="fnx-stats__list" data-count={stats.length}>
+      {stats.map((stat) => (
+        <li class:list={["fnx-stats__item", stat.accent && "fnx-stats__item--accent"]}>
+          <div class="fnx-stats__value">{stat.value}</div>
+          <div class="fnx-stats__label">{stat.label}</div>
+        </li>
+      ))}
+    </ul>
+  </Container>
+</Section>
 
 <style>
-  @import "../../styles/sections/stats-strip.css";
+  .fnx-stats__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1rem;
+  }
+
+  .fnx-stats__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .fnx-stats__value {
+    font-family: var(--font-headline);
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: var(--font-headline-weight, 700);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    color: var(--color-foreground);
+  }
+
+  .fnx-stats__item--accent .fnx-stats__value {
+    color: var(--color-primary);
+  }
+
+  .fnx-stats__label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+  }
+
+  @media (min-width: 640px) {
+    .fnx-stats__list[data-count="3"] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .fnx-stats__list[data-count="4"] {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .fnx-stats__list[data-count="5"],
+    .fnx-stats__list[data-count="6"] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .fnx-stats__list[data-count="5"] {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    .fnx-stats__list[data-count="6"] {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
 </style>

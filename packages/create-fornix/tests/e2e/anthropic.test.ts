@@ -34,8 +34,8 @@ function makeBaseConfig(projectDir: string): ResolvedConfig {
     cssEngine: "vanilla",
     packageManager: "npm",
     blocks: [
-      { name: "hero-gradient", variant: "default" },
-      { name: "cta-banner", variant: "default" },
+      { name: "hero-text", variant: "default" },
+      { name: "cta-strip", variant: "default" },
     ],
     locales: ["en"],
     defaultLocale: "en",

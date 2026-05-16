@@ -29,7 +29,7 @@ function makeConfig(projectDir: string, projectName: string): ResolvedConfig {
     database: "none",
     cssEngine: "vanilla",
     packageManager: "npm",
-    blocks: [{ name: "hero-gradient", variant: "default" }],
+    blocks: [{ name: "hero-text", variant: "default" }],
     locales: ["en"],
     defaultLocale: "en",
     palette: {

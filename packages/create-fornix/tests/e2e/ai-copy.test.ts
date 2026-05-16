@@ -31,7 +31,6 @@ const AI_HEADLINE = "Settle disputes in seconds, not weeks";
 const AI_SUBHEADLINE =
   "Lexura uses verified evidence and AI to resolve commercial conflicts at a fraction of the cost.";
 const AI_CTA = "Start a case";
-const AI_FOOTER_COPYRIGHT = "© 2026 Lexura Legal Inc.";
 
 function makeBaseConfig(projectDir: string): ResolvedConfig {
   return {
@@ -43,8 +42,8 @@ function makeBaseConfig(projectDir: string): ResolvedConfig {
     cssEngine: "vanilla",
     packageManager: "npm",
     blocks: [
-      { name: "hero-gradient", variant: "default" },
-      { name: "footer-minimal", variant: "default" },
+      { name: "hero-text", variant: "default" },
+      { name: "footer-columns", variant: "default" },
     ],
     locales: ["en"],
     defaultLocale: "en",
@@ -78,19 +77,23 @@ describe("v2 AI copy seam", () => {
 
     try {
       const provider = createMockProvider({
-        "hero-gradient": {
+        "hero-text": {
+          eyebrow: "Beta",
           headline: AI_HEADLINE,
           subheadline: AI_SUBHEADLINE,
-          ctaText: AI_CTA,
-          ctaHref: "#start",
-          badge: "Beta",
+          primaryCtaText: AI_CTA,
+          primaryCtaHref: "#start",
         },
-        "footer-minimal": {
-          copyright: AI_FOOTER_COPYRIGHT,
+        "footer-columns": {
           tagline: "Built for legal teams.",
-          links: [
-            { label: "Privacy", href: "/privacy" },
-            { label: "Terms", href: "/terms" },
+          columns: [
+            {
+              title: "Product",
+              links: [
+                { label: "Pricing", href: "/pricing" },
+                { label: "Docs", href: "/docs" },
+              ],
+            },
           ],
         },
       });
@@ -105,8 +108,8 @@ describe("v2 AI copy seam", () => {
       // Provenance trace shows both blocks were filled by AI.
       const aiEntries = result.value.copyTrace.filter((e) => e.source === "ai");
       expect(aiEntries.map((e) => e.blockName).sort()).toEqual([
-        "footer-minimal",
-        "hero-gradient",
+        "footer-columns",
+        "hero-text",
       ]);
 
       execSync("npm install --no-audit --no-fund --loglevel=error", {
@@ -124,10 +127,13 @@ describe("v2 AI copy seam", () => {
       expect(html).toContain(AI_HEADLINE);
       expect(html).toContain(AI_SUBHEADLINE);
       expect(html).toContain(AI_CTA);
-      expect(html).toContain(AI_FOOTER_COPYRIGHT);
+      // Footer tagline came from AI; copyright auto-derives from projectName
+      // (which is "ai-test" → "Ai Test" — the AI provider doesn't override
+      // site-level data, only block content slots).
+      expect(html).toContain("Built for legal teams.");
 
       // Default copy is NOT present (proves the AI seam actually overrode).
-      expect(html).not.toContain("Build Beautiful Websites Faster");
+      expect(html).not.toContain("Calendars that protect deep work");
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }
@@ -139,8 +145,8 @@ describe("v2 AI copy seam", () => {
 
     try {
       const provider = createMockProvider({
-        "hero-gradient": new Error("simulated provider outage"),
-        // footer-minimal has no entry → also produces an error → also falls back
+        "hero-text": new Error("simulated provider outage"),
+        // footer-columns has no entry → also produces an error → also falls back
       });
 
       const result = await scaffoldProject(makeBaseConfig(projectDir), {
@@ -166,7 +172,7 @@ describe("v2 AI copy seam", () => {
       );
 
       // Default hero headline appears (proves fallback path works).
-      expect(html).toContain("Build Beautiful Websites Faster");
+      expect(html).toContain("Calendars that protect deep work");
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }
@@ -178,7 +184,7 @@ describe("v2 AI copy seam", () => {
 
     try {
       const provider = createMockProvider({
-        "hero-gradient": {
+        "hero-text": {
           // headline `maxLength` is 80 in the manifest; this is 200+ chars
           // and should fail validation, triggering fallback for this block.
           headline:
@@ -187,7 +193,7 @@ describe("v2 AI copy seam", () => {
           ctaText: "ok",
           ctaHref: "#",
         },
-        "footer-minimal": {
+        "footer-columns": {
           copyright: "© 2026 Test Co.",
           tagline: "Validated.",
           links: [],
@@ -202,10 +208,10 @@ describe("v2 AI copy seam", () => {
       if (!result.ok) return;
 
       const heroEntry = result.value.copyTrace.find(
-        (e) => e.blockName === "hero-gradient",
+        (e) => e.blockName === "hero-text",
       );
       const footerEntry = result.value.copyTrace.find(
-        (e) => e.blockName === "footer-minimal",
+        (e) => e.blockName === "footer-columns",
       );
       expect(heroEntry?.source).toBe("ai-validation-failed");
       expect(footerEntry?.source).toBe("ai");

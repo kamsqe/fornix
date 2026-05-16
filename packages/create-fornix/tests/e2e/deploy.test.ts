@@ -33,8 +33,8 @@ function makeConfig(
     cssEngine: "vanilla",
     packageManager: "npm",
     blocks: [
-      { name: "hero-gradient", variant: "default" },
-      { name: "footer-minimal", variant: "default" },
+      { name: "hero-text", variant: "default" },
+      { name: "footer-columns", variant: "default" },
     ],
     locales: ["en"],
     defaultLocale: "en",

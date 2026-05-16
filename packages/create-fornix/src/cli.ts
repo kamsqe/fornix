@@ -63,7 +63,8 @@ const main = defineCommand({
     },
     deploy: {
       type: "string",
-      description: "Deploy target (cloudflare | static). Default: static.",
+      description:
+        "Deploy target (cloudflare | vercel | netlify | static). Default: static.",
       default: "static",
     },
     prompt: {
@@ -135,7 +136,7 @@ const main = defineCommand({
     const deployTarget = parseDeployTarget(args.deploy);
     if (!deployTarget) {
       process.stderr.write(
-        `error: --deploy must be one of: cloudflare, static (got "${args.deploy}")\n`,
+        `error: --deploy must be one of: cloudflare, vercel, netlify, static (got "${args.deploy}")\n`,
       );
       process.exit(1);
     }
@@ -206,20 +207,49 @@ const main = defineCommand({
     process.stdout.write(`  npm install\n`);
     process.stdout.write(`  npm run dev\n`);
 
-    if (deployTarget === "cloudflare") {
+    printDeployHint(deployTarget, args.name);
+  },
+});
+
+function printDeployHint(
+  target: ResolvedConfig["deployTarget"],
+  projectName: string,
+): void {
+  switch (target) {
+    case "cloudflare":
       process.stdout.write(`\nDeploy to Cloudflare Pages:\n`);
       process.stdout.write(`  npm run build\n`);
       process.stdout.write(
-        `  npx wrangler pages deploy dist --project-name ${args.name}\n`,
+        `  npx wrangler pages deploy dist --project-name ${projectName}\n`,
       );
-    }
-  },
-});
+      return;
+    case "vercel":
+      process.stdout.write(`\nDeploy to Vercel:\n`);
+      process.stdout.write(`  npm run build\n`);
+      process.stdout.write(`  npx vercel --prod\n`);
+      return;
+    case "netlify":
+      process.stdout.write(`\nDeploy to Netlify:\n`);
+      process.stdout.write(`  npm run build\n`);
+      process.stdout.write(`  npx netlify deploy --prod\n`);
+      return;
+    case "static":
+      // Static is the default — no deploy command to suggest.
+      return;
+  }
+}
 
 function parseDeployTarget(
   value: string,
 ): ResolvedConfig["deployTarget"] | null {
-  if (value === "cloudflare" || value === "static") return value;
+  if (
+    value === "cloudflare" ||
+    value === "vercel" ||
+    value === "netlify" ||
+    value === "static"
+  ) {
+    return value;
+  }
   return null;
 }
 

@@ -1,0 +1,136 @@
+---
+/**
+ * CTA Strip — final pre-footer conversion band.
+ *
+ * Composes: Section, Container, Headline, Button.
+ * Reads site.config: ctaPrimary, ctaSecondary.
+ *
+ * Two variants:
+ *   `accent` (default) — primary-color band with on-primary text and a
+ *     contrast-flipped button (white-ish on accent palettes; dark on light)
+ *   `subtle` — uses the alt surface for a quieter treatment, e.g. for
+ *     archetypes where the accent variant would be too loud
+ */
+import { getEntry } from "astro:content";
+import Section from "../primitives/Section.astro";
+import Container from "../primitives/Container.astro";
+import Headline from "../primitives/Headline.astro";
+import Button from "../primitives/Button.astro";
+import { site } from "../../site.config";
+
+const locale = Astro.currentLocale ?? site.locale.default;
+const entry = await getEntry("sections", `${locale}/cta-strip`);
+const data = (entry?.data ?? {}) as {
+  headline?: string;
+  subheadline?: string;
+  primaryCtaText?: string;
+  primaryCtaHref?: string;
+  secondaryCtaText?: string;
+  secondaryCtaHref?: string;
+  variant?: "accent" | "subtle";
+};
+
+const headline = data.headline ?? "Ready when you are.";
+const subheadline = data.subheadline ?? "";
+const primaryText = data.primaryCtaText ?? site.ctaPrimary?.text ?? "Get started";
+const primaryHref = data.primaryCtaHref ?? site.ctaPrimary?.href ?? "/";
+const secondaryText = data.secondaryCtaText ?? site.ctaSecondary?.text;
+const secondaryHref = data.secondaryCtaHref ?? site.ctaSecondary?.href;
+const variant = data.variant ?? "accent";
+---
+
+<Section variant={variant === "accent" ? "accent" : "alt"} density="compact">
+  <Container size="default">
+    <div class:list={["fnx-cta-strip", `fnx-cta-strip--${variant}`]}>
+      <div class="fnx-cta-strip__text">
+        <Headline level={2} align="left" measure="comfortable" class="fnx-cta-strip__headline">
+          {headline}
+        </Headline>
+        {subheadline && (
+          <p class="fnx-cta-strip__sub">{subheadline}</p>
+        )}
+      </div>
+      <div class="fnx-cta-strip__actions">
+        <Button
+          href={primaryHref}
+          variant={variant === "accent" ? "secondary" : "primary"}
+          size="lg"
+          class="fnx-cta-strip__button"
+        >
+          {primaryText}
+        </Button>
+        {secondaryText && (
+          <Button
+            href={secondaryHref ?? "#"}
+            variant="ghost"
+            size="lg"
+            class="fnx-cta-strip__button"
+          >
+            {secondaryText}
+          </Button>
+        )}
+      </div>
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .fnx-cta-strip {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+
+  .fnx-cta-strip__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .fnx-cta-strip__sub {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.55;
+    opacity: 0.85;
+    max-width: 48ch;
+  }
+
+  .fnx-cta-strip__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  /* On accent variant, the Button "secondary" variant has a transparent
+     background + border in the foreground color. We invert it so the button
+     reads as a bright pill on the primary band. */
+  .fnx-cta-strip--accent :global(.fnx-button--secondary) {
+    background: var(--color-on-primary);
+    color: var(--color-primary);
+    border-color: var(--color-on-primary);
+  }
+  .fnx-cta-strip--accent :global(.fnx-button--secondary:hover) {
+    background: color-mix(in srgb, var(--color-on-primary) 92%, transparent);
+  }
+
+  .fnx-cta-strip--accent :global(.fnx-button--ghost) {
+    color: var(--color-on-primary);
+  }
+  .fnx-cta-strip--accent :global(.fnx-button--ghost:hover) {
+    background: color-mix(in srgb, var(--color-on-primary) 12%, transparent);
+  }
+
+  @media (min-width: 768px) {
+    .fnx-cta-strip {
+      flex-direction: row;
+      align-items: center;
+      gap: 2rem;
+    }
+    .fnx-cta-strip__actions {
+      flex-shrink: 0;
+    }
+  }
+</style>

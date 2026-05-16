@@ -1,0 +1,276 @@
+---
+/**
+ * Footer Columns — site-wide footer. Brand + grouped nav columns + social
+ * + legal line. Reads heavily from site.config.
+ *
+ * Composes: Container, Icon.
+ * Reads site.config: name, tagline, logo, social, legal, contact.
+ * Content slots add the grouped `columns` (Product / Company / Resources etc).
+ */
+import { getEntry } from "astro:content";
+import Container from "../primitives/Container.astro";
+import Icon from "../primitives/Icon.astro";
+import { site } from "../../site.config";
+
+interface NavColumn {
+  title: string;
+  links: Array<{ label: string; href: string }>;
+}
+
+const locale = Astro.currentLocale ?? site.locale.default;
+const entry = await getEntry("sections", `${locale}/footer-columns`);
+const data = (entry?.data ?? {}) as {
+  tagline?: string;
+  columns?: NavColumn[];
+  privacyLabel?: string;
+  termsLabel?: string;
+  navAriaLabel?: string;
+};
+
+const tagline = data.tagline ?? site.tagline ?? "";
+const columns = (data.columns ?? []) as NavColumn[];
+const privacyLabel = data.privacyLabel ?? "Privacy";
+const termsLabel = data.termsLabel ?? "Terms";
+const navAriaLabel = data.navAriaLabel ?? "Footer navigation";
+const logo = site.logo ?? { type: "monogram" as const, text: site.name.charAt(0) };
+
+const socials = site.social
+  ? (Object.entries(site.social).filter(([, v]) => typeof v === "string" && v.length > 0) as Array<[string, string]>)
+  : [];
+
+const copyright = site.legal?.copyright ?? `© ${new Date().getUTCFullYear()} ${site.name}`;
+const privacyHref = site.legal?.privacyHref;
+const termsHref = site.legal?.termsHref;
+
+const socialIcon = (network: string) => {
+  // Map our known Icon set to social handles; unknown networks fall back
+  // to the external-link icon as a generic visual.
+  switch (network) {
+    case "mail":
+      return "mail" as const;
+    case "phone":
+      return "phone" as const;
+    default:
+      return "external-link" as const;
+  }
+};
+---
+
+<footer class="fnx-footer">
+  <Container size="wide">
+    <div class="fnx-footer__inner">
+      <div class="fnx-footer__brand">
+        <a href="/" class="fnx-footer__brand-link" aria-label={site.name}>
+          {logo.type === "monogram" && (
+            <span class="fnx-footer__monogram">{logo.text ?? site.name.charAt(0)}</span>
+          )}
+          <span class="fnx-footer__wordmark">{site.name}</span>
+        </a>
+        {tagline && <p class="fnx-footer__tagline">{tagline}</p>}
+        {socials.length > 0 && (
+          <ul class="fnx-footer__socials">
+            {socials.map(([network, handle]) => (
+              <li>
+                <a
+                  href={handle.startsWith("http") ? handle : `https://${network}.com/${handle.replace(/^@/, "")}`}
+                  class="fnx-footer__social"
+                  aria-label={network}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Icon name={socialIcon(network)} size="1rem" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {columns.length > 0 && (
+        <nav class="fnx-footer__columns" aria-label={navAriaLabel}>
+          {columns.map((col) => (
+            <div class="fnx-footer__column">
+              <h3 class="fnx-footer__column-title">{col.title}</h3>
+              <ul class="fnx-footer__column-list">
+                {col.links.map((link) => (
+                  <li>
+                    <a href={link.href} class="fnx-footer__link">{link.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </nav>
+      )}
+    </div>
+
+    <div class="fnx-footer__legal">
+      <p class="fnx-footer__copyright">{copyright}</p>
+      <div class="fnx-footer__legal-links">
+        {privacyHref && <a href={privacyHref} class="fnx-footer__link">{privacyLabel}</a>}
+        {termsHref && <a href={termsHref} class="fnx-footer__link">{termsLabel}</a>}
+      </div>
+    </div>
+  </Container>
+</footer>
+
+<style>
+  .fnx-footer {
+    background: var(--color-surface);
+    color: var(--color-foreground);
+    border-top: 1px solid var(--color-border);
+    padding-block: clamp(3rem, 5vw, 4.5rem) 2rem;
+  }
+
+  .fnx-footer__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .fnx-footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 28rem;
+  }
+
+  .fnx-footer__brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-foreground);
+    text-decoration: none;
+  }
+
+  .fnx-footer__monogram {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-md);
+    font-family: var(--font-headline);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .fnx-footer__wordmark {
+    font-family: var(--font-headline);
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+
+  .fnx-footer__tagline {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--color-foreground) 65%, transparent);
+  }
+
+  .fnx-footer__socials {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .fnx-footer__social {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+    transition: color var(--duration-fast) var(--easing-default),
+      border-color var(--duration-fast) var(--easing-default);
+  }
+  .fnx-footer__social:hover {
+    color: var(--color-foreground);
+    border-color: var(--color-foreground);
+  }
+
+  .fnx-footer__columns {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+
+  .fnx-footer__column-title {
+    margin: 0 0 0.875rem;
+    font-family: var(--font-headline);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-foreground) 60%, transparent);
+  }
+
+  .fnx-footer__column-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+
+  .fnx-footer__link {
+    color: color-mix(in srgb, var(--color-foreground) 80%, transparent);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    transition: color var(--duration-fast) var(--easing-default);
+  }
+  .fnx-footer__link:hover,
+  .fnx-footer__link:focus-visible {
+    color: var(--color-foreground);
+  }
+
+  .fnx-footer__legal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.875rem;
+    color: color-mix(in srgb, var(--color-foreground) 60%, transparent);
+  }
+
+  .fnx-footer__copyright {
+    margin: 0;
+  }
+
+  .fnx-footer__legal-links {
+    display: flex;
+    gap: 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .fnx-footer__inner {
+      grid-template-columns: 1.4fr 2fr;
+      gap: 4rem;
+    }
+    .fnx-footer__columns {
+      grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+    }
+    .fnx-footer__legal {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fnx-footer__social,
+    .fnx-footer__link {
+      transition: none;
+    }
+  }
+</style>

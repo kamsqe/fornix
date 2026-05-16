@@ -1,0 +1,167 @@
+---
+/**
+ * FAQ — accordion of question/answer pairs using native <details>/<summary>.
+ *
+ * Composes: Section, Container, Headline, Eyebrow, Icon.
+ * Reads no site.config — purely content-driven via the `items` slot.
+ *
+ * Behavior: zero JS. The browser handles open/close, keyboard nav, and
+ * a11y semantics automatically via <details>. We just style the chevron
+ * rotation on the open state.
+ */
+import { getEntry } from "astro:content";
+import Section from "../primitives/Section.astro";
+import Container from "../primitives/Container.astro";
+import Headline from "../primitives/Headline.astro";
+import Eyebrow from "../primitives/Eyebrow.astro";
+import Icon from "../primitives/Icon.astro";
+import { site } from "../../site.config";
+
+interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+const locale = Astro.currentLocale ?? site.locale.default;
+const entry = await getEntry("sections", `${locale}/faq`);
+const data = (entry?.data ?? {}) as {
+  eyebrow?: string;
+  headline?: string;
+  subheadline?: string;
+  items?: FaqItem[];
+};
+
+const eyebrow = data.eyebrow ?? "";
+const headline = data.headline ?? "";
+const subheadline = data.subheadline ?? "";
+const items = (data.items ?? []) as FaqItem[];
+---
+
+<Section id="faq">
+  <Container size="default">
+    <header class="fnx-faq__header">
+      {eyebrow && <Eyebrow align="center">{eyebrow}</Eyebrow>}
+      {headline && (
+        <Headline level={2} align="center" measure="comfortable">
+          {headline}
+        </Headline>
+      )}
+      {subheadline && <p class="fnx-faq__sub">{subheadline}</p>}
+    </header>
+
+    <ul class="fnx-faq__list">
+      {items.map((item) => (
+        <li class="fnx-faq__item">
+          <details class="fnx-faq__details">
+            <summary class="fnx-faq__summary">
+              <span class="fnx-faq__question">{item.question}</span>
+              <span class="fnx-faq__chevron" aria-hidden="true">
+                <Icon name="chevron-down" size="1.125rem" />
+              </span>
+            </summary>
+            <div class="fnx-faq__answer">
+              <p>{item.answer}</p>
+            </div>
+          </details>
+        </li>
+      ))}
+    </ul>
+  </Container>
+</Section>
+
+<style>
+  .fnx-faq__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .fnx-faq__sub {
+    margin: 0;
+    max-width: 48ch;
+    font-size: 1rem;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+  }
+
+  .fnx-faq__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .fnx-faq__details {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color var(--duration-fast) var(--easing-default);
+  }
+  .fnx-faq__details:hover {
+    border-color: color-mix(in srgb, var(--color-foreground) 25%, var(--color-border));
+  }
+  .fnx-faq__details[open] {
+    border-color: color-mix(in srgb, var(--color-primary) 50%, var(--color-border));
+  }
+
+  .fnx-faq__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+  .fnx-faq__summary::-webkit-details-marker {
+    display: none;
+  }
+  .fnx-faq__summary:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+  }
+
+  .fnx-faq__question {
+    font-family: var(--font-headline);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-foreground);
+    line-height: 1.4;
+  }
+
+  .fnx-faq__chevron {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: color-mix(in srgb, var(--color-foreground) 70%, transparent);
+    transition: transform var(--duration-fast) var(--easing-default);
+  }
+  .fnx-faq__details[open] .fnx-faq__chevron {
+    transform: rotate(180deg);
+  }
+
+  .fnx-faq__answer {
+    padding: 0 1.25rem 1.125rem;
+    color: color-mix(in srgb, var(--color-foreground) 75%, transparent);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+  .fnx-faq__answer p {
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fnx-faq__details,
+    .fnx-faq__chevron {
+      transition: none;
+    }
+  }
+</style>

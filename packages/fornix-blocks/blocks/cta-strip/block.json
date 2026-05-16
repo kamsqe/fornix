@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "name": "cta-strip",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Bold one-line conversion strip — accent-colored band with a headline and 1–2 buttons. Designed as the final pre-footer call-to-action.",
+  "category": "cta",
+  "tags": ["cta", "conversion", "accent", "v0.3"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "cta-strip.astro",
+      "destination": "src/components/sections/cta-strip.astro"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use as the closing call-to-action above the footer. Bold, single-message, one clear next step. Reads site.config.ctaPrimary by default; overridable per-page via content slots.",
+    "whenNotToUse": "Don't stack multiple CTAs above the footer — pick one. Don't use mid-page; mid-page CTAs belong inside other blocks (hero, pricing).",
+    "pairsWith": ["faq", "footer-columns"],
+    "contentSlots": {
+      "headline": {
+        "type": "string",
+        "description": "Bold headline. Short — one line on desktop.",
+        "maxLength": 80,
+        "example": "Ready to ship your next side project?"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Optional supporting line under the headline.",
+        "maxLength": 160,
+        "example": "14-day trial. No credit card. Cancel from your dashboard in two clicks."
+      },
+      "primaryCtaText": {
+        "type": "string",
+        "description": "Primary CTA label. Falls back to site.ctaPrimary.",
+        "maxLength": 30,
+        "example": "Start free trial"
+      },
+      "primaryCtaHref": {
+        "type": "string",
+        "description": "Primary CTA destination.",
+        "example": "/signup"
+      },
+      "secondaryCtaText": {
+        "type": "string",
+        "description": "Optional secondary CTA.",
+        "maxLength": 30,
+        "example": "Talk to sales"
+      },
+      "secondaryCtaHref": {
+        "type": "string",
+        "description": "Secondary CTA destination.",
+        "example": "/contact"
+      },
+      "variant": {
+        "type": "string",
+        "description": "Surface treatment: `accent` (primary-color band, default) or `subtle` (alt surface).",
+        "maxLength": 12,
+        "example": "accent"
+      }
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "name": "footer-columns",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Multi-column site footer with brand, navigation columns, social links, and legal line. Reads heavily from src/site.config.ts; per-page slots add grouped link columns.",
+  "category": "footer",
+  "tags": ["footer", "navigation", "v0.3"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": [],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "footer-columns.astro",
+      "destination": "src/components/sections/footer-columns.astro"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use as the site-wide footer on every page. Reads brand/tagline/social/legal from site.config; adds optional grouped link columns from the `columns` slot (Product / Company / Resources, etc.).",
+    "whenNotToUse": "Don't use two footers. Don't put marketing CTAs here — those belong in cta-strip directly above.",
+    "pairsWith": ["cta-strip", "header-sticky"],
+    "contentSlots": {
+      "tagline": {
+        "type": "string",
+        "description": "Short tagline under the brand mark. Falls back to site.tagline.",
+        "maxLength": 120,
+        "example": "The deploy platform built for teams that ship."
+      },
+      "columns": {
+        "type": "array",
+        "description": "Grouped nav columns. Each column has a title + an array of links.",
+        "minItems": 0,
+        "maxItems": 5,
+        "items": {
+          "title": { "type": "string" },
+          "links": { "type": "array" }
+        },
+        "example": [
+          {
+            "title": "Product",
+            "links": [
+              { "label": "Features", "href": "/#features" },
+              { "label": "Pricing", "href": "/#pricing" }
+            ]
+          }
+        ]
+      },
+      "privacyLabel": {
+        "type": "string",
+        "description": "Label for the Privacy link in the legal row. Falls back to 'Privacy'.",
+        "maxLength": 30,
+        "example": "Privacy"
+      },
+      "termsLabel": {
+        "type": "string",
+        "description": "Label for the Terms link in the legal row. Falls back to 'Terms'.",
+        "maxLength": 30,
+        "example": "Terms"
+      },
+      "navAriaLabel": {
+        "type": "string",
+        "description": "Accessibility label for the footer navigation element.",
+        "maxLength": 60,
+        "example": "Footer navigation"
+      }
+    }
+  }
+}

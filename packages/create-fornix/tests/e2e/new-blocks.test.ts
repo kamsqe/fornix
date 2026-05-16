@@ -182,4 +182,66 @@ describe("v0.3 new blocks (header-sticky + hero-text)", () => {
       rmSync(tmp, { recursive: true, force: true });
     }
   }, 240_000);
+
+  it("full v0.3 landing: 7 new blocks compose into a complete page", async () => {
+    const tmp = mkdtempSync(join(tmpdir(), "fornix-newblocks-full-"));
+    const projectDir = join(tmp, "site");
+
+    try {
+      const config = makeConfig(projectDir);
+      const result = await scaffoldProject({
+        ...config,
+        blocks: [
+          { name: "header-sticky", variant: "default" },
+          { name: "hero-media", variant: "default" },
+          { name: "features-grid", variant: "default" },
+          { name: "pricing-table", variant: "default" },
+          { name: "faq", variant: "default" },
+          { name: "cta-strip", variant: "default" },
+          { name: "footer-columns", variant: "default" },
+        ],
+      });
+      expect(result.ok, JSON.stringify(result, null, 2)).toBe(true);
+
+      execSync("npm install --no-audit --no-fund --loglevel=error", {
+        cwd: projectDir,
+        stdio: "pipe",
+      });
+      execSync("npx astro build", { cwd: projectDir, stdio: "pipe" });
+
+      const html = readFileSync(
+        join(projectDir, "dist", "index.html"),
+        "utf8",
+      );
+
+      // Every new block contributes recognizable rendered output.
+      expect(html).toContain("fnx-header");                 // header-sticky
+      expect(html).toContain("fnx-hero-media");             // hero-media
+      expect(html).toContain("Built for teams that ship");  // features-grid headline
+      expect(html).toContain("Simple, honest pricing");     // pricing-table headline
+      expect(html).toContain("Questions everyone asks first"); // faq headline
+      expect(html).toContain("fnx-cta-strip");              // cta-strip
+      expect(html).toContain("fnx-footer");                 // footer-columns
+
+      // Pricing-table-specific: highlighted "Most Popular" badge appears
+      expect(html).toContain("Most Popular");
+      // Three pricing plans render with their realistic prices
+      expect(html).toContain("$19");
+      expect(html).toContain("$49");
+      expect(html).toContain("$199");
+
+      // FAQ uses native <details>/<summary> — zero JS accordion
+      expect(html).toContain("<details");
+      expect(html).toContain("<summary");
+
+      // Footer reflects site.config-derived data
+      expect(html).toContain("Helix App");                  // brand name
+      expect(html).toContain("© ");                         // copyright auto-generated
+
+      // No empty <img src=""> — sanity check that no block ships broken images
+      expect(html).not.toMatch(/<img[^>]*\bsrc=""[^>]*>/);
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  }, 360_000);
 });

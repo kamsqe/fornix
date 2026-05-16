@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "name": "faq",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Frequently asked questions accordion using native <details>/<summary> — zero JS, full keyboard support, works without scripts. Composes Section + Container + Headline + Eyebrow + Icon.",
+  "category": "faq",
+  "tags": ["faq", "questions", "accordion", "v0.3"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": ["faq-home", "faq-accordion"],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "faq.astro",
+      "destination": "src/components/sections/faq.astro"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use to handle the most common pre-purchase questions (pricing, plans, refunds, security, who-it's-for). Best in the lower-middle of a marketing page — after pricing, before final CTA. 4–8 questions is the sweet spot.",
+    "whenNotToUse": "Don't use for support docs (that's a docs site). Don't use for in-depth explanations — link out instead.",
+    "pairsWith": ["pricing-table", "cta-strip", "footer-columns"],
+    "contentSlots": {
+      "eyebrow": {
+        "type": "string",
+        "description": "Optional pre-headline label.",
+        "maxLength": 40,
+        "example": "FAQ"
+      },
+      "headline": {
+        "type": "string",
+        "description": "Section headline.",
+        "maxLength": 80,
+        "example": "Questions everyone asks first"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "Optional one-line elaboration.",
+        "maxLength": 200,
+        "example": "Can't find what you're looking for? Drop us a note."
+      },
+      "items": {
+        "type": "array",
+        "description": "Question/answer pairs. Keep answers under ~3 sentences; link out for depth.",
+        "minItems": 3,
+        "maxItems": 10,
+        "items": {
+          "question": { "type": "string" },
+          "answer": { "type": "string" }
+        },
+        "example": [
+          {
+            "question": "Can I switch plans later?",
+            "answer": "Yes, upgrade or downgrade any time from your account settings. Prorated to the day."
+          }
+        ]
+      }
+    }
+  }
+}

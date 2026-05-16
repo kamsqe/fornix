@@ -1,0 +1,9 @@
+{
+  "name": "fornix-archetypes",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Pre-authored Fornix archetypes (saas, agency, portfolio, gym, restaurant). Each declares palette + site.config defaults + multi-page block selections + content overrides. Bundled into the CLI; not an npm runtime dep.",
+  "type": "module",
+  "license": "MIT",
+  "files": ["archetypes"]
+}

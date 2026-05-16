@@ -41,6 +41,11 @@ export default defineConfig({
       join("dist", "primitives"),
       { recursive: true },
     );
+    await cp(
+      join(REPO_ROOT, "packages", "fornix-archetypes", "archetypes"),
+      join("dist", "archetypes"),
+      { recursive: true },
+    );
 
     // Mark the CLI entry executable so `node_modules/.bin/create-fornix` works.
     await chmod(join("dist", "cli.js"), 0o755);

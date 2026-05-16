@@ -68,6 +68,22 @@ export function primitivesDir(): string {
 }
 
 /**
+ * Path to an archetype's JSON file. Prefers bundled
+ * `dist/archetypes/<name>.json`, falls back to workspace
+ * `packages/fornix-archetypes/archetypes/<name>.json`.
+ */
+export function archetypePath(archetypeName: string): string {
+  const bundled = resolve(HERE, "archetypes", `${archetypeName}.json`);
+  if (existsSync(bundled)) return bundled;
+  return workspacePath(
+    "packages",
+    "fornix-archetypes",
+    "archetypes",
+    `${archetypeName}.json`,
+  );
+}
+
+/**
  * Workspace-rooted path. Throws when not running inside the monorepo —
  * callers should prefer `blockPath()` / `palettePath()` which fall back
  * to bundled assets when published.

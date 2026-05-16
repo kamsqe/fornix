@@ -3,17 +3,30 @@
  * Fornix CLI.
  *
  * Surface:
- *   create-fornix <name> [--blocks ...] [--palette ...] [--prompt "..."] [--yes]
+ *   create-fornix <name> [--archetype ...] [--blocks ...] [--palette ...] [--prompt "..."] [--yes]
  *
- * AI mode kicks in automatically when `ANTHROPIC_API_KEY` is set AND
- * `--prompt` is non-empty. Without one or both, the scaffolder uses each
- * block's `default-content.json`.
+ * Two top-level modes (mutually exclusive on first use; --archetype wins
+ * when both are passed):
+ *
+ *   • Archetype mode (recommended)
+ *       --archetype saas | agency | portfolio | gym | restaurant
+ *     Loads a pre-authored bundle (palette + site.config + multi-page
+ *     block selection + content overrides). Ship a near-final site in
+ *     under a minute.
+ *
+ *   • Custom block mode
+ *       --blocks header-sticky,hero-text,features-grid,...
+ *     The escape hatch — pick your own block list and palette. Single-page.
+ *
+ * AI copy generation activates when ANTHROPIC_API_KEY is set AND --prompt
+ * is non-empty. AI overrides land on top of archetype/block defaults.
  */
 import { defineCommand, runMain } from "citty";
 import { resolve } from "node:path";
 
 import { scaffoldProject } from "./scaffold/scaffold-project.js";
 import { loadPaletteData } from "./scaffold/palette.js";
+import { loadArchetype, archetypeOverlay } from "./scaffold/archetype.js";
 import type { ResolvedConfig } from "./schemas/config.js";
 import { createAnthropicProvider } from "./ai/providers/anthropic.js";
 import type { AIProvider, BrandContext } from "./ai/provider.js";
@@ -21,9 +34,9 @@ import type { AIProvider, BrandContext } from "./ai/provider.js";
 const main = defineCommand({
   meta: {
     name: "create-fornix",
-    version: "0.2.0",
+    version: "0.3.0",
     description:
-      "Scaffold Astro + Cloudflare projects from a curated block registry",
+      "Scaffold Astro projects from curated archetypes + a 13-block design system",
   },
   args: {
     name: {
@@ -31,15 +44,22 @@ const main = defineCommand({
       description: "Project directory name (created relative to cwd)",
       required: true,
     },
+    archetype: {
+      type: "string",
+      description:
+        "Archetype name (saas, agency, portfolio, gym, restaurant). Overrides --blocks and --palette.",
+      default: "",
+    },
     blocks: {
       type: "string",
-      description: "Comma-separated block names",
-      default: "hero-gradient,features-grid,cta-banner,footer-minimal",
+      description: "Comma-separated block names (custom mode only)",
+      default: "header-sticky,hero-text,features-grid,cta-strip,footer-columns",
     },
     palette: {
       type: "string",
-      description: "Palette preset name (obsidian, paper, fraktur, ember, terracotta, sage, aurora)",
-      default: "obsidian",
+      description:
+        "Palette preset name (obsidian, paper, fraktur, ember, terracotta, sage, aurora). Overrides archetype default if set explicitly.",
+      default: "",
     },
     deploy: {
       type: "string",
@@ -49,7 +69,7 @@ const main = defineCommand({
     prompt: {
       type: "string",
       description:
-        "Describe your project. When ANTHROPIC_API_KEY is set, this drives AI copy generation.",
+        "Describe your project. When ANTHROPIC_API_KEY is set, this drives AI copy generation on top of archetype defaults.",
       default: "",
     },
     yes: {
@@ -68,21 +88,48 @@ const main = defineCommand({
       );
     }
 
-    const paletteResult = loadPaletteData(args.palette);
+    // ── Archetype loading (when --archetype is set) ───────────────
+    const archetypeName = args.archetype.trim();
+    const archetypeResult = archetypeName
+      ? loadArchetype(archetypeName)
+      : null;
+    if (archetypeResult && !archetypeResult.ok) {
+      process.stderr.write(`error: ${archetypeResult.error.message}\n`);
+      process.exit(1);
+    }
+    const archetype = archetypeResult?.ok ? archetypeResult.value : null;
+
+    // ── Palette resolution ────────────────────────────────────────
+    // Priority: explicit --palette flag → archetype default → fallback obsidian
+    const paletteName =
+      args.palette.trim() || archetype?.palette || "obsidian";
+    const paletteResult = loadPaletteData(paletteName);
     if (!paletteResult.ok) {
       process.stderr.write(`error: ${paletteResult.error.message}\n`);
       process.exit(1);
     }
     const palette = paletteResult.value;
 
-    const blockNames = args.blocks
-      .split(",")
-      .map((b: string) => b.trim())
-      .filter((b: string) => b.length > 0);
-
-    if (blockNames.length === 0) {
-      process.stderr.write("error: --blocks must contain at least one block name\n");
-      process.exit(1);
+    // ── Block list / pages resolution ─────────────────────────────
+    let blocks: ResolvedConfig["blocks"];
+    let pages: ResolvedConfig["pages"];
+    if (archetype) {
+      const overlay = archetypeOverlay(archetype, ["en"]);
+      blocks = overlay.blockNames.map((name) => ({ name, variant: "default" }));
+      pages = overlay.pages;
+    } else {
+      const blockNames = args.blocks
+        .split(",")
+        .map((b: string) => b.trim())
+        .filter((b: string) => b.length > 0);
+      if (blockNames.length === 0) {
+        process.stderr.write(
+          "error: --blocks must contain at least one block name\n",
+        );
+        process.exit(1);
+      }
+      blocks = blockNames.map((name: string) => ({ name, variant: "default" }));
+      pages = undefined;
     }
 
     const deployTarget = parseDeployTarget(args.deploy);
@@ -101,7 +148,8 @@ const main = defineCommand({
       database: "none",
       cssEngine: "vanilla",
       packageManager: "npm",
-      blocks: blockNames.map((name: string) => ({ name, variant: "default" })),
+      blocks,
+      pages,
       locales: ["en"],
       defaultLocale: "en",
       palette: {
@@ -122,8 +170,22 @@ const main = defineCommand({
         `→ AI copy enabled via Anthropic (model: ${aiSetup.model})\n`,
       );
     }
+    if (archetype) {
+      process.stdout.write(
+        `→ Archetype: ${archetype.displayName} (${archetype.pages.length} page${archetype.pages.length === 1 ? "" : "s"}, palette: ${palette.name})\n`,
+      );
+    }
 
-    const result = await scaffoldProject(config, aiSetup ?? {});
+    // Layer archetype content + site config into scaffold options.
+    const overlay = archetype
+      ? archetypeOverlay(archetype, ["en"])
+      : null;
+
+    const result = await scaffoldProject(config, {
+      ...(aiSetup ?? {}),
+      archetypeContent: overlay?.contentByLocale,
+      siteConfigOverrides: overlay?.site,
+    });
     if (!result.ok) {
       process.stderr.write(`error: ${result.error.message}\n`);
       process.exit(1);
@@ -179,8 +241,6 @@ function resolveAiSetup(opts: {
   const model = process.env.FORNIX_ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
   const provider = createAnthropicProvider({ apiKey, model });
 
-  // Day-4b derives brand fields heuristically from the prompt. A later pass
-  // can promote this to a real LLM-driven brand-extraction step.
   const brand: BrandContext = {
     name: opts.projectName,
     description,

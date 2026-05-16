@@ -1,9 +1,28 @@
 import type { BlockManifest } from "fornix-registry";
 
-import type { ResolvedConfig } from "../schemas/config.js";
+import type {
+  ResolvedConfig,
+  PageSelection,
+} from "../schemas/config.js";
 import type { SiteConfig } from "../schemas/site-config.js";
 import type { BlockSource } from "./blocks.js";
 import type { PaletteCss } from "./palette.js";
+
+/**
+ * A page in the render plan. Each becomes one `.astro` file under
+ * `src/pages/{slug}.astro` (default locale) and `src/pages/{locale}/{slug}.astro`
+ * (other locales).
+ */
+export interface RenderPage {
+  /** "" for home, "pricing", "about/team", etc. */
+  slug: string;
+  /** Page title (drives `<title>` and OG meta). Defaults to project name. */
+  title: string;
+  /** Meta description for the page. */
+  description: string;
+  /** Section blocks for this page, in render order. */
+  sectionBlocks: ReadonlyArray<BlockSource>;
+}
 
 /**
  * The intermediate representation between `ResolvedConfig` and emitted files.
@@ -37,10 +56,11 @@ export interface RenderPlan {
   };
 
   /**
-   * Section blocks in the order they should appear on `index.astro`.
-   * Layout/integration/feature blocks are not handled by the day-1 spine.
+   * Pages to emit. At minimum one (the home page). Each page declares its
+   * own block list; blocks shared across pages are copied once but rendered
+   * on each page they appear in.
    */
-  sectionBlocks: ReadonlyArray<BlockSource>;
+  pages: ReadonlyArray<RenderPage>;
 
   /**
    * Content entries to write under `src/content/sections/`.
@@ -103,6 +123,11 @@ export type ContentByLocale = Record<string, Record<string, Record<string, unkno
 /**
  * Pure function: takes the resolved config + loaded block sources and produces
  * the render plan. No I/O, no side effects.
+ *
+ * Page resolution:
+ *   - if `config.pages` is set, use it directly (multi-page mode)
+ *   - otherwise, synthesize a single home page from `config.blocks` (the
+ *     single-page mode that every v0.3 scaffold uses by default)
  */
 export function buildRenderPlan(
   config: ResolvedConfig,
@@ -111,31 +136,61 @@ export function buildRenderPlan(
   contentByLocale: ContentByLocale = {},
   siteConfig?: SiteConfig,
 ): RenderPlan {
-  // Stable sort by category priority. Section blocks only — layout/integration
-  // blocks aren't rendered as sections on index.astro.
-  const sectionBlocks = blocks
-    .filter((b) => b.manifest.type === "section")
-    .map((block, index) => ({ block, index }))
-    .sort((a, b) => {
-      const diff =
-        categoryPriority(a.block.manifest.category) -
-        categoryPriority(b.block.manifest.category);
-      return diff !== 0 ? diff : a.index - b.index;
-    })
-    .map(({ block }) => block);
+  // Build a quick lookup so we can resolve `BlockSelection.name` → `BlockSource`
+  // for each page declaration. Blocks not present in `blocks` are skipped
+  // (the caller is expected to have loaded everything the config references).
+  const blockByName = new Map<string, BlockSource>(
+    blocks.map((b) => [b.manifest.name, b] as const),
+  );
+
+  // Resolve pages: either from explicit `config.pages` or fall back to a
+  // single home page containing every block from `config.blocks`.
+  const pageDeclarations: ReadonlyArray<PageSelection> = config.pages ?? [
+    { slug: "", blocks: config.blocks },
+  ];
+
+  const pages: RenderPage[] = pageDeclarations.map((page) => {
+    const pageBlocks = page.blocks
+      .map((sel) => blockByName.get(sel.name))
+      .filter((b): b is BlockSource => b !== undefined)
+      .filter((b) => b.manifest.type === "section");
+
+    const sortedBlocks = pageBlocks
+      .map((block, index) => ({ block, index }))
+      .sort((a, b) => {
+        const diff =
+          categoryPriority(a.block.manifest.category) -
+          categoryPriority(b.block.manifest.category);
+        return diff !== 0 ? diff : a.index - b.index;
+      })
+      .map(({ block }) => block);
+
+    return {
+      slug: page.slug,
+      title: page.title ?? config.projectName,
+      description: page.description ?? `Generated with Fornix — ${config.projectName}`,
+      sectionBlocks: sortedBlocks,
+    };
+  });
+
+  // Unique blocks across all pages — each gets exactly one content entry per
+  // locale. If two pages reference the same block, they share that entry.
+  const uniqueBlocks = new Map<string, BlockSource>();
+  for (const page of pages) {
+    for (const block of page.sectionBlocks) {
+      uniqueBlocks.set(block.manifest.name, block);
+    }
+  }
 
   const contentEntries: Array<RenderPlan["contentEntries"][number]> = [];
 
   // Convention: content always lives under `sections/{locale}/{block}.json`,
   // even for single-locale projects. The block .astro reads the locale via
   // `Astro.currentLocale` and constructs the entry ID as `{locale}/{block}`.
-  // This eliminates a whole class of "content not found" bugs by treating
-  // single-locale as just multi-locale with N=1.
-  //
   // For each (locale, block), prefer the AI-supplied per-locale content from
   // `contentByLocale`, then the block's `defaultContent`, then skip.
   for (const locale of config.locales) {
-    for (const block of sectionBlocks) {
+    for (const block of uniqueBlocks.values()) {
       const override = contentByLocale[locale]?.[block.manifest.name];
       const data = override ?? block.defaultContent;
       if (!data) continue;
@@ -148,7 +203,10 @@ export function buildRenderPlan(
     }
   }
 
-  const dependencies = mergeDependencies(blocks, palette);
+  const dependencies = mergeDependencies(
+    Array.from(uniqueBlocks.values()),
+    palette,
+  );
 
   return {
     projectName: config.projectName,
@@ -162,7 +220,7 @@ export function buildRenderPlan(
       title: config.projectName,
       description: `Generated with Fornix — ${config.projectName}`,
     },
-    sectionBlocks,
+    pages,
     contentEntries,
     dependencies,
   };

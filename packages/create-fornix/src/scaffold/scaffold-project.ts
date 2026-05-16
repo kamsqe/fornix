@@ -55,10 +55,18 @@ export async function scaffoldProject(
   config: ResolvedConfig,
   options: ScaffoldOptions = {},
 ): Promise<Result<ScaffoldResult, FornixError>> {
-  // 1. Blocks
+  // 1. Blocks — collect the union of every block referenced by `config.blocks`
+  //    AND every block referenced by `config.pages[*].blocks`. Same block on
+  //    multiple pages is loaded once (deduped by name).
+  const blockNames = new Set<string>(config.blocks.map((b) => b.name));
+  if (config.pages) {
+    for (const page of config.pages) {
+      for (const sel of page.blocks) blockNames.add(sel.name);
+    }
+  }
   const blocks: BlockSource[] = [];
-  for (const selection of config.blocks) {
-    const result = loadBlock(selection.name);
+  for (const name of blockNames) {
+    const result = loadBlock(name);
     if (!result.ok) return result;
     blocks.push(result.value);
   }

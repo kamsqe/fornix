@@ -42,25 +42,44 @@ export function renderToFiles(plan: RenderPlan): FileMap {
     fontImports: renderFontImports(plan.palette.name),
   });
 
-  // ── Index pages (one per locale; default at /, others at /{locale}/) ──
-  const { blockImports, blockRenders } = renderBlockSlots(plan);
+  // ── Page emission (one .astro per page × per locale) ────
+  // For each (page, locale) we generate one file. The home page goes at
+  // `src/pages/index.astro`; secondary pages at `src/pages/{slug}.astro`.
+  // For non-default locales the locale segment is prepended.
   const indexTemplate = loadTemplate("index.astro");
-  for (const locale of plan.locales) {
-    const isDefault = locale === plan.locale;
-    const indexPath = isDefault
-      ? "src/pages/index.astro"
-      : `src/pages/${locale}/index.astro`;
-    files[indexPath] = fillTemplate(indexTemplate, {
-      layoutPath: isDefault
-        ? "../layouts/Layout.astro"
-        : "../../layouts/Layout.astro",
-      blockImports: isDefault
-        ? blockImports
-        : adjustImportsForNestedPage(blockImports),
-      blockRenders,
-      title: plan.layout.title,
-      description: plan.layout.description,
-    });
+  for (const page of plan.pages) {
+    const { blockImports, blockRenders } = renderBlockSlotsForPage(page);
+    const isHome = page.slug === "";
+    const pageFile = isHome ? "index.astro" : `${page.slug}.astro`;
+
+    for (const locale of plan.locales) {
+      const isDefaultLocale = locale === plan.locale;
+      const indexPath = isDefaultLocale
+        ? `src/pages/${pageFile}`
+        : `src/pages/${locale}/${pageFile}`;
+
+      // Depth from src/pages/... to src/layouts/Layout.astro:
+      //   src/pages/index.astro                → ../layouts/...
+      //   src/pages/pricing.astro              → ../layouts/...
+      //   src/pages/about/team.astro           → ../../layouts/...
+      //   src/pages/es/index.astro             → ../../layouts/...
+      //   src/pages/es/about/team.astro        → ../../../layouts/...
+      const depth =
+        pageFile.split("/").length - 1 + (isDefaultLocale ? 0 : 1);
+      const layoutPath = `${"../".repeat(depth + 1)}layouts/Layout.astro`;
+      const finalImports =
+        depth === 0
+          ? blockImports
+          : adjustImportsForDepth(blockImports, depth);
+
+      files[indexPath] = fillTemplate(indexTemplate, {
+        layoutPath,
+        blockImports: finalImports,
+        blockRenders,
+        title: page.title,
+        description: page.description,
+      });
+    }
   }
 
   // ── astro.config.mjs ─────────────────────────────────────
@@ -113,8 +132,16 @@ export function renderToFiles(plan: RenderPlan): FileMap {
     });
   }
 
-  // ── Block source files (copied as-is) ────────────────────
-  for (const block of plan.sectionBlocks) {
+  // ── Block source files (copied once across all pages) ───
+  // Collect unique blocks across all pages — each one gets copied a single
+  // time even if multiple pages render it (header on every page, etc.).
+  const allBlocks = new Map<string, RenderPlan["pages"][number]["sectionBlocks"][number]>();
+  for (const page of plan.pages) {
+    for (const block of page.sectionBlocks) {
+      allBlocks.set(block.manifest.name, block);
+    }
+  }
+  for (const block of allBlocks.values()) {
     for (const fileSpec of block.manifest.files) {
       const content = block.files[fileSpec.source];
       if (content === undefined) {
@@ -136,20 +163,20 @@ export function renderToFiles(plan: RenderPlan): FileMap {
 
 // ── Helpers ──────────────────────────────────────────────
 
-function renderBlockSlots(plan: RenderPlan): {
+function renderBlockSlotsForPage(
+  page: RenderPlan["pages"][number],
+): {
   blockImports: string;
   blockRenders: string;
 } {
   const imports: string[] = [];
   const renders: string[] = [];
-  for (const block of plan.sectionBlocks) {
+  for (const block of page.sectionBlocks) {
     const component = blockToComponentName(block.manifest.name);
     const astroFile = block.manifest.files.find((f) =>
       f.source.endsWith(".astro"),
     );
     if (!astroFile) continue;
-    // The destination path always lives somewhere under `src/`. Compute its
-    // path relative to `src/pages/` (where index.astro lives).
     const relImport = relativeFromPages(astroFile.destination);
     imports.push(`import ${component} from "${relImport}";`);
     renders.push(`  <${component} />`);
@@ -171,7 +198,12 @@ function renderContentSchema(plan: RenderPlan): {
   schemaDeclarations: string;
   sectionsSchema: string;
 } {
-  const perBlock = plan.sectionBlocks
+  // Collect unique blocks across all pages — schemas merge once.
+  const uniqueBlocks = new Set<typeof plan.pages[number]["sectionBlocks"][number]>();
+  for (const page of plan.pages) {
+    for (const block of page.sectionBlocks) uniqueBlocks.add(block);
+  }
+  const perBlock = Array.from(uniqueBlocks)
     .map((b) => b.manifest.ai?.contentSlots)
     .filter((slots): slots is NonNullable<typeof slots> => !!slots);
 
@@ -256,8 +288,19 @@ function relativeFromPages(destination: string): string {
 }
 
 /**
- * Nested-locale pages (`src/pages/{locale}/index.astro`) sit one directory
- * deeper than `src/pages/index.astro`, so their imports need an extra `../`.
+ * Pages nested below `src/pages/` (locale sub-dirs, slugged subdirs like
+ * `about/team.astro`) need additional `../` prefixes on their relative
+ * imports. `depth` is the number of extra levels beyond `src/pages/`.
+ */
+function adjustImportsForDepth(imports: string, depth: number): string {
+  if (depth <= 0) return imports;
+  const extra = "../".repeat(depth);
+  return imports.replace(/from "\.\.\//g, `from "../${extra}`);
+}
+
+/**
+ * Legacy alias kept for any out-of-tree callers; new code uses
+ * `adjustImportsForDepth(imports, 1)` directly.
  */
 function adjustImportsForNestedPage(imports: string): string {
   return imports.replace(/from "\.\.\//g, 'from "../../');

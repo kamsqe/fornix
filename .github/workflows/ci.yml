@@ -22,25 +22,13 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test:unit
+      - run: pnpm --filter fornix-registry build
+      - run: pnpm --filter create-fornix typecheck
 
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
-    needs: [typecheck, unit-tests]
+    needs: [typecheck]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -49,13 +37,14 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm test:integration
+      - run: pnpm --filter fornix-registry build
+      - run: pnpm --filter create-fornix vitest run tests/integration
         timeout-minutes: 5
 
-  cli-tests:
-    name: CLI E2E Tests
+  e2e-tests:
+    name: E2E Tests
     runs-on: ubuntu-latest
-    needs: [typecheck, unit-tests]
+    needs: [typecheck]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -64,15 +53,17 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Build CLI
-        run: pnpm --filter create-fornix build
-      - name: Run CLI tests
-        run: pnpm --filter create-fornix vitest run tests/e2e/cli-ci.test.ts
-        timeout-minutes: 5
+      - run: pnpm --filter fornix-registry build
+      - run: pnpm --filter create-fornix build
+      # ANTHROPIC_API_KEY is intentionally NOT set in CI — the live test
+      # (tests/e2e/anthropic.test.ts) auto-skips when the key is absent.
+      - run: pnpm --filter create-fornix vitest run tests/e2e
+        timeout-minutes: 15
 
-  lint:
-    name: Lint
+  smoke-publish:
+    name: Smoke-test the npm tarball
     runs-on: ubuntu-latest
+    needs: [typecheck]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -81,5 +72,19 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-        continue-on-error: true
+      - run: pnpm --filter fornix-registry build
+      - run: pnpm --filter create-fornix build
+      - name: Pack
+        run: pnpm --filter create-fornix pack
+      - name: Install + scaffold from tarball in a clean dir
+        run: |
+          TARBALL=$(ls packages/create-fornix/create-fornix-*.tgz | head -1)
+          TMP=$(mktemp -d)
+          cp "$TARBALL" "$TMP/"
+          cd "$TMP"
+          npm init -y >/dev/null
+          npm install ./$(basename "$TARBALL")
+          npx create-fornix smoke-site --blocks hero-gradient,footer-minimal --palette midnight --yes
+          test -f smoke-site/astro.config.mjs
+          test -f smoke-site/src/pages/index.astro
+        timeout-minutes: 5

@@ -17,10 +17,12 @@ import { tmpdir } from "node:os";
 import { scaffoldProject } from "../../src/index.js";
 import type { ResolvedConfig } from "../../src/schemas/config.js";
 
-const HERO_DEFAULT_HEADLINE = "Build Beautiful Websites Faster";
-const FEATURES_DEFAULT_HEADLINE = "Everything You Need";
-const CTA_DEFAULT_HEADLINE = "Ready to Get Started?";
-const FOOTER_DEFAULT_COPYRIGHT = "© 2026 Acme Inc. All rights reserved.";
+const HERO_DEFAULT_HEADLINE = "Calendars that protect deep work";
+const FEATURES_DEFAULT_HEADLINE = "Built for teams that ship";
+const CTA_DEFAULT_HEADLINE = "Ready to ship your next side project?";
+// Footer copyright is auto-derived from projectName when site.config.legal
+// isn't set — `humanizeProjectName("spine-test")` → "Spine Test".
+const FOOTER_COPYRIGHT_PATTERN = /© \d{4} Spine Test/;
 
 function makeConfig(
   projectDir: string,
@@ -38,7 +40,7 @@ function makeConfig(
     locales: ["en"],
     defaultLocale: "en",
     palette: {
-      preset: "midnight",
+      preset: "obsidian",
       colors: {
         primary: "#6366f1",
         secondary: "#818cf8",
@@ -79,7 +81,7 @@ async function scaffoldAndBuild(
 describe("v2 spine", () => {
   it("scaffolds a single block → palette + headline render", async () => {
     const { projectDir, html, cleanup } = await scaffoldAndBuild([
-      "hero-gradient",
+      "hero-text",
     ]);
     try {
       expect(html).toContain('id="fornix-palette-link"');
@@ -105,23 +107,23 @@ describe("v2 spine", () => {
 
   it("scaffolds 4 blocks → each renders its default content", async () => {
     const { html, cleanup } = await scaffoldAndBuild([
-      "hero-gradient",
+      "hero-text",
       "features-grid",
-      "cta-banner",
-      "footer-minimal",
+      "cta-strip",
+      "footer-columns",
     ]);
     try {
       expect(html).toContain(HERO_DEFAULT_HEADLINE);
       expect(html).toContain(FEATURES_DEFAULT_HEADLINE);
       expect(html).toContain(CTA_DEFAULT_HEADLINE);
-      expect(html).toContain(FOOTER_DEFAULT_COPYRIGHT);
+      expect(html).toMatch(FOOTER_COPYRIGHT_PATTERN);
       expect(html).not.toMatch(/<img[^>]*\bsrc=""[^>]*>/);
 
-      // Each block's <section>/<footer> class lands in the DOM.
-      expect(html).toContain('class="hero-gradient');
-      expect(html).toContain('class="features-grid');
-      expect(html).toContain('class="cta-banner');
-      expect(html).toContain('class="footer-minimal');
+      // Each block's primitive-composed class lands in the DOM.
+      expect(html).toContain("fnx-hero-text");
+      expect(html).toContain("fnx-features__");
+      expect(html).toContain("fnx-cta-strip");
+      expect(html).toContain("fnx-footer");
     } finally {
       cleanup();
     }
@@ -131,16 +133,17 @@ describe("v2 spine", () => {
     // Pass blocks in reverse: footer → cta → features → hero.
     // Expected render order: hero → features → cta → footer.
     const { html, cleanup } = await scaffoldAndBuild([
-      "footer-minimal",
-      "cta-banner",
+      "footer-columns",
+      "cta-strip",
       "features-grid",
-      "hero-gradient",
+      "hero-text",
     ]);
     try {
-      const heroPos = html.indexOf("hero-gradient");
-      const featuresPos = html.indexOf("features-grid");
-      const ctaPos = html.indexOf("cta-banner");
-      const footerPos = html.indexOf("footer-minimal");
+      // Search by primitive-composed BEM class — every new block ships one.
+      const heroPos = html.indexOf("fnx-hero-text");
+      const featuresPos = html.indexOf("fnx-features");
+      const ctaPos = html.indexOf("fnx-cta-strip");
+      const footerPos = html.indexOf("fnx-footer");
 
       expect(heroPos).toBeGreaterThan(-1);
       expect(featuresPos).toBeGreaterThan(-1);

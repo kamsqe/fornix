@@ -1,56 +1,62 @@
 {
   "schemaVersion": 1,
   "name": "features-grid",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "section",
-  "description": "Responsive grid of feature cards with icons, titles, and descriptions",
+  "description": "Responsive grid of feature cards — icon + title + description. 3-column on desktop, single column on mobile. Composes Card + Icon primitives.",
   "category": "features",
-  "tags": ["features", "grid", "cards", "benefits"],
+  "tags": ["features", "grid", "cards", "v0.3"],
   "dependencies": {},
   "requires": [],
   "conflicts": [],
   "envVars": [],
-  "variants": ["default", "two-column", "icon-left"],
+  "variants": ["default"],
   "slots": [],
   "files": [
     {
       "source": "features-grid.astro",
       "destination": "src/components/sections/features-grid.astro"
-    },
-    {
-      "source": "features-grid.css",
-      "destination": "src/styles/sections/features-grid.css"
     }
   ],
   "ai": {
-    "whenToUse": "Use to showcase product features, benefits, or capabilities in a visually scannable grid. Best placed after the hero section on landing pages.",
-    "whenNotToUse": "Don't use for pricing comparisons (use pricing-table), detailed documentation, or content that needs sequential reading order.",
-    "pairsWith": ["hero-gradient", "cta-simple", "footer-minimal"],
+    "whenToUse": "Use mid-page to enumerate 3–6 product capabilities, benefits, or value props. Each feature is a card with an icon, short title, and one- or two-sentence description. Best for SaaS, agency service lists, gym class types — anywhere a tidy comparison helps.",
+    "whenNotToUse": "Don't use for image-heavy showcases (use a different layout). Don't use with more than 6 features — visual weight collapses; pick the top 3 and link out to details.",
+    "pairsWith": ["hero-text", "hero-media", "cta-strip", "pricing-table"],
     "contentSlots": {
+      "eyebrow": {
+        "type": "string",
+        "description": "Optional pre-headline label.",
+        "maxLength": 40,
+        "example": "What you get"
+      },
       "headline": {
         "type": "string",
-        "description": "Section headline above the feature grid",
+        "description": "Section headline above the grid.",
         "maxLength": 80,
-        "example": "Everything You Need"
+        "example": "Built for teams that ship"
       },
       "subheadline": {
         "type": "string",
-        "description": "Optional supporting text below the headline",
+        "description": "One-line elaboration below the headline.",
         "maxLength": 200,
-        "example": "Powerful features to help you build faster and ship with confidence."
+        "example": "Every feature ties back to one thing: getting code into production faster, with fewer surprises."
       },
       "features": {
         "type": "array",
-        "description": "List of feature cards to display in the grid",
+        "description": "Feature cards. Each must declare `title`, `description`, and an `icon` from the Icon primitive's set.",
         "minItems": 2,
-        "maxItems": 12,
+        "maxItems": 6,
         "items": {
-          "icon": { "type": "string", "description": "Emoji or icon identifier" },
+          "icon": { "type": "string" },
           "title": { "type": "string" },
           "description": { "type": "string" }
         },
         "example": [
-          { "icon": "⚡", "title": "Lightning Fast", "description": "Built on Astro for zero JS by default." }
+          {
+            "icon": "check",
+            "title": "Atomic preview deploys",
+            "description": "Every PR gets a unique URL with a real environment. Reviewers click, not clone."
+          }
         ]
       }
     }

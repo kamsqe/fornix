@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "name": "agency",
+  "displayName": "Agency",
+  "description": "Branding & product studio. Light, editorial palette. Home + Work + About + Contact, with case-study bento on Work and FAQ on Contact.",
+  "palette": "paper",
+
+  "site": {
+    "name": "Atelier North",
+    "tagline": "A branding & product studio for companies that care about details.",
+    "logo": { "type": "monogram", "text": "AN" },
+    "nav": [
+      { "label": "Work", "href": "/work" },
+      { "label": "About", "href": "/about" },
+      { "label": "Journal", "href": "/journal" },
+      { "label": "Contact", "href": "/contact" }
+    ],
+    "ctaPrimary": { "text": "Start a project", "href": "/contact" },
+    "ctaSecondary": { "text": "See our work", "href": "/work" },
+    "social": {
+      "twitter": "ateliernorth",
+      "instagram": "atelier.north",
+      "linkedin": "company/atelier-north"
+    },
+    "contact": {
+      "email": "hello@ateliernorth.studio",
+      "phone": "+46 8 555 0144",
+      "address": "Krukmakargatan 22, 118 51 Stockholm"
+    },
+    "legal": {
+      "copyright": "© 2026 Atelier North AB",
+      "privacyHref": "/privacy",
+      "termsHref": "/terms"
+    },
+    "meta": {
+      "twitterHandle": "ateliernorth"
+    }
+  },
+
+  "pages": [
+    {
+      "slug": "",
+      "title": "Atelier North — Branding & product studio, Stockholm",
+      "description": "We help category-defining companies find their voice, build their identity systems, and ship products that feel like the brand looks.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-media" },
+        { "name": "logo-cloud" },
+        { "name": "features-grid" },
+        { "name": "how-it-works" },
+        { "name": "testimonials-grid" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "work",
+      "title": "Work — Atelier North",
+      "description": "Selected projects across identity, product, and packaging. We work on a small number of engagements per year so each gets the room it needs.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "features-bento" },
+        { "name": "testimonials-grid" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "about",
+      "title": "About — Atelier North",
+      "description": "Eight people in a converted bakery in Södermalm. What we believe and how we work.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-text" },
+        { "name": "stats-strip" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "contact",
+      "title": "Contact — Atelier North",
+      "description": "Start a conversation. We reply within one business day.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "faq" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    }
+  ],
+
+  "content": {
+    "hero-media": {
+      "eyebrow": "Studio",
+      "headline": "Identity, product, and packaging — for companies that read the spec sheet",
+      "subheadline": "Atelier North is a branding & product studio in Stockholm. We take on six engagements a year and live inside each one.",
+      "primaryCtaText": "Start a project",
+      "primaryCtaHref": "/contact",
+      "secondaryCtaText": "See our work",
+      "secondaryCtaHref": "/work",
+      "mediaAlt": "Brand identity system laid out across stationery, packaging, and a product UI screen.",
+      "mediaPlacement": "right"
+    },
+
+    "logo-cloud": {
+      "label": "Selected clients",
+      "logos": [
+        { "name": "Lexura" },
+        { "name": "Norrbro" },
+        { "name": "Klocka" },
+        { "name": "Föregång" },
+        { "name": "Vault HQ" },
+        { "name": "Bloom Studio" }
+      ]
+    },
+
+    "features-grid": {
+      "eyebrow": "What we do",
+      "headline": "Three disciplines, one studio",
+      "subheadline": "We don't pretend to do everything. We do these three things, and we do them with the same hands that started them.",
+      "features": [
+        {
+          "icon": "star",
+          "title": "Brand identity",
+          "description": "Naming, logotype, type system, color, motion principles, and the brand guide that makes it survive contact with reality."
+        },
+        {
+          "icon": "external-link",
+          "title": "Product design",
+          "description": "From early product thinking to shipping interfaces. We design in code with engineering, not over a wall."
+        },
+        {
+          "icon": "check",
+          "title": "Packaging & print",
+          "description": "Physical surfaces still matter. We design unboxings, business systems, books, and the occasional pop-up shop."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Type & wordmark",
+          "description": "Custom type design when off-the-shelf doesn't fit. Wordmarks drawn from scratch, not modified Helvetica."
+        },
+        {
+          "icon": "mail",
+          "title": "Editorial direction",
+          "description": "Voice systems, content principles, launch comms. The words a brand uses are part of the identity."
+        },
+        {
+          "icon": "play",
+          "title": "Motion & video",
+          "description": "Brand motion principles, launch films, and the short loops that make a product page feel alive."
+        }
+      ]
+    },
+
+    "how-it-works": {
+      "eyebrow": "How we work",
+      "headline": "A six-month engagement, run like a real partnership",
+      "subheadline": "We embed with your team, ship in milestones, and hand off a brand that your in-house team can extend without us.",
+      "steps": [
+        {
+          "icon": "external-link",
+          "title": "1. Listen",
+          "description": "Three weeks of conversations with founders, customers, and the team. We map what the brand is, what it isn't, and what it needs to become."
+        },
+        {
+          "icon": "check",
+          "title": "2. Make",
+          "description": "Four months of focused design work. Weekly milestones, monthly reviews, and a shared Figma where you watch the brand build in real time."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "3. Hand off",
+          "description": "A brand guide your team actually reads, a working component library, and three weeks of paired sessions to make sure it lives after we're gone."
+        }
+      ]
+    },
+
+    "testimonials-grid": {
+      "eyebrow": "What clients say",
+      "headline": "Long engagements, lasting relationships",
+      "subheadline": "Selected words from people we've spent six months with.",
+      "items": [
+        {
+          "quote": "Atelier North didn't sell us a moodboard. They moved into our Slack for six months and came out the other side with a brand we still use every part of.",
+          "author": "Maya Patel",
+          "role": "VP Eng",
+          "company": "Lexura",
+          "rating": 5
+        },
+        {
+          "quote": "The brand guide is the only one I've ever seen designers actually read. Everything ladders back to a clear principle.",
+          "author": "Anya Kowalski",
+          "role": "Co-founder",
+          "company": "Vault HQ",
+          "rating": 5
+        },
+        {
+          "quote": "Their packaging sketches showed up with the production tolerances already accounted for. That's the difference between studios that ship and studios that pitch.",
+          "author": "Marcus Lee",
+          "role": "Founder",
+          "company": "Iron Forge",
+          "rating": 5
+        }
+      ]
+    },
+
+    "cta-strip": {
+      "headline": "Have a project in mind?",
+      "subheadline": "We're taking on two more engagements for late 2026. The earlier you write, the better the chance.",
+      "primaryCtaText": "Start a conversation",
+      "primaryCtaHref": "/contact",
+      "secondaryCtaText": "See selected work",
+      "secondaryCtaHref": "/work",
+      "variant": "accent"
+    },
+
+    "footer-columns": {
+      "tagline": "A branding & product studio in Stockholm. Six engagements a year. No retainers.",
+      "columns": [
+        {
+          "title": "Studio",
+          "links": [
+            { "label": "Work", "href": "/work" },
+            { "label": "About", "href": "/about" },
+            { "label": "Journal", "href": "/journal" },
+            { "label": "Contact", "href": "/contact" }
+          ]
+        },
+        {
+          "title": "Services",
+          "links": [
+            { "label": "Brand identity", "href": "/services/identity" },
+            { "label": "Product design", "href": "/services/product" },
+            { "label": "Packaging", "href": "/services/packaging" },
+            { "label": "Type design", "href": "/services/type" }
+          ]
+        },
+        {
+          "title": "Visit",
+          "links": [
+            { "label": "Krukmakargatan 22", "href": "https://maps.google.com/?q=Krukmakargatan+22+Stockholm" },
+            { "label": "Stockholm, Sweden", "href": "/about" },
+            { "label": "hello@ateliernorth.studio", "href": "mailto:hello@ateliernorth.studio" },
+            { "label": "+46 8 555 0144", "href": "tel:+4685550144" }
+          ]
+        }
+      ]
+    },
+
+    "features-bento": {
+      "eyebrow": "Selected work",
+      "headline": "A small studio's case files",
+      "subheadline": "We publish in detail, not in volume. Each case study is a real engagement, not a moodboard.",
+      "features": [
+        {
+          "icon": "star",
+          "title": "Lexura — full brand & product system",
+          "description": "Six-month engagement: naming, identity, type, marketing site, and a 60-component product library. Lexura raised their Series A two weeks after launch.",
+          "span": "large"
+        },
+        {
+          "icon": "check",
+          "title": "Norrbro — packaging",
+          "description": "Coffee subscription. 14 SKU packaging system that survived a 3× catalog expansion.",
+          "span": "default"
+        },
+        {
+          "icon": "external-link",
+          "title": "Klocka — type & wordmark",
+          "description": "Custom display face for a Swedish watchmaker. Drawn from a 1958 reference, modernized for screens.",
+          "span": "default"
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Föregång — editorial system",
+          "description": "Quarterly print magazine. Grid, type pairings, contributor voice guidelines, and a website that holds its weight against print.",
+          "span": "large"
+        }
+      ]
+    },
+
+    "hero-text": {
+      "eyebrow": "About the studio",
+      "headline": "Eight people. A converted bakery. Six engagements a year.",
+      "subheadline": "We started Atelier North because we missed working in studios where designers and engineers sat in the same room. So we built one.",
+      "primaryCtaText": "Read our journal",
+      "primaryCtaHref": "/journal",
+      "secondaryCtaText": "Get in touch",
+      "secondaryCtaHref": "/contact"
+    },
+
+    "stats-strip": {
+      "stats": [
+        { "value": "8", "label": "People in the studio", "accent": true },
+        { "value": "6", "label": "Engagements a year" },
+        { "value": "12", "label": "Years in business" },
+        { "value": "94", "label": "Projects shipped" }
+      ]
+    },
+
+    "faq": {
+      "eyebrow": "Before we talk",
+      "headline": "Questions clients ask in the first email",
+      "subheadline": "If yours isn't here, write anyway — we read everything.",
+      "items": [
+        {
+          "question": "How long is a typical engagement?",
+          "answer": "Six months for a full brand + product system. Shorter for a focused project (packaging, identity refresh, a single product surface) — usually 8–12 weeks."
+        },
+        {
+          "question": "What does it cost?",
+          "answer": "Full engagements start at €120k. Single-discipline projects start around €35k. We send a real budget after the first conversation, not a tier sheet."
+        },
+        {
+          "question": "Do you work with early-stage companies?",
+          "answer": "Yes — we take on two pre-seed engagements a year at a reduced rate, often in exchange for a small equity slice. Ask if that's interesting."
+        },
+        {
+          "question": "Can you start next week?",
+          "answer": "Almost never. Our calendar is usually booked 4–6 months out. The earlier you write, the better the chance of fitting your timeline."
+        },
+        {
+          "question": "Do you offer retainers?",
+          "answer": "No. Retainers reward us for being slow. We work in fixed-scope engagements and recommend an in-house hire when you need ongoing design."
+        },
+        {
+          "question": "Where are you based?",
+          "answer": "Stockholm. We work remotely with clients across Europe and North America, and travel for kickoff and milestone weeks."
+        }
+      ]
+    }
+  }
+}

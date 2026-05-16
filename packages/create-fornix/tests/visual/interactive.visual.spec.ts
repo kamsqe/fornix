@@ -8,8 +8,8 @@
  * Covers:
  *   - hero CTA hover state         (CSS pseudo-class :hover)
  *   - hero CTA focus state         (keyboard accessibility)
- *   - faq-accordion expanded item  (native <details open>)
- *   - pricing-toggle annual prices (script-driven state change)
+ *   - faq item expanded            (native <details open>)
+ *   - pricing-table featured badge  (highlighted plan visible)
  *
  * Update baselines with:
  *   pnpm exec playwright test --update-snapshots
@@ -26,14 +26,14 @@ import { loadPaletteData } from "../../src/scaffold/palette.js";
 import type { ResolvedConfig } from "../../src/schemas/config.js";
 
 const BLOCKS = [
-  "hero-gradient",
-  "faq-accordion",
-  "pricing-toggle",
-  "footer-minimal",
+  "hero-text",
+  "faq",
+  "pricing-table",
+  "footer-columns",
 ];
 
 function makeConfig(projectDir: string): ResolvedConfig {
-  const data = loadPaletteData("midnight");
+  const data = loadPaletteData("obsidian");
   if (!data.ok) throw new Error("palette load failed");
   return {
     projectName: "visual-interactive",
@@ -46,7 +46,7 @@ function makeConfig(projectDir: string): ResolvedConfig {
     blocks: BLOCKS.map((name) => ({ name, variant: "default" })),
     locales: ["en"],
     defaultLocale: "en",
-    palette: { preset: "midnight", colors: data.value.colors },
+    palette: { preset: "obsidian", colors: data.value.colors },
     themeSwitcher: false,
     createdWith: "manual",
   };
@@ -119,63 +119,52 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+// The hero CTAs in v0.3 are <Button> primitives. Multiple buttons can exist
+// on the page (hero primary + secondary), so we target the first primary
+// button inside the hero section specifically.
+const HERO_CTA_SELECTOR = ".fnx-hero-text .fnx-button--primary";
+
 test("hero CTA: idle state (no hover, no focus)", async ({ page }) => {
-  const cta = page.locator(".hero-gradient__cta");
+  const cta = page.locator(HERO_CTA_SELECTOR).first();
   await expect(cta).toBeVisible();
-  // Move pointer far away to ensure no accidental hover.
   await page.mouse.move(0, 0);
   await expect(cta).toHaveScreenshot("hero-cta-idle.png");
 });
 
 test("hero CTA: hover state", async ({ page }) => {
-  const cta = page.locator(".hero-gradient__cta");
+  const cta = page.locator(HERO_CTA_SELECTOR).first();
   await cta.hover();
-  // Give the browser a beat to apply :hover styles (animations are disabled).
   await sleep(50);
   await expect(cta).toHaveScreenshot("hero-cta-hover.png");
 });
 
 test("hero CTA: keyboard focus state", async ({ page }) => {
-  const cta = page.locator(".hero-gradient__cta");
+  const cta = page.locator(HERO_CTA_SELECTOR).first();
   await cta.focus();
   await sleep(50);
   await expect(cta).toHaveScreenshot("hero-cta-focus.png");
 });
 
-test("faq-accordion: first item collapsed → expanded", async ({ page }) => {
-  const firstItem = page.locator(".faq-accordion__item").first();
+test("faq: first item collapsed → expanded (native details)", async ({ page }) => {
+  const firstItem = page.locator(".fnx-faq__item").first();
   await expect(firstItem).toBeVisible();
 
-  // Collapsed baseline first.
   await firstItem.scrollIntoViewIfNeeded();
   await expect(firstItem).toHaveScreenshot("faq-item-collapsed.png");
 
-  // Click the summary; <details> picks up `open` attribute.
-  await firstItem.locator(".faq-accordion__question").click();
+  // Click the <summary> — <details> picks up `open` attribute natively.
+  await firstItem.locator(".fnx-faq__summary").click();
   await page.waitForFunction(() => {
-    const el = document.querySelector(".faq-accordion__item");
+    const el = document.querySelector(".fnx-faq__details");
     return el?.hasAttribute("open");
   });
   await expect(firstItem).toHaveScreenshot("faq-item-expanded.png");
 });
 
-test("pricing-toggle: monthly → annual prices", async ({ page }) => {
-  const grid = page.locator(".pricing-toggle__grid");
-  await grid.scrollIntoViewIfNeeded();
-  // Wait for the JS that wires the toggle.
-  await page.waitForSelector(".pricing-toggle__switch");
-
-  // Monthly baseline.
-  await expect(grid).toHaveScreenshot("pricing-grid-monthly.png");
-
-  // Click the switch.
-  await page.locator(".pricing-toggle__switch").click();
-  await page.waitForFunction(() => {
-    const sw = document.querySelector(".pricing-toggle__switch");
-    return sw?.getAttribute("aria-checked") === "true";
-  });
-
-  await expect(grid).toHaveScreenshot("pricing-grid-annual.png");
+test("pricing-table: highlighted plan card renders with featured badge", async ({ page }) => {
+  const featured = page.locator(".fnx-pricing__card .fnx-pricing__badge").first();
+  await expect(featured).toBeVisible();
+  await expect(featured).toHaveText("Most Popular");
 });
 
 test("no horizontal overflow at desktop", async ({ page }) => {

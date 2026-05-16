@@ -1,12 +1,31 @@
 {
-  "headline": "Everything You Need, Nothing You Don't",
-  "subheadline": "Powerful features designed to help you build faster and ship with confidence.",
-  "items": [
-    { "icon": "⚡", "title": "Lightning Fast", "description": "Zero JavaScript by default. Your site loads instantly on any device.", "size": "large" },
-    { "icon": "🧩", "title": "Modular Blocks", "description": "Compose from pre-built, tested blocks.", "size": "small" },
-    { "icon": "🎨", "title": "Beautiful Themes", "description": "Curated palettes that look stunning.", "size": "small" },
-    { "icon": "🌍", "title": "Global Ready", "description": "Built-in i18n with locale-based content collections.", "size": "medium" },
-    { "icon": "☁️", "title": "Edge First", "description": "Deploy to Cloudflare Workers for global edge performance.", "size": "medium" },
-    { "icon": "🤖", "title": "AI Powered", "description": "Smart scaffolding that understands your project.", "size": "large" }
+  "eyebrow": "Capabilities",
+  "headline": "Everything you'd expect, nothing you wouldn't",
+  "subheadline": "We sweat the details so you don't have to wire them up.",
+  "features": [
+    {
+      "icon": "star",
+      "title": "Atomic preview deploys",
+      "description": "Every PR gets a unique URL with a real environment. Reviewers click, not clone.",
+      "span": "large"
+    },
+    {
+      "icon": "check",
+      "title": "Rollback in one click",
+      "description": "Bad deploy at 2am? Six seconds to safe.",
+      "span": "default"
+    },
+    {
+      "icon": "external-link",
+      "title": "Edge-first by default",
+      "description": "300+ POPs. No cold starts.",
+      "span": "default"
+    },
+    {
+      "icon": "mail",
+      "title": "Observability built in",
+      "description": "Request logs, real-user metrics, and error traces in one place — no Datadog setup required.",
+      "span": "large"
+    }
   ]
 }

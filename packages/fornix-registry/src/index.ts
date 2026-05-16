@@ -12,6 +12,8 @@ export {
   PaletteRegistrySchema,
   type Palette,
   type PaletteRegistry,
+  type Typography,
+  type Radius,
+  type Motion,
+  type Shadow,
 } from "./schemas/palette.js";
-
-export { BUILTIN_PALETTES } from "./builtin-palettes.js";

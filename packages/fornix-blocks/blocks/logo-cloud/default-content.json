@@ -1,11 +1,11 @@
 {
-  "headline": "Trusted by the best teams",
+  "label": "Trusted by teams at",
   "logos": [
-    { "name": "Vercel", "src": "", "href": "" },
-    { "name": "Stripe", "src": "", "href": "" },
-    { "name": "Linear", "src": "", "href": "" },
-    { "name": "Notion", "src": "", "href": "" },
-    { "name": "Figma", "src": "", "href": "" },
-    { "name": "GitHub", "src": "", "href": "" }
+    { "name": "Linear" },
+    { "name": "Vercel" },
+    { "name": "Stripe" },
+    { "name": "Notion" },
+    { "name": "Cloudflare" },
+    { "name": "Supabase" }
   ]
 }

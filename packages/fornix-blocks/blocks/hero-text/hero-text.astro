@@ -1,0 +1,88 @@
+---
+/**
+ * Hero Text — type-led hero. Eyebrow + headline + subheadline + 1–2 CTAs.
+ *
+ * Composes primitives: Section + Container + Eyebrow + Headline + Button.
+ * Reads from site.config: ctaPrimary, ctaSecondary, tagline (headline fallback).
+ *
+ * All copy is overridable via content slots; everything has sensible fallbacks
+ * so a fresh scaffold renders a coherent hero out of the box.
+ */
+import { getEntry } from "astro:content";
+import Section from "../primitives/Section.astro";
+import Container from "../primitives/Container.astro";
+import Headline from "../primitives/Headline.astro";
+import Eyebrow from "../primitives/Eyebrow.astro";
+import Button from "../primitives/Button.astro";
+import { site } from "../../site.config";
+
+const locale = Astro.currentLocale ?? site.locale.default;
+const entry = await getEntry("sections", `${locale}/hero-text`);
+const data = (entry?.data ?? {}) as {
+  eyebrow?: string;
+  headline?: string;
+  subheadline?: string;
+  primaryCtaText?: string;
+  primaryCtaHref?: string;
+  secondaryCtaText?: string;
+  secondaryCtaHref?: string;
+};
+
+const eyebrow = data.eyebrow ?? "";
+const headline = data.headline ?? site.tagline ?? "Build something great.";
+const subheadline = data.subheadline ?? "";
+const primaryText = data.primaryCtaText ?? site.ctaPrimary?.text ?? "Get started";
+const primaryHref = data.primaryCtaHref ?? site.ctaPrimary?.href ?? "/";
+const secondaryText = data.secondaryCtaText ?? site.ctaSecondary?.text;
+const secondaryHref = data.secondaryCtaHref ?? site.ctaSecondary?.href;
+---
+
+<Section id="hero" density="spacious">
+  <Container size="default">
+    <div class="fnx-hero-text">
+      {eyebrow && <Eyebrow align="center">{eyebrow}</Eyebrow>}
+      <Headline level={1} align="center" measure="narrow">
+        {headline}
+      </Headline>
+      {subheadline && <p class="fnx-hero-text__sub">{subheadline}</p>}
+      <div class="fnx-hero-text__actions">
+        <Button href={primaryHref} variant="primary" size="lg">
+          {primaryText}
+        </Button>
+        {secondaryText && (
+          <Button href={secondaryHref ?? "#"} variant="secondary" size="lg">
+            {secondaryText}
+          </Button>
+        )}
+      </div>
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .fnx-hero-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .fnx-hero-text__sub {
+    font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--color-foreground) 75%, transparent);
+    margin: 0;
+    text-align: center;
+    max-width: 42ch;
+    text-wrap: pretty;
+  }
+
+  .fnx-hero-text__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+</style>

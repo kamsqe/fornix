@@ -1,10 +1,22 @@
 {
-  "badge": "Getting Started",
-  "headline": "Three Steps to Launch",
-  "subheadline": "From zero to production in minutes, not months.",
+  "eyebrow": "How it works",
+  "headline": "From git push to live URL in 12 seconds",
+  "subheadline": "Three steps, no YAML — we figured that part out so you don't have to.",
   "steps": [
-    { "icon": "📦", "title": "Install", "description": "Run a single command to scaffold your project with the blocks you need.", "command": "npx create-fornix my-app" },
-    { "icon": "🎨", "title": "Customize", "description": "Pick your blocks, choose a color palette, and configure everything to match your brand.", "command": "" },
-    { "icon": "🚀", "title": "Deploy", "description": "Ship to Cloudflare's global edge network with one command.", "command": "npm run deploy" }
+    {
+      "title": "Connect your repo",
+      "description": "GitHub, GitLab, or Bitbucket — pick one, OAuth in. We read your build config and propose sensible defaults.",
+      "icon": "external-link"
+    },
+    {
+      "title": "Add your env vars",
+      "description": "Paste a .env file or sync from your secrets manager. We encrypt at rest and only inject into the right environments.",
+      "icon": "check"
+    },
+    {
+      "title": "Push to main",
+      "description": "First deploy lands at your-project.fornix.app. Custom domain when you're ready — TLS auto-issued in under 30 seconds.",
+      "icon": "arrow-right"
+    }
   ]
 }

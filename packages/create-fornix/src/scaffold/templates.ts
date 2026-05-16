@@ -28,7 +28,11 @@ export type TemplateName =
   | "tsconfig.json"
   | "content.config.ts"
   | "gitignore"
-  | "wrangler.json";
+  | "wrangler.json"
+  | "vercel.json"
+  | "netlify.toml"
+  | "site.config.ts"
+  | "global.css";
 
 export function loadTemplate(name: TemplateName): string {
   const filename = `${name}.template`;

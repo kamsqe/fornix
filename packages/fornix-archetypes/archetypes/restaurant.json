@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "name": "restaurant",
+  "displayName": "Restaurant",
+  "description": "Wood-fire kitchen with a tight menu. Warm terracotta palette with serif type. Home + Menu + About + Contact, with dish bento and press mentions.",
+  "palette": "terracotta",
+
+  "site": {
+    "name": "Olea & Sale",
+    "tagline": "A wood-fire kitchen with a Mediterranean accent. Lisbon, since 2019.",
+    "logo": { "type": "monogram", "text": "O&S" },
+    "nav": [
+      { "label": "Menu", "href": "/menu" },
+      { "label": "About", "href": "/about" },
+      { "label": "Contact", "href": "/contact" }
+    ],
+    "ctaPrimary": { "text": "Book a table", "href": "/reservations" },
+    "ctaSecondary": { "text": "See the menu", "href": "/menu" },
+    "social": {
+      "instagram": "olea.e.sale",
+      "facebook": "oleaesale"
+    },
+    "contact": {
+      "email": "ola@oleasale.pt",
+      "phone": "+351 21 555 0182",
+      "address": "Rua das Salgadeiras 16, 1200-396 Lisboa"
+    },
+    "legal": {
+      "copyright": "© 2026 Olea & Sale Lda.",
+      "privacyHref": "/privacy"
+    },
+    "meta": {
+      "twitterHandle": "oleaesale"
+    }
+  },
+
+  "pages": [
+    {
+      "slug": "",
+      "title": "Olea & Sale — Wood-fire kitchen in Lisbon",
+      "description": "A tight menu of wood-fire dishes built around the day's market. Open Tuesday through Saturday for dinner; Sundays for long lunches.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-media" },
+        { "name": "features-grid" },
+        { "name": "logo-cloud" },
+        { "name": "testimonials-grid" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "menu",
+      "title": "Menu — Olea & Sale",
+      "description": "Tonight's menu, written this afternoon. We change roughly half the dishes each week, following what's at the market.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "features-bento" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "about",
+      "title": "About — Olea & Sale",
+      "description": "Twelve seats, two cooks, one fire. Why we opened, who we cook for, and where the food comes from.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-text" },
+        { "name": "how-it-works" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "contact",
+      "title": "Contact & Reservations — Olea & Sale",
+      "description": "Reservations open four weeks in advance. Walk-ins welcome at the bar.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "faq" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    }
+  ],
+
+  "content": {
+    "hero-media": {
+      "eyebrow": "Tuesday — Sunday",
+      "headline": "A wood-fire kitchen with a Mediterranean accent",
+      "subheadline": "Twelve seats, two cooks, one fire. We cook what's at the market that morning, on a wood grill, for the people who walked through the door that evening.",
+      "primaryCtaText": "Book a table",
+      "primaryCtaHref": "/reservations",
+      "secondaryCtaText": "See the menu",
+      "secondaryCtaHref": "/menu",
+      "mediaAlt": "A whole grilled sea bream on a ceramic plate with charred lemon and salsa verde, on a marble counter at Olea & Sale.",
+      "mediaPlacement": "right"
+    },
+
+    "features-grid": {
+      "eyebrow": "How we cook",
+      "headline": "Three things that don't change",
+      "subheadline": "The menu changes weekly. These don't.",
+      "features": [
+        {
+          "icon": "star",
+          "title": "Wood fire, every dish",
+          "description": "Holm-oak coals, no gas burner in the building. Every plate touches the grill or the wood oven at some point in its life."
+        },
+        {
+          "icon": "external-link",
+          "title": "Market in the morning, plate at night",
+          "description": "We buy at Ribeira Market most days. What's there sets the menu. If the dourada isn't right, the dourada isn't on the card."
+        },
+        {
+          "icon": "check",
+          "title": "Twelve seats, two cooks",
+          "description": "You'll see us cook. We'll see you eat. It's harder to phone in a dish when you're three meters from the person eating it."
+        },
+        {
+          "icon": "mail",
+          "title": "Wine from neighbours",
+          "description": "Almost the entire list is Portuguese, mostly from small producers we visit. Nothing on the list costs more than 65€."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "No corkage games",
+          "description": "Bring a bottle if you must — 12€ corkage, no eye-rolling. We'd rather you drink something you love."
+        },
+        {
+          "icon": "play",
+          "title": "Long Sundays",
+          "description": "Sunday lunch starts at 1pm and stretches as long as you want it to. Last sitting at 3:30, but no one's counting."
+        }
+      ]
+    },
+
+    "logo-cloud": {
+      "label": "Said about us",
+      "logos": [
+        { "name": "The Guardian" },
+        { "name": "Eater" },
+        { "name": "Condé Nast Traveler" },
+        { "name": "Time Out Lisboa" },
+        { "name": "The New York Times" },
+        { "name": "Monocle" }
+      ]
+    },
+
+    "testimonials-grid": {
+      "eyebrow": "From the guestbook",
+      "headline": "What our guests say",
+      "subheadline": "We keep a paper guestbook by the door. A few entries we asked permission to share.",
+      "items": [
+        {
+          "quote": "The grilled octopus was the single best plate I had in three weeks of eating across Portugal. We came back for the carrots the next night, which sounds insane but is true.",
+          "author": "Maya Patel",
+          "role": "Guest",
+          "company": "London",
+          "rating": 5
+        },
+        {
+          "quote": "Twelve seats, no English menu when we visited, two cooks who waved at our toddler. It's the restaurant I tell every friend about. I've sent six couples here in 2025.",
+          "author": "Diego Romero",
+          "role": "Guest",
+          "company": "Madrid",
+          "rating": 5
+        },
+        {
+          "quote": "The wine list is one of the best in the city — short, all neighbours, all reasonable. Whoever buys for them is doing the city a service.",
+          "author": "Soren Mikkelsen",
+          "role": "Guest",
+          "company": "Copenhagen",
+          "rating": 5
+        }
+      ]
+    },
+
+    "cta-strip": {
+      "headline": "Come find a seat",
+      "subheadline": "Reservations open four weeks ahead. Walk-ins welcome at the bar (six seats, first come).",
+      "primaryCtaText": "Book a table",
+      "primaryCtaHref": "/reservations",
+      "secondaryCtaText": "Call the restaurant",
+      "secondaryCtaHref": "tel:+351215550182",
+      "variant": "accent"
+    },
+
+    "footer-columns": {
+      "tagline": "Olea & Sale. Rua das Salgadeiras 16, Lisboa. Open Tue — Sun for dinner, Sundays for long lunches.",
+      "columns": [
+        {
+          "title": "Visit",
+          "links": [
+            { "label": "Rua das Salgadeiras 16", "href": "https://maps.google.com/?q=Rua+das+Salgadeiras+16+Lisboa" },
+            { "label": "1200-396 Lisboa", "href": "/contact" },
+            { "label": "Tue — Sat · 7pm to 11pm", "href": "/contact" },
+            { "label": "Sun · 1pm to 4pm", "href": "/contact" }
+          ]
+        },
+        {
+          "title": "Reservations",
+          "links": [
+            { "label": "Book a table", "href": "/reservations" },
+            { "label": "Private dining", "href": "/private" },
+            { "label": "Gift vouchers", "href": "/vouchers" },
+            { "label": "Group bookings", "href": "/groups" }
+          ]
+        },
+        {
+          "title": "Eat",
+          "links": [
+            { "label": "Tonight's menu", "href": "/menu" },
+            { "label": "Wine list", "href": "/wine" },
+            { "label": "About the kitchen", "href": "/about" },
+            { "label": "Press", "href": "/press" }
+          ]
+        }
+      ]
+    },
+
+    "features-bento": {
+      "eyebrow": "Tonight's plates",
+      "headline": "What's on the fire this week",
+      "subheadline": "Roughly half the menu changes each week. Here's what we're cooking right now. Allergens noted on the printed card.",
+      "features": [
+        {
+          "icon": "star",
+          "title": "Whole grilled sea bream",
+          "description": "Today's catch from Sesimbra, grilled over holm-oak coals with charred lemon, salsa verde, and the morning's bread. For two. 38€.",
+          "span": "large"
+        },
+        {
+          "icon": "check",
+          "title": "Wood-fire octopus",
+          "description": "Slow-cooked, then finished over the grill. Smoked paprika oil, lima beans. 22€.",
+          "span": "default"
+        },
+        {
+          "icon": "external-link",
+          "title": "Charred carrots, dukkah",
+          "description": "From a farmer in Mafra. Tahini, honey, sumac. 9€.",
+          "span": "default"
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Côte de bœuf, for two",
+          "description": "Eight-week dry-aged Alentejana, 800g over the coals with rosemary salt. Bone-marrow on the side. 78€ for two, 30-min cook time. Order at the start of your meal.",
+          "span": "large"
+        }
+      ]
+    },
+
+    "hero-text": {
+      "eyebrow": "About us",
+      "headline": "Twelve seats. Two cooks. One fire.",
+      "subheadline": "We opened Olea & Sale in 2019 because we missed the kind of restaurants where the cooks knew the guests by face and the food was honest about where it came from. So we built one.",
+      "primaryCtaText": "Book a table",
+      "primaryCtaHref": "/reservations",
+      "secondaryCtaText": "See the menu",
+      "secondaryCtaHref": "/menu"
+    },
+
+    "how-it-works": {
+      "eyebrow": "Where the food comes from",
+      "headline": "A short supply chain, by design",
+      "subheadline": "We can name the person who grew or caught almost everything on your plate. Here's roughly how that works.",
+      "steps": [
+        {
+          "icon": "external-link",
+          "title": "6:30am · Ribeira Market",
+          "description": "One of us is at the market every morning. We buy fish from the same three boats, vegetables from four farms, bread from a baker in Marvila."
+        },
+        {
+          "icon": "check",
+          "title": "10am · Menu set",
+          "description": "Back at the kitchen by 9. By 10 the menu is written for that night. Printed by 4pm. What you read at your table is roughly five hours old."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "7pm · The fire is hot",
+          "description": "Holm-oak coals lit at 5pm; service starts at 7. From there it's two cooks, twelve seats, and three hours of focused work."
+        }
+      ]
+    },
+
+    "faq": {
+      "eyebrow": "Before you visit",
+      "headline": "Questions guests ask",
+      "subheadline": "Email ola@oleasale.pt if yours isn't here — Ola reads everything personally.",
+      "items": [
+        {
+          "question": "How far in advance should I book?",
+          "answer": "Reservations open four weeks ahead, online, at 10am Lisbon time. Friday and Saturday usually go in the first few hours. Tuesday and Wednesday are easier."
+        },
+        {
+          "question": "Do you take walk-ins?",
+          "answer": "Yes, at the bar — six seats, first come, first served. We hold those exclusively for walk-ins. Come early, especially on weekends."
+        },
+        {
+          "question": "I have an allergy or dietary need. Can you accommodate?",
+          "answer": "Almost always — tell us when you book and we'll plan ahead. We're not a strict vegetarian kitchen but we always have 3–4 vegetable-led dishes a night."
+        },
+        {
+          "question": "Is there a children's menu?",
+          "answer": "No children's menu, but children are welcome and we'll happily portion any dish for a small person. The whole fish for two is a hit with curious 8-year-olds."
+        },
+        {
+          "question": "Can I bring my own wine?",
+          "answer": "Yes — 12€ corkage, no eye-rolling, no minimum bottle value. We'd rather you drank something you loved than ordered to feel polite."
+        },
+        {
+          "question": "Do you do private events?",
+          "answer": "Yes, the full room can be booked for parties of 12. Email ola@oleasale.pt with a date and we'll send a sample menu and pricing."
+        }
+      ]
+    }
+  }
+}

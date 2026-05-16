@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "name": "hero-media",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Split-layout hero — text on one side, a media slot (image, illustration, or video poster) on the other. Ships with a default palette-aware SVG illustration so a fresh scaffold renders complete.",
+  "category": "hero",
+  "tags": ["hero", "landing", "media", "split", "v0.3"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": ["hero-text", "hero-gradient", "hero-glass", "hero-split", "hero-video"],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "hero-media.astro",
+      "destination": "src/components/sections/hero-media.astro"
+    },
+    {
+      "source": "default-illustration.svg",
+      "destination": "public/illustrations/hero-default.svg"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when the brand benefits from showing a product screenshot, photo, or illustration alongside copy. Best for SaaS with a UI to show, agencies showcasing a project, or any archetype where mood/visual is central. Default illustration is palette-aware so it never feels like a TODO.",
+    "whenNotToUse": "Don't use when the message is type-led and copy is the whole point — use `hero-text` instead. Don't use multiple heroes on the same page.",
+    "pairsWith": ["header-sticky", "features-grid", "logo-cloud"],
+    "contentSlots": {
+      "eyebrow": {
+        "type": "string",
+        "description": "Tiny pre-headline label.",
+        "maxLength": 40,
+        "example": "Now in beta"
+      },
+      "headline": {
+        "type": "string",
+        "description": "Primary message — short, specific, claim-driven.",
+        "maxLength": 90,
+        "example": "The intern your whole team trusts"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "One- or two-line elaboration.",
+        "maxLength": 220,
+        "example": "Atlas handles your inbox, schedules meetings, and drafts replies — so you get back to building."
+      },
+      "primaryCtaText": {
+        "type": "string",
+        "description": "Primary CTA label.",
+        "maxLength": 30,
+        "example": "Try Atlas free"
+      },
+      "primaryCtaHref": {
+        "type": "string",
+        "description": "Primary CTA destination.",
+        "example": "/signup"
+      },
+      "secondaryCtaText": {
+        "type": "string",
+        "description": "Optional secondary CTA.",
+        "maxLength": 30,
+        "example": "See it in action"
+      },
+      "secondaryCtaHref": {
+        "type": "string",
+        "description": "Secondary CTA destination.",
+        "example": "#demo"
+      },
+      "mediaSrc": {
+        "type": "string",
+        "description": "Path to the hero media (image, illustration, or video poster). Defaults to the bundled palette-aware illustration at `/illustrations/hero-default.svg`.",
+        "example": "/images/product-hero.png"
+      },
+      "mediaAlt": {
+        "type": "string",
+        "description": "Accessibility text for the media. Required if mediaSrc is informational.",
+        "maxLength": 150,
+        "example": "Atlas dashboard showing weekly summary"
+      },
+      "mediaPlacement": {
+        "type": "string",
+        "description": "Which side the media sits on. `right` (default) or `left`.",
+        "maxLength": 10,
+        "example": "right"
+      }
+    }
+  }
+}

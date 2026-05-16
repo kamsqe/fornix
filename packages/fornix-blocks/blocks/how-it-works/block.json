@@ -1,65 +1,58 @@
 {
   "schemaVersion": 1,
   "name": "how-it-works",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "section",
-  "description": "Numbered steps section showing a process flow with icons, descriptions, and optional code snippets",
-  "category": "process",
-  "tags": ["steps", "process", "how-it-works", "flow", "getting-started"],
+  "description": "Three-step process — numbered cards with title + description. Best for onboarding-style explainers ('Sign up → Connect → Deploy'). Composes Section + Container + Headline + Eyebrow + Card + Icon.",
+  "category": "how-it-works",
+  "tags": ["process", "steps", "explainer", "v0.3"],
   "dependencies": {},
   "requires": [],
   "conflicts": [],
   "envVars": [],
-  "variants": ["default", "horizontal", "vertical"],
+  "variants": ["default"],
   "slots": [],
   "files": [
     {
       "source": "how-it-works.astro",
       "destination": "src/components/sections/how-it-works.astro"
-    },
-    {
-      "source": "how-it-works.css",
-      "destination": "src/styles/sections/how-it-works.css"
     }
   ],
   "ai": {
-    "whenToUse": "Use to explain a multi-step process like onboarding, setup, or workflow. Great for SaaS products, developer tools, and any product with a clear getting-started flow.",
-    "whenNotToUse": "Don't use for generic feature lists — use features-grid instead. Avoid if your process has more than 5 steps (too dense).",
-    "pairsWith": ["hero-gradient", "hero-split", "cta-banner", "stats-strip"],
+    "whenToUse": "Use to make a 3-step process feel inevitable. Best for products with non-obvious onboarding, agencies/services explaining engagement, or local businesses explaining 'how it works' to first-time customers.",
+    "whenNotToUse": "Don't use for processes with more than 4 steps (visual weight collapses). Don't use when the product is self-explanatory — adds friction without value.",
+    "pairsWith": ["hero-text", "hero-media", "features-grid"],
     "contentSlots": {
-      "badge": {
+      "eyebrow": {
         "type": "string",
-        "description": "Eyebrow text above headline",
-        "maxLength": 30,
-        "example": "Getting Started"
+        "description": "Optional pre-headline label.",
+        "maxLength": 40,
+        "example": "How it works"
       },
       "headline": {
         "type": "string",
-        "description": "Section headline",
+        "description": "Section headline.",
         "maxLength": 80,
-        "example": "Three Steps to Launch"
+        "example": "From git push to live URL in 12 seconds"
       },
       "subheadline": {
         "type": "string",
-        "description": "Supporting text",
+        "description": "Optional one-line elaboration.",
         "maxLength": 200,
-        "example": "From zero to production in minutes, not months."
+        "example": "Three steps, no YAML — we figured that part out so you don't have to."
       },
       "steps": {
         "type": "array",
-        "description": "Array of process steps",
+        "description": "Process steps. 3 is the sweet spot; 4 is the max. Each has a `title` and `description`; optional `icon` for visual interest.",
         "minItems": 2,
-        "maxItems": 5,
+        "maxItems": 4,
         "items": {
-          "icon": { "type": "string" },
           "title": { "type": "string" },
           "description": { "type": "string" },
-          "command": { "type": "string", "description": "Optional terminal command to display" }
+          "icon": { "type": "string" }
         },
         "example": [
-          { "icon": "📦", "title": "Install", "description": "Run a single command to scaffold your project.", "command": "npx create-fornix my-app" },
-          { "icon": "🎨", "title": "Customize", "description": "Pick blocks, themes, and configure to your needs.", "command": "" },
-          { "icon": "🚀", "title": "Deploy", "description": "Ship to the edge with one command.", "command": "npm run deploy" }
+          { "title": "Connect your repo", "description": "GitHub, GitLab, or Bitbucket — pick one, OAuth in.", "icon": "external-link" }
         ]
       }
     }

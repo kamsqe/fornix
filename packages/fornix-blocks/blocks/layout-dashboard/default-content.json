@@ -1,7 +1,0 @@
-{
-  "sidebarLinks": [
-    { "label": "Overview", "href": "/dashboard", "icon": "home" },
-    { "label": "Settings", "href": "/dashboard/settings", "icon": "settings" }
-  ],
-  "logoutText": "Sign out"
-}

@@ -58,6 +58,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.19.13)
 
+  packages/fornix-archetypes: {}
+
   packages/fornix-blocks:
     dependencies:
       fornix-registry:
@@ -85,6 +87,8 @@ importers:
       vitest:
         specifier: ^2.1.0
         version: 2.1.9(@types/node@22.19.13)
+
+  packages/fornix-primitives: {}
 
   packages/fornix-registry:
     dependencies:

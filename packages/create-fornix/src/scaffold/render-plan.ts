@@ -1,8 +1,28 @@
 import type { BlockManifest } from "fornix-registry";
 
-import type { ResolvedConfig } from "../schemas/config.js";
+import type {
+  ResolvedConfig,
+  PageSelection,
+} from "../schemas/config.js";
+import type { SiteConfig } from "../schemas/site-config.js";
 import type { BlockSource } from "./blocks.js";
 import type { PaletteCss } from "./palette.js";
+
+/**
+ * A page in the render plan. Each becomes one `.astro` file under
+ * `src/pages/{slug}.astro` (default locale) and `src/pages/{locale}/{slug}.astro`
+ * (other locales).
+ */
+export interface RenderPage {
+  /** "" for home, "pricing", "about/team", etc. */
+  slug: string;
+  /** Page title (drives `<title>` and OG meta). Defaults to project name. */
+  title: string;
+  /** Meta description for the page. */
+  description: string;
+  /** Section blocks for this page, in render order. */
+  sectionBlocks: ReadonlyArray<BlockSource>;
+}
 
 /**
  * The intermediate representation between `ResolvedConfig` and emitted files.
@@ -20,6 +40,13 @@ export interface RenderPlan {
 
   palette: PaletteCss;
 
+  /**
+   * Site-wide configuration object emitted to `src/site.config.ts` and read
+   * by every block. The single source of truth for brand, nav, CTAs, social,
+   * legal, and archetype-specific extension data.
+   */
+  siteConfig: SiteConfig;
+
   /** Where the generated project will deploy. Drives wrangler.json emission. */
   deployTarget: "cloudflare" | "vercel" | "netlify" | "static";
 
@@ -29,10 +56,11 @@ export interface RenderPlan {
   };
 
   /**
-   * Section blocks in the order they should appear on `index.astro`.
-   * Layout/integration/feature blocks are not handled by the day-1 spine.
+   * Pages to emit. At minimum one (the home page). Each page declares its
+   * own block list; blocks shared across pages are copied once but rendered
+   * on each page they appear in.
    */
-  sectionBlocks: ReadonlyArray<BlockSource>;
+  pages: ReadonlyArray<RenderPage>;
 
   /**
    * Content entries to write under `src/content/sections/`.
@@ -95,38 +123,74 @@ export type ContentByLocale = Record<string, Record<string, Record<string, unkno
 /**
  * Pure function: takes the resolved config + loaded block sources and produces
  * the render plan. No I/O, no side effects.
+ *
+ * Page resolution:
+ *   - if `config.pages` is set, use it directly (multi-page mode)
+ *   - otherwise, synthesize a single home page from `config.blocks` (the
+ *     single-page mode that every v0.3 scaffold uses by default)
  */
 export function buildRenderPlan(
   config: ResolvedConfig,
   blocks: ReadonlyArray<BlockSource>,
   palette: PaletteCss,
   contentByLocale: ContentByLocale = {},
+  siteConfig?: SiteConfig,
 ): RenderPlan {
-  // Stable sort by category priority. Section blocks only — layout/integration
-  // blocks aren't rendered as sections on index.astro.
-  const sectionBlocks = blocks
-    .filter((b) => b.manifest.type === "section")
-    .map((block, index) => ({ block, index }))
-    .sort((a, b) => {
-      const diff =
-        categoryPriority(a.block.manifest.category) -
-        categoryPriority(b.block.manifest.category);
-      return diff !== 0 ? diff : a.index - b.index;
-    })
-    .map(({ block }) => block);
+  // Build a quick lookup so we can resolve `BlockSelection.name` → `BlockSource`
+  // for each page declaration. Blocks not present in `blocks` are skipped
+  // (the caller is expected to have loaded everything the config references).
+  const blockByName = new Map<string, BlockSource>(
+    blocks.map((b) => [b.manifest.name, b] as const),
+  );
+
+  // Resolve pages: either from explicit `config.pages` or fall back to a
+  // single home page containing every block from `config.blocks`.
+  const pageDeclarations: ReadonlyArray<PageSelection> = config.pages ?? [
+    { slug: "", blocks: config.blocks },
+  ];
+
+  const pages: RenderPage[] = pageDeclarations.map((page) => {
+    const pageBlocks = page.blocks
+      .map((sel) => blockByName.get(sel.name))
+      .filter((b): b is BlockSource => b !== undefined)
+      .filter((b) => b.manifest.type === "section");
+
+    const sortedBlocks = pageBlocks
+      .map((block, index) => ({ block, index }))
+      .sort((a, b) => {
+        const diff =
+          categoryPriority(a.block.manifest.category) -
+          categoryPriority(b.block.manifest.category);
+        return diff !== 0 ? diff : a.index - b.index;
+      })
+      .map(({ block }) => block);
+
+    return {
+      slug: page.slug,
+      title: page.title ?? config.projectName,
+      description: page.description ?? `Generated with Fornix — ${config.projectName}`,
+      sectionBlocks: sortedBlocks,
+    };
+  });
+
+  // Unique blocks across all pages — each gets exactly one content entry per
+  // locale. If two pages reference the same block, they share that entry.
+  const uniqueBlocks = new Map<string, BlockSource>();
+  for (const page of pages) {
+    for (const block of page.sectionBlocks) {
+      uniqueBlocks.set(block.manifest.name, block);
+    }
+  }
 
   const contentEntries: Array<RenderPlan["contentEntries"][number]> = [];
 
   // Convention: content always lives under `sections/{locale}/{block}.json`,
   // even for single-locale projects. The block .astro reads the locale via
   // `Astro.currentLocale` and constructs the entry ID as `{locale}/{block}`.
-  // This eliminates a whole class of "content not found" bugs by treating
-  // single-locale as just multi-locale with N=1.
-  //
   // For each (locale, block), prefer the AI-supplied per-locale content from
   // `contentByLocale`, then the block's `defaultContent`, then skip.
   for (const locale of config.locales) {
-    for (const block of sectionBlocks) {
+    for (const block of uniqueBlocks.values()) {
       const override = contentByLocale[locale]?.[block.manifest.name];
       const data = override ?? block.defaultContent;
       if (!data) continue;
@@ -139,7 +203,10 @@ export function buildRenderPlan(
     }
   }
 
-  const dependencies = mergeDependencies(blocks);
+  const dependencies = mergeDependencies(
+    Array.from(uniqueBlocks.values()),
+    palette,
+  );
 
   return {
     projectName: config.projectName,
@@ -147,31 +214,138 @@ export function buildRenderPlan(
     locale: config.defaultLocale,
     locales: config.locales,
     palette,
+    siteConfig: siteConfig ?? defaultSiteConfig(config),
     deployTarget: config.deployTarget,
     layout: {
       title: config.projectName,
       description: `Generated with Fornix — ${config.projectName}`,
     },
-    sectionBlocks,
+    pages,
     contentEntries,
     dependencies,
   };
 }
 
+/**
+ * Reasonable site-config defaults derived from `ResolvedConfig`. Archetype
+ * authors will override these in week 3; for now this gives every scaffold
+ * a populated `src/site.config.ts` consistent with the rest of the project.
+ */
+function defaultSiteConfig(config: ResolvedConfig): SiteConfig {
+  const displayName = humanizeProjectName(config.projectName);
+  const initials = monogramFrom(displayName);
+  return {
+    name: displayName,
+    archetype: config.createdWith === "ai" ? "ai-generated" : undefined,
+    locale: {
+      default: config.defaultLocale,
+      supported: [...config.locales],
+    },
+    logo: { type: "monogram", text: initials },
+    legal: {
+      copyright: `© ${new Date().getUTCFullYear()} ${displayName}`,
+    },
+  };
+}
+
+function humanizeProjectName(slug: string): string {
+  return slug
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ") || slug;
+}
+
+function monogramFrom(name: string): string {
+  const words = name
+    .split(/[\s]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase());
+  if (words.length === 0) return "F";
+  if (words.length === 1) return words[0];
+  return (words[0] + words[1]).slice(0, 2);
+}
+
+/**
+ * Map from a font family (as it appears in palette typography) to its
+ * `@fontsource` package name. Only listed families are recognized;
+ * anything else falls through (the user can install it themselves).
+ */
+const FONTSOURCE_PACKAGES: Record<string, string> = {
+  inter: "@fontsource/inter",
+  fraunces: "@fontsource/fraunces",
+  "dm serif display": "@fontsource/dm-serif-display",
+  "archivo black": "@fontsource/archivo-black",
+};
+
+/**
+ * Inspect a CSS font-family string (e.g. `"'DM Serif Display', Georgia, serif"`)
+ * and return the matching `@fontsource` package name if any.
+ */
+function fontsourcePackageFor(familyString: string): string | null {
+  const normalized = familyString.toLowerCase();
+  for (const [needle, pkg] of Object.entries(FONTSOURCE_PACKAGES)) {
+    if (normalized.includes(needle)) return pkg;
+  }
+  return null;
+}
+
 function mergeDependencies(
   blocks: ReadonlyArray<BlockSource>,
+  palette: PaletteCss,
 ): Record<string, string> {
-  const merged: Record<string, string> = { astro: "^5.0.0" };
+  const merged: Record<string, string> = {
+    astro: "^5.0.0",
+    tailwindcss: "^4.0.0",
+    "@tailwindcss/vite": "^4.0.0",
+  };
+
+  // Every scaffold needs Inter (it's the body default everywhere). Headline
+  // font may be different per palette — derive from the palette's typography
+  // declaration. Note: the palette object carries only the rendered CSS
+  // string here, so we fall back to including Inter; archetype-aware
+  // dependency resolution lives a layer up.
+  merged["@fontsource/inter"] = "^5.0.0";
+
+  // Block-declared deps win on conflict (last-write-wins; semver merge is
+  // a later concern).
   for (const block of blocks) {
     for (const [name, version] of Object.entries(block.manifest.dependencies)) {
-      const existing = merged[name];
-      if (existing && existing !== version) {
-        // Day 1: last-write-wins. A future pass should reconcile semver ranges.
-        merged[name] = version;
-      } else {
-        merged[name] = version;
-      }
+      merged[name] = version;
     }
   }
+
+  // Palette name → font package(s). `palette` here is the rendered `PaletteCss`,
+  // not the raw JSON; we sniff its name → known map. (Cleaner alternative:
+  // pass the raw `Palette` into `buildRenderPlan` so we can read typography
+  // directly. Day 4 cleanup.)
+  for (const pkg of fontsourceDepsForPaletteName(palette.name)) {
+    merged[pkg] = "^5.0.0";
+  }
+
   return merged;
 }
+
+/**
+ * Map palette name → headline font @fontsource package (if any beyond Inter).
+ * Inter is always installed (added separately above).
+ */
+function fontsourceDepsForPaletteName(paletteName: string): string[] {
+  switch (paletteName) {
+    case "fraktur":
+      return ["@fontsource/fraunces"];
+    case "ember":
+      return ["@fontsource/archivo-black"];
+    case "terracotta":
+      return ["@fontsource/dm-serif-display"];
+    case "obsidian":
+    case "paper":
+    case "sage":
+    case "aurora":
+    default:
+      return []; // Inter only (already added)
+  }
+}
+
+// Exported for the future archetype-aware dep merger.
+export { fontsourcePackageFor };

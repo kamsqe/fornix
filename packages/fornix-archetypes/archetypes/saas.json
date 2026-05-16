@@ -1,0 +1,311 @@
+{
+  "schemaVersion": 1,
+  "name": "saas",
+  "displayName": "SaaS",
+  "description": "Modern dark-theme SaaS product site. Hero → social proof → features → pricing → FAQ → CTA → footer, with a dedicated Pricing page.",
+  "palette": "obsidian",
+
+  "site": {
+    "name": "Helix",
+    "tagline": "Calendars that protect deep work.",
+    "logo": { "type": "monogram", "text": "Hx" },
+    "nav": [
+      { "label": "Features", "href": "/#features" },
+      { "label": "Pricing", "href": "/pricing" },
+      { "label": "Docs", "href": "/docs" },
+      { "label": "Blog", "href": "/blog" }
+    ],
+    "ctaPrimary": { "text": "Start free trial", "href": "/signup" },
+    "ctaSecondary": { "text": "Watch demo", "href": "#demo" },
+    "social": {
+      "twitter": "helixapp",
+      "github": "helixapp",
+      "linkedin": "company/helixapp"
+    },
+    "legal": {
+      "copyright": "© 2026 Helix Inc.",
+      "privacyHref": "/privacy",
+      "termsHref": "/terms"
+    },
+    "meta": {
+      "twitterHandle": "helixapp"
+    }
+  },
+
+  "pages": [
+    {
+      "slug": "",
+      "title": "Helix — Calendars that protect deep work",
+      "description": "Helix blocks focus time automatically when your week fills up — no manual rearranging, no guilt.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "hero-text" },
+        { "name": "logo-cloud" },
+        { "name": "features-grid" },
+        { "name": "how-it-works" },
+        { "name": "testimonials-grid" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    },
+    {
+      "slug": "pricing",
+      "title": "Pricing — Helix",
+      "description": "Simple, honest pricing for solo builders and growing teams.",
+      "blocks": [
+        { "name": "header-sticky" },
+        { "name": "pricing-table" },
+        { "name": "faq" },
+        { "name": "cta-strip" },
+        { "name": "footer-columns" }
+      ]
+    }
+  ],
+
+  "content": {
+    "hero-text": {
+      "eyebrow": "Now in beta",
+      "headline": "Calendars that protect deep work",
+      "subheadline": "Helix blocks focus time automatically when your week fills up — no manual rearranging, no guilt.",
+      "primaryCtaText": "Start free trial",
+      "primaryCtaHref": "/signup",
+      "secondaryCtaText": "Watch demo",
+      "secondaryCtaHref": "#demo"
+    },
+
+    "logo-cloud": {
+      "label": "Trusted by teams at",
+      "logos": [
+        { "name": "Linear" },
+        { "name": "Vercel" },
+        { "name": "Stripe" },
+        { "name": "Notion" },
+        { "name": "Cloudflare" },
+        { "name": "Supabase" }
+      ]
+    },
+
+    "features-grid": {
+      "eyebrow": "How it helps",
+      "headline": "Your calendar, but adversarial to busywork",
+      "subheadline": "Helix protects what gets you paid: focused, uninterrupted blocks of building time.",
+      "features": [
+        {
+          "icon": "check",
+          "title": "Auto-blocking when you book up",
+          "description": "When your week passes a focus threshold, Helix proactively declines new low-value meetings and offers async alternatives."
+        },
+        {
+          "icon": "star",
+          "title": "Two-clock scheduling",
+          "description": "External \"open hours\" face the world; internal time is yours to wreck. Same calendar, two surfaces."
+        },
+        {
+          "icon": "external-link",
+          "title": "Pull in real context",
+          "description": "Meeting prep cards link the doc, the Slack thread, and the last conversation — auto, no manual notes."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Smart rescheduling",
+          "description": "Drop a meeting and Helix finds the next slot that respects everyone's focus rules. Suggested, not enforced."
+        },
+        {
+          "icon": "mail",
+          "title": "End-of-day briefs",
+          "description": "5pm summary of tomorrow: what's protected, what's new, what to push back on. 60 seconds; in your inbox."
+        },
+        {
+          "icon": "play",
+          "title": "Real-time meeting hygiene",
+          "description": "Live agenda prompts during the call. Helix flags drift, captures decisions, drafts the follow-up."
+        }
+      ]
+    },
+
+    "how-it-works": {
+      "eyebrow": "How it works",
+      "headline": "Three steps. Day one focus protected.",
+      "subheadline": "Most teams have working focus rules within 24 hours of connecting their calendar.",
+      "steps": [
+        {
+          "icon": "external-link",
+          "title": "Connect Google or Outlook",
+          "description": "OAuth in 10 seconds. Helix imports your calendar, reads the patterns, proposes rules."
+        },
+        {
+          "icon": "check",
+          "title": "Pick your focus rules",
+          "description": "Set hours, days, project types. Helix builds the policy; you tune it. Edit any time."
+        },
+        {
+          "icon": "arrow-right",
+          "title": "Helix runs in the background",
+          "description": "Protections fire automatically. You get a daily brief. Nothing else changes about your calendar UX."
+        }
+      ]
+    },
+
+    "testimonials-grid": {
+      "eyebrow": "What teams say",
+      "headline": "Built for people who actually ship",
+      "items": [
+        {
+          "quote": "We added Helix in March; my engineering team's deep-work hours went from 11 to 19 a week. Same calendar, same meetings — just held to a different standard.",
+          "author": "Maya Patel",
+          "role": "VP Eng",
+          "company": "Lexura",
+          "rating": 5
+        },
+        {
+          "quote": "Stop selling productivity. Sell calendar discipline. Helix is the first tool that finally lives in the right place.",
+          "author": "Diego Romero",
+          "role": "CTO",
+          "company": "Bloom Studio",
+          "rating": 5
+        },
+        {
+          "quote": "I'd been writing custom Calendar API scripts for years to do half of what Helix does. Cancelled all of them after week one.",
+          "author": "Soren Mikkelsen",
+          "role": "Senior Engineer",
+          "company": "Iron Forge",
+          "rating": 5
+        }
+      ]
+    },
+
+    "cta-strip": {
+      "headline": "Ready to take your week back?",
+      "subheadline": "Free 14-day trial. No card. Cancel from settings in two clicks.",
+      "primaryCtaText": "Start free trial",
+      "primaryCtaHref": "/signup",
+      "secondaryCtaText": "Book a 15-min demo",
+      "secondaryCtaHref": "/demo",
+      "variant": "accent"
+    },
+
+    "footer-columns": {
+      "tagline": "The calendar that protects deep work for engineering teams.",
+      "columns": [
+        {
+          "title": "Product",
+          "links": [
+            { "label": "Features", "href": "/#features" },
+            { "label": "Pricing", "href": "/pricing" },
+            { "label": "Changelog", "href": "/changelog" },
+            { "label": "Docs", "href": "/docs" }
+          ]
+        },
+        {
+          "title": "Company",
+          "links": [
+            { "label": "About", "href": "/about" },
+            { "label": "Customers", "href": "/customers" },
+            { "label": "Careers", "href": "/careers" },
+            { "label": "Press kit", "href": "/press" }
+          ]
+        },
+        {
+          "title": "Resources",
+          "links": [
+            { "label": "Blog", "href": "/blog" },
+            { "label": "Community", "href": "https://discord.gg/helix" },
+            { "label": "Support", "href": "/support" },
+            { "label": "Status", "href": "https://status.helix.app" }
+          ]
+        }
+      ]
+    },
+
+    "pricing-table": {
+      "eyebrow": "Pricing",
+      "headline": "Simple, honest pricing",
+      "subheadline": "No per-seat surprises. Upgrade or cancel any time. Real engineers in support, not a chatbot.",
+      "popularBadge": "Most Popular",
+      "plans": [
+        {
+          "name": "Solo",
+          "price": "$19",
+          "period": "/mo",
+          "description": "For one builder running a calendar like a battlefield.",
+          "features": [
+            "Connect 1 calendar",
+            "Auto-blocking + focus rules",
+            "End-of-day brief",
+            "Community support",
+            "Atomic preview deploys for your linked workspace"
+          ],
+          "ctaText": "Start free trial",
+          "ctaHref": "/signup?plan=solo",
+          "highlighted": false
+        },
+        {
+          "name": "Team",
+          "price": "$49",
+          "period": "/seat/mo",
+          "description": "For teams that share calendars and protect each other's time.",
+          "features": [
+            "Everything in Solo",
+            "Multi-user focus rules",
+            "Shared meeting hygiene policies",
+            "Priority support (< 4hr response)",
+            "Slack + Linear integrations",
+            "Custom domains for your team page"
+          ],
+          "ctaText": "Start 14-day trial",
+          "ctaHref": "/signup?plan=team",
+          "highlighted": true
+        },
+        {
+          "name": "Scale",
+          "price": "$199",
+          "period": "/seat/mo",
+          "description": "For orgs with serious calendar discipline goals.",
+          "features": [
+            "Everything in Team",
+            "SSO (SAML, OIDC) + audit logs",
+            "Dedicated success engineer",
+            "Custom contracts and DPA",
+            "99.99% uptime SLA",
+            "Bring your own auth provider"
+          ],
+          "ctaText": "Talk to sales",
+          "ctaHref": "/contact?topic=scale",
+          "highlighted": false
+        }
+      ]
+    },
+
+    "faq": {
+      "eyebrow": "FAQ",
+      "headline": "Questions teams ask before buying",
+      "subheadline": "Don't see your question? Real engineers reply at hi@helix.app within four hours during business days.",
+      "items": [
+        {
+          "question": "Does Helix actually decline meetings on my behalf?",
+          "answer": "Only with your explicit consent, and only when it matches a focus rule you defined. Default is 'suggest decline + draft reply' — you approve. The auto-decline mode is opt-in per rule."
+        },
+        {
+          "question": "What calendars work with Helix?",
+          "answer": "Google Calendar and Outlook (Microsoft 365). Apple iCloud is on the roadmap for Q3. CalDAV self-hosted: planned, no timeline."
+        },
+        {
+          "question": "Can I switch plans later?",
+          "answer": "Up or down any time. Prorated to the day. Cancel from your dashboard in two clicks, no email exit ritual."
+        },
+        {
+          "question": "How is this different from Reclaim or Clockwise?",
+          "answer": "Reclaim optimizes your time; Helix protects it. Clockwise smooths out meetings across teams; Helix puts a sharper edge on individual focus rules. You can run all three; we'd rather you didn't need to."
+        },
+        {
+          "question": "Do you offer a free tier?",
+          "answer": "Not currently. Solo is $19/mo with a real 14-day trial — long enough to feel the difference. We'd rather charge fairly than dilute the experience with an underpowered free tier."
+        },
+        {
+          "question": "Can I self-host?",
+          "answer": "The core scheduler is open-source under Apache 2.0. The brief generator, integrations, and admin UI are hosted. Scale plan includes a self-hosted control plane license if you need everything on-prem."
+        }
+      ]
+    }
+  }
+}

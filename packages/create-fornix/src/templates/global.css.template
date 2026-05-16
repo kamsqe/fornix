@@ -1,0 +1,32 @@
+/*
+ * Global stylesheet — loaded by Layout.astro and processed by Tailwind v4.
+ *
+ * The `@import "tailwindcss"` brings in Tailwind's utilities. Font imports
+ * below match the palette's typography choices (set via Fornix at scaffold
+ * time); adjust freely if you swap fonts in `src/site.config.ts`.
+ *
+ * Palette CSS variables (`--color-*`, `--radius-*`, `--font-*`, ...) live
+ * in `public/styles/palettes/_current.css` and are linked from Layout's
+ * `<head>`. Edit that file to retheme the project.
+ */
+
+{{fontImports}}
+
+@import "tailwindcss";
+
+@layer base {
+  html {
+    font-family: var(--font-body, "Inter", system-ui, sans-serif);
+    font-weight: var(--font-body-weight, 400);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-headline, var(--font-body, "Inter", system-ui, sans-serif));
+    font-weight: var(--font-headline-weight, 700);
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+}

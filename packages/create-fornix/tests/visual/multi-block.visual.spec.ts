@@ -42,15 +42,16 @@ function makeConfig(): ResolvedConfig {
     cssEngine: "vanilla",
     packageManager: "npm",
     blocks: [
-      { name: "hero-gradient", variant: "default" },
+      { name: "header-sticky", variant: "default" },
+      { name: "hero-text", variant: "default" },
       { name: "features-grid", variant: "default" },
-      { name: "cta-banner", variant: "default" },
-      { name: "footer-minimal", variant: "default" },
+      { name: "cta-strip", variant: "default" },
+      { name: "footer-columns", variant: "default" },
     ],
     locales: ["en"],
     defaultLocale: "en",
     palette: {
-      preset: "midnight",
+      preset: "obsidian",
       colors: {
         primary: "#6366f1",
         secondary: "#818cf8",
@@ -116,7 +117,7 @@ test.afterAll(async () => {
   }
 });
 
-test("midnight + 4 blocks renders without layout regressions", async ({
+test("obsidian + v0.3 lineup renders without layout regressions", async ({
   page,
 }) => {
   await page.goto(previewUrl, { waitUntil: "networkidle" });
@@ -125,7 +126,7 @@ test("midnight + 4 blocks renders without layout regressions", async ({
   // anything CSS-paint-related.
   await page.evaluate(() => document.fonts.ready);
 
-  await expect(page).toHaveScreenshot("multi-block-midnight-desktop.png", {
+  await expect(page).toHaveScreenshot("multi-block-obsidian-desktop.png", {
     fullPage: true,
   });
 });

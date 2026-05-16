@@ -1,14 +1,33 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "terracotta",
   "displayName": "Terracotta",
-  "category": "warm",
+  "category": "warm-hospitality",
   "mode": "light",
   "colors": {
     "primary": "#c2410c",
-    "secondary": "#dc2626",
-    "accent": "#65a30d",
-    "background": "#fdf2f8",
-    "foreground": "#431407"
+    "secondary": "#65a30d",
+    "accent": "#92400e",
+    "background": "#fef3e7",
+    "foreground": "#44403c"
+  },
+  "typography": {
+    "headline": { "family": "'DM Serif Display', Georgia, serif", "weight": 400 },
+    "body": { "family": "'Inter', system-ui, sans-serif", "weight": 400 }
+  },
+  "radius": {
+    "sm": "0.5rem",
+    "md": "0.875rem",
+    "lg": "1.25rem",
+    "full": "9999px"
+  },
+  "motion": {
+    "duration": { "fast": "200ms", "normal": "300ms", "slow": "450ms" },
+    "easing": { "default": "cubic-bezier(0.4, 0, 0.2, 1)" }
+  },
+  "shadow": {
+    "sm": "0 1px 2px rgba(68, 64, 60, 0.06)",
+    "md": "0 6px 16px rgba(68, 64, 60, 0.10)",
+    "lg": "0 18px 56px rgba(68, 64, 60, 0.15)"
   }
 }

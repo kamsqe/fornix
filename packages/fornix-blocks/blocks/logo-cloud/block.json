@@ -1,55 +1,47 @@
 {
   "schemaVersion": 1,
   "name": "logo-cloud",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "section",
-  "description": "Logo cloud section showing partner, client, or technology logos with optional grayscale hover effect",
-  "category": "social-proof",
-  "tags": ["logos", "partners", "clients", "social-proof", "trust"],
+  "description": "Strip of customer/partner/press logos for social proof. Defaults to text-based wordmarks (so a fresh scaffold renders cleanly without bundling real logos); users replace with their own image URLs.",
+  "category": "logo-cloud",
+  "tags": ["logos", "social-proof", "press", "v0.3"],
   "dependencies": {},
   "requires": [],
   "conflicts": [],
   "envVars": [],
-  "variants": ["default", "compact", "grid"],
+  "variants": ["default"],
   "slots": [],
   "files": [
     {
       "source": "logo-cloud.astro",
       "destination": "src/components/sections/logo-cloud.astro"
-    },
-    {
-      "source": "logo-cloud.css",
-      "destination": "src/styles/sections/logo-cloud.css"
     }
   ],
   "ai": {
-    "whenToUse": "Use for 'Trusted by' or 'Partners' sections showing brand logos. Great for SaaS, B2B, and enterprise sites. Place after hero or before footer for credibility.",
-    "whenNotToUse": "Don't use if you have fewer than 4 logos. Avoid if your partners are not recognizable — text-only trust strips work better for unknown brands.",
-    "pairsWith": ["hero-gradient", "hero-split", "stats-strip", "testimonials-wall"],
+    "whenToUse": "Use just below the hero on B2B sites — establishes trust early via 'as featured in' or 'used by'. Best with 4–8 logos. Text logos are stylized as wordmarks until users add real images.",
+    "whenNotToUse": "Don't use without real customers/press to show. Don't pad with random logos — fewer real ones beat more fake ones.",
+    "pairsWith": ["hero-text", "hero-media", "testimonials-grid"],
     "contentSlots": {
-      "headline": {
+      "label": {
         "type": "string",
-        "description": "Optional headline above the logos",
-        "maxLength": 60,
-        "example": "Trusted by the best teams"
+        "description": "Small label above the logos (e.g. 'As featured in', 'Trusted by').",
+        "maxLength": 40,
+        "example": "Trusted by teams at"
       },
       "logos": {
         "type": "array",
-        "description": "Array of logo items",
-        "minItems": 4,
-        "maxItems": 12,
+        "description": "Logos to display. Each declares `name` (wordmark text or alt for images), optional `src` (image URL — defaults to text wordmark), optional `href` (link out).",
+        "minItems": 3,
+        "maxItems": 10,
         "items": {
-          "name": { "type": "string", "description": "Company name (used as alt text)" },
-          "src": { "type": "string", "description": "Path to logo image (optional — text fallback if missing)" },
-          "href": { "type": "string", "description": "Optional link URL" }
+          "name": { "type": "string" },
+          "src": { "type": "string" },
+          "href": { "type": "string" }
         },
         "example": [
-          { "name": "Vercel", "src": "", "href": "" },
-          { "name": "Stripe", "src": "", "href": "" },
-          { "name": "Linear", "src": "", "href": "" },
-          { "name": "Notion", "src": "", "href": "" },
-          { "name": "Figma", "src": "", "href": "" },
-          { "name": "GitHub", "src": "", "href": "" }
+          { "name": "Linear" },
+          { "name": "Vercel", "href": "https://vercel.com" }
         ]
       }
     }

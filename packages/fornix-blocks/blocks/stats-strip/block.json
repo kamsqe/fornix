@@ -1,57 +1,41 @@
 {
   "schemaVersion": 1,
   "name": "stats-strip",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "section",
-  "description": "Horizontal strip of key metrics with animated count-up on scroll. Social proof numbers for landing pages.",
-  "category": "social-proof",
-  "tags": ["stats", "metrics", "social-proof", "numbers", "count-up"],
+  "description": "Horizontal band of big-number statistics — value + label per stat. Static (no counter animation), works without JS. Replaces v1 stats-strip which had broken IntersectionObserver-driven counters.",
+  "category": "stats",
+  "tags": ["stats", "metrics", "social-proof", "v0.3"],
   "dependencies": {},
   "requires": [],
   "conflicts": [],
   "envVars": [],
-  "variants": ["default", "compact", "bordered"],
+  "variants": ["default"],
   "slots": [],
   "files": [
     {
       "source": "stats-strip.astro",
       "destination": "src/components/sections/stats-strip.astro"
-    },
-    {
-      "source": "stats-strip.css",
-      "destination": "src/styles/sections/stats-strip.css"
     }
   ],
   "ai": {
-    "whenToUse": "Use between hero and features sections as social proof. Best for showcasing key metrics like user counts, uptime percentages, customer numbers, or product stats that build credibility.",
-    "whenNotToUse": "Don't use if you have fewer than 3 meaningful metrics. Avoid on pages where numbers aren't a selling point (e.g. purely content/editorial sites).",
-    "pairsWith": ["hero-gradient", "hero-split", "hero-video", "features-grid", "features-bento"],
+    "whenToUse": "Use to surface 3–5 quantitative trust signals (active users, uptime, countries, NPS, years in business). Best placed just above or below the hero, or between features and pricing.",
+    "whenNotToUse": "Don't fabricate numbers. Don't pad — three real stats beat five inflated ones.",
+    "pairsWith": ["hero-text", "logo-cloud", "features-grid"],
     "contentSlots": {
-      "items": {
+      "stats": {
         "type": "array",
-        "description": "Array of stat items to display in the strip",
+        "description": "Stat tiles. Each has a `value` (the big number/string), a `label` (what it measures), and optional `accent: true` to highlight the most important stat.",
         "minItems": 3,
-        "maxItems": 8,
+        "maxItems": 6,
         "items": {
-          "value": {
-            "type": "string",
-            "description": "The stat value (e.g. '99.9%', '50K+', '24/7')"
-          },
-          "label": {
-            "type": "string",
-            "description": "Short label describing the stat"
-          },
-          "accent": {
-            "type": "boolean",
-            "description": "Whether to highlight this stat with the accent color"
-          }
+          "value": { "type": "string" },
+          "label": { "type": "string" },
+          "accent": { "type": "boolean" }
         },
         "example": [
-          { "value": "10K+", "label": "Active Users", "accent": true },
-          { "value": "99.9%", "label": "Uptime", "accent": false },
-          { "value": "150+", "label": "Countries", "accent": false },
-          { "value": "4.9", "label": "Star Rating", "accent": false },
-          { "value": "24/7", "label": "Support", "accent": true }
+          { "value": "12k+", "label": "Active projects", "accent": true },
+          { "value": "99.99%", "label": "Uptime, last 12 months" }
         ]
       }
     }

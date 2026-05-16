@@ -40,7 +40,7 @@ describe("v2 CLI (built binary)", () => {
 
       // Invoke the actual CLI binary as a subprocess, from a tmp cwd.
       execSync(
-        `node ${JSON.stringify(CLI_BIN)} ${projectName} --blocks hero-gradient,features-grid,footer-minimal --palette neon-tokyo --yes`,
+        `node ${JSON.stringify(CLI_BIN)} ${projectName} --blocks hero-text,features-grid,footer-columns --palette aurora --yes`,
         { cwd: tmp, stdio: "pipe" },
       );
 
@@ -67,9 +67,11 @@ describe("v2 CLI (built binary)", () => {
         "utf8",
       );
       expect(html).toContain('id="fornix-palette-link"');
-      expect(html).toContain("Build Beautiful Websites Faster");
-      expect(html).toContain("Everything You Need");
-      expect(html).toContain("© 2026 Acme Inc.");
+      expect(html).toContain("Calendars that protect deep work");
+      expect(html).toContain("Built for teams that ship");
+      // Footer copyright auto-derives from projectName: "cli-test-site" →
+      // "Cli Test Site" via humanizeProjectName.
+      expect(html).toMatch(/© \d{4} Cli Test Site/);
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }

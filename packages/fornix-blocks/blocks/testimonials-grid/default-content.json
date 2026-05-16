@@ -1,0 +1,48 @@
+{
+  "eyebrow": "Loved by builders",
+  "headline": "Built for people who actually ship",
+  "subheadline": "Quotes from teams currently running production traffic on the platform.",
+  "items": [
+    {
+      "quote": "Switched from Next on Vercel — preview deploys are actually atomic now. The rollback in 6 seconds claim is real; I've used it twice.",
+      "author": "Maya Patel",
+      "role": "Eng Lead",
+      "company": "Lexura",
+      "rating": 5
+    },
+    {
+      "quote": "We replaced our entire CDN + observability stack and saved $400/mo. Support reply times are absurdly fast for the price.",
+      "author": "Diego Romero",
+      "role": "CTO",
+      "company": "Bloom Studio",
+      "rating": 5
+    },
+    {
+      "quote": "First deploy platform where the per-project pricing actually makes sense for a small team. No surprise per-seat costs as we hired.",
+      "author": "Anya Kowalski",
+      "role": "Co-founder",
+      "company": "Vault HQ",
+      "rating": 5
+    },
+    {
+      "quote": "Branch preview URLs that just work, with environment variables that just work. I forgot how much friction we used to have.",
+      "author": "Soren Mikkelsen",
+      "role": "Senior Engineer",
+      "company": "Helix",
+      "rating": 5
+    },
+    {
+      "quote": "Documentation is dense and assumes you know what you're doing — exactly what I want as a senior dev. No fluff.",
+      "author": "Priya Iyer",
+      "role": "Solo Indie",
+      "rating": 4
+    },
+    {
+      "quote": "The atomic deploy + instant rollback combo means I deploy on Fridays now. The platform earns trust by being correct, not by marketing.",
+      "author": "Marcus Lee",
+      "role": "Founder",
+      "company": "Iron Forge",
+      "rating": 5
+    }
+  ]
+}

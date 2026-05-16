@@ -28,7 +28,7 @@ const EXAMPLES_DIR = resolve(ROOT, "examples");
 const SHOWCASE_DIR = resolve(EXAMPLES_DIR, "showcase");
 
 const PROJECT_NAME = "showcase";
-const PALETTE = "midnight";
+const PALETTE = "obsidian";
 
 // Curated, conflict-free block list. The pipeline's category-based sort
 // puts these in render order automatically.

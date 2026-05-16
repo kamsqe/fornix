@@ -33,13 +33,13 @@ function makeConfig(
     cssEngine: "vanilla",
     packageManager: "npm",
     blocks: [
-      { name: "hero-gradient", variant: "default" },
-      { name: "footer-minimal", variant: "default" },
+      { name: "hero-text", variant: "default" },
+      { name: "footer-columns", variant: "default" },
     ],
     locales: ["en"],
     defaultLocale: "en",
     palette: {
-      preset: "midnight",
+      preset: "obsidian",
       colors: {
         primary: "#6366f1",
         secondary: "#818cf8",
@@ -81,6 +81,52 @@ describe("v2 deploy target", () => {
       expect(result.ok).toBe(true);
 
       expect(existsSync(join(projectDir, "wrangler.json"))).toBe(false);
+      expect(existsSync(join(projectDir, "vercel.json"))).toBe(false);
+      expect(existsSync(join(projectDir, "netlify.toml"))).toBe(false);
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("emits vercel.json when deployTarget=vercel (and not the others)", async () => {
+    const tmp = mkdtempSync(join(tmpdir(), "fornix-deploy-vercel-"));
+    const projectDir = join(tmp, "site");
+    try {
+      const result = await scaffoldProject(makeConfig(projectDir, "vercel"));
+      expect(result.ok).toBe(true);
+
+      const vercelPath = join(projectDir, "vercel.json");
+      expect(existsSync(vercelPath), "vercel.json missing").toBe(true);
+
+      const vercel = JSON.parse(readFileSync(vercelPath, "utf8"));
+      expect(vercel.framework).toBe("astro");
+      expect(vercel.buildCommand).toBe("astro build");
+      expect(vercel.outputDirectory).toBe("dist");
+
+      expect(existsSync(join(projectDir, "wrangler.json"))).toBe(false);
+      expect(existsSync(join(projectDir, "netlify.toml"))).toBe(false);
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("emits netlify.toml when deployTarget=netlify (and not the others)", async () => {
+    const tmp = mkdtempSync(join(tmpdir(), "fornix-deploy-netlify-"));
+    const projectDir = join(tmp, "site");
+    try {
+      const result = await scaffoldProject(makeConfig(projectDir, "netlify"));
+      expect(result.ok).toBe(true);
+
+      const netlifyPath = join(projectDir, "netlify.toml");
+      expect(existsSync(netlifyPath), "netlify.toml missing").toBe(true);
+
+      const netlify = readFileSync(netlifyPath, "utf8");
+      expect(netlify).toContain('command = "astro build"');
+      expect(netlify).toContain('publish = "dist"');
+      expect(netlify).toContain("NODE_VERSION");
+
+      expect(existsSync(join(projectDir, "wrangler.json"))).toBe(false);
+      expect(existsSync(join(projectDir, "vercel.json"))).toBe(false);
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }

@@ -1,35 +1,57 @@
 {
-  "headline": "Simple, Transparent Pricing",
-  "subheadline": "Choose the plan that fits your needs. Upgrade or downgrade anytime.",
+  "eyebrow": "Pricing",
+  "headline": "Simple, honest pricing",
+  "subheadline": "No hidden fees. No per-seat pricing surprises. Upgrade or cancel any time.",
+  "popularBadge": "Most Popular",
   "plans": [
     {
-      "name": "Free",
-      "price": "$0",
-      "period": "/month",
-      "description": "For individuals getting started",
-      "features": ["1 project", "Basic analytics", "Community support"],
-      "ctaText": "Get Started",
-      "ctaHref": "#signup",
+      "name": "Solo",
+      "price": "$19",
+      "period": "/mo",
+      "description": "For solo builders and side-project hackers.",
+      "features": [
+        "3 projects",
+        "10GB asset bandwidth",
+        "Community support",
+        "Atomic preview deploys",
+        "1 custom domain"
+      ],
+      "ctaText": "Start free",
+      "ctaHref": "/signup?plan=solo",
       "highlighted": false
     },
     {
-      "name": "Pro",
-      "price": "$29",
-      "period": "/month",
-      "description": "For growing teams",
-      "features": ["Unlimited projects", "Advanced analytics", "Priority support", "Custom domain"],
-      "ctaText": "Start Free Trial",
-      "ctaHref": "#trial",
+      "name": "Team",
+      "price": "$49",
+      "period": "/mo",
+      "description": "For small teams shipping in production.",
+      "features": [
+        "Unlimited projects",
+        "100GB asset bandwidth",
+        "Priority support, < 4hr response",
+        "Atomic deploys + instant rollback",
+        "5 custom domains",
+        "Branch-based preview environments"
+      ],
+      "ctaText": "Start 14-day trial",
+      "ctaHref": "/signup?plan=team",
       "highlighted": true
     },
     {
-      "name": "Enterprise",
-      "price": "Custom",
-      "period": "",
-      "description": "For large organizations",
-      "features": ["Everything in Pro", "SSO", "Dedicated support", "SLA", "Custom integrations"],
-      "ctaText": "Contact Sales",
-      "ctaHref": "#contact",
+      "name": "Scale",
+      "price": "$199",
+      "period": "/mo",
+      "description": "For growing teams with serious traffic.",
+      "features": [
+        "Everything in Team",
+        "1TB asset bandwidth",
+        "Dedicated support engineer",
+        "SSO + audit logs",
+        "Custom contracts and DPA",
+        "99.99% uptime SLA"
+      ],
+      "ctaText": "Contact sales",
+      "ctaHref": "/contact?topic=scale",
       "highlighted": false
     }
   ]

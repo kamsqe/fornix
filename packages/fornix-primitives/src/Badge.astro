@@ -1,0 +1,63 @@
+---
+/**
+ * Badge — small chip-style pill for status labels, eyebrow alternatives,
+ * "Most Popular" indicators, version tags.
+ *
+ * Reads from palette tokens:
+ *   --color-primary, --color-on-primary, --color-accent, --color-surface,
+ *   --color-border, --color-foreground, --radius-full
+ */
+interface Props {
+  /** Color treatment.
+   *  `primary` — solid filled with primary color
+   *  `accent`  — solid filled with accent color
+   *  `neutral` — bordered surface (default; works in any palette)
+   *  `outline` — transparent with border only
+   */
+  variant?: "primary" | "accent" | "neutral" | "outline";
+  /** Pass-through class. */
+  class?: string;
+}
+
+const { variant = "neutral", class: className = "" } = Astro.props;
+---
+
+<span class:list={[`fnx-badge fnx-badge--${variant}`, className]}>
+  <slot />
+</span>
+
+<style>
+  .fnx-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-full);
+    border: 1px solid transparent;
+    white-space: nowrap;
+  }
+
+  .fnx-badge--primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+  .fnx-badge--accent {
+    background: var(--color-accent);
+    color: var(--color-on-primary);
+  }
+  .fnx-badge--neutral {
+    background: var(--color-surface);
+    color: var(--color-foreground);
+    border-color: var(--color-border);
+  }
+  .fnx-badge--outline {
+    background: transparent;
+    color: var(--color-foreground);
+    border-color: var(--color-border);
+  }
+</style>

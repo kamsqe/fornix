@@ -1,0 +1,60 @@
+---
+/**
+ * Container — horizontal centering wrapper with size variants.
+ *
+ * Every block wraps its content in a Container to keep the max-width
+ * consistent across the site. The `size` prop picks one of four widths;
+ * vertical rhythm is owned by `<Section>`.
+ */
+interface Props {
+  /**
+   * `narrow` (~672px, blog/post body)
+   * `default` (~1024px, marketing copy)
+   * `wide` (~1280px, dense layouts)
+   * `full` (no max — bleed)
+   */
+  size?: "narrow" | "default" | "wide" | "full";
+  /** Pass-through class for one-off overrides. */
+  class?: string;
+}
+
+const { size = "default", class: className = "" } = Astro.props;
+---
+
+<div class:list={[`fnx-container fnx-container--${size}`, className]}>
+  <slot />
+</div>
+
+<style>
+  .fnx-container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .fnx-container {
+      padding-inline: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .fnx-container {
+      padding-inline: 2rem;
+    }
+  }
+
+  .fnx-container--narrow {
+    max-width: 42rem;
+  }
+  .fnx-container--default {
+    max-width: 64rem;
+  }
+  .fnx-container--wide {
+    max-width: 80rem;
+  }
+  .fnx-container--full {
+    max-width: none;
+    padding-inline: 0;
+  }
+</style>

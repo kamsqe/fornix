@@ -1,0 +1,57 @@
+---
+/**
+ * Eyebrow — small uppercase pre-headline. Sits above a `<Headline>` to give
+ * the section a category label ("Pricing", "What we do", "New release").
+ *
+ * Uses `--color-accent` for the text by default; consumers can override via
+ * the `variant` prop for muted/primary tints.
+ */
+interface Props {
+  /** Color treatment. */
+  variant?: "accent" | "muted" | "primary";
+  /** Horizontal alignment (typically matches the sibling `<Headline>`). */
+  align?: "left" | "center";
+  /** Pass-through class. */
+  class?: string;
+}
+
+const {
+  variant = "accent",
+  align = "left",
+  class: className = "",
+} = Astro.props;
+---
+
+<p
+  class:list={[
+    `fnx-eyebrow fnx-eyebrow--${variant} fnx-eyebrow--align-${align}`,
+    className,
+  ]}
+>
+  <slot />
+</p>
+
+<style>
+  .fnx-eyebrow {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .fnx-eyebrow--accent {
+    color: var(--color-accent);
+  }
+  .fnx-eyebrow--muted {
+    color: var(--color-muted);
+  }
+  .fnx-eyebrow--primary {
+    color: var(--color-primary);
+  }
+
+  .fnx-eyebrow--align-center {
+    text-align: center;
+  }
+</style>

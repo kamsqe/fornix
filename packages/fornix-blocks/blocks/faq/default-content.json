@@ -1,0 +1,31 @@
+{
+  "eyebrow": "FAQ",
+  "headline": "Questions everyone asks first",
+  "subheadline": "Can't find what you're looking for? Drop us a note — real engineers reply.",
+  "items": [
+    {
+      "question": "Can I switch plans later?",
+      "answer": "Yes, upgrade or downgrade any time from your account settings. Changes prorate to the day, so you're never paying for capacity you're not using."
+    },
+    {
+      "question": "What happens if my project outgrows the plan limits?",
+      "answer": "We email you when you hit 80% of any limit. Most teams upgrade once; a small handful exceed Scale and move to a custom contract — usually a one-week conversation, not a multi-month enterprise sales cycle."
+    },
+    {
+      "question": "Do you offer a free tier?",
+      "answer": "Not currently. Solo is $19/mo with a 14-day trial — long enough to ship a real project and decide. We'd rather charge a fair price and stay in business than offer a sub-sustainable free tier we'd have to take away later."
+    },
+    {
+      "question": "How is this different from Vercel or Netlify?",
+      "answer": "We're edge-first by default (every static asset cached at 300+ POPs, no opt-in). Pricing is per-project, not per-seat — you don't pay more when your team grows. And support is real engineers, not a Zendesk queue."
+    },
+    {
+      "question": "Can I self-host?",
+      "answer": "The runtime is open source and self-hostable. The control plane (deploys, rollback, observability) is hosted. If you need everything on-prem, the Scale plan includes a self-hosted control plane license."
+    },
+    {
+      "question": "Do you offer educational or non-profit discounts?",
+      "answer": "Yes — 50% off Team for verified students, educators, and registered non-profits. Email hi@example.com with proof and we'll set it up the same day."
+    }
+  ]
+}

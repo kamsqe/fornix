@@ -1,51 +1,313 @@
 ---
 /**
- * Header Sticky — fixed navigation header that stays at the top on scroll.
+ * Header Sticky — pinned top nav with logo + links + CTA + mobile drawer.
  *
- * ALL text is sourced from the content collection (zero hardcoded strings).
+ * Reads from `src/site.config.ts`:
+ *   site.name, site.logo, site.nav, site.ctaPrimary
+ *
+ * Per-page overrides via content slots:
+ *   ctaText, ctaHref, ctaVariant
+ *
+ * Behavior:
+ *   - Sticky at top of page (`position: sticky`)
+ *   - Subtle backdrop-blur background; gains a border once scrolled
+ *   - Mobile (<768px): drawer toggled by hamburger; closes on Escape
+ *   - All transitions respect `prefers-reduced-motion`
  */
 import { getEntry } from "astro:content";
+import Container from "../primitives/Container.astro";
+import Button from "../primitives/Button.astro";
+import Icon from "../primitives/Icon.astro";
+import { site } from "../../site.config";
 
-interface NavLink {
-  label: string;
-  href: string;
-}
-
-const locale = Astro.currentLocale ?? "en";
+const locale = Astro.currentLocale ?? site.locale.default;
 const entry = await getEntry("sections", `${locale}/header-sticky`);
-const { brandName, ctaText, ctaHref } = entry?.data ?? {
-  brandName: "",
-  ctaText: "",
-  ctaHref: "#",
+const data = (entry?.data ?? {}) as {
+  ctaText?: string;
+  ctaHref?: string;
+  ctaVariant?: "primary" | "secondary" | "ghost";
+  navAriaLabel?: string;
+  menuToggleAriaLabel?: string;
 };
-const navLinks = (entry?.data?.navLinks ?? []) as NavLink[];
+
+const navItems = site.nav ?? [];
+const logo = site.logo ?? { type: "monogram" as const, text: site.name.charAt(0) };
+
+const ctaText = data.ctaText ?? site.ctaPrimary?.text ?? "Get started";
+const ctaHref = data.ctaHref ?? site.ctaPrimary?.href ?? "/";
+const ctaVariant = data.ctaVariant ?? "primary";
+const navAriaLabel = data.navAriaLabel ?? "Primary";
+const menuToggleAriaLabel = data.menuToggleAriaLabel ?? "Toggle navigation menu";
 ---
 
-<header class="header-sticky">
-  <div class="header-sticky__inner">
-    <a href="/" class="header-sticky__brand">{brandName}</a>
-    <nav class="header-sticky__nav" aria-label="primary">
-      <ul class="header-sticky__links">
-        {navLinks.map((link) => (
+<header class="fnx-header" data-fnx-header>
+  <Container size="wide">
+    <div class="fnx-header__inner">
+      <a href="/" class="fnx-header__brand" aria-label={site.name}>
+        {logo.type === "monogram" && (
+          <span class="fnx-header__monogram">{logo.text ?? site.name.charAt(0)}</span>
+        )}
+        {logo.type === "wordmark" && (
+          <span class="fnx-header__wordmark">{logo.text ?? site.name}</span>
+        )}
+        {logo.type === "svg" && logo.src && (
+          <img src={logo.src} alt={site.name} class="fnx-header__logo-img" />
+        )}
+      </a>
+
+      <nav class="fnx-header__nav" aria-label={navAriaLabel}>
+        <ul class="fnx-header__nav-list">
+          {navItems.map((item) => (
+            <li>
+              <a href={item.href} class="fnx-header__nav-link">{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div class="fnx-header__actions">
+        <Button href={ctaHref} variant={ctaVariant} size="default">
+          {ctaText}
+        </Button>
+      </div>
+
+      <button
+        class="fnx-header__menu-toggle"
+        aria-label={menuToggleAriaLabel}
+        aria-expanded="false"
+        aria-controls="fnx-header-drawer"
+        data-fnx-menu-toggle
+      >
+        <Icon name="menu" />
+      </button>
+    </div>
+
+    <div
+      id="fnx-header-drawer"
+      class="fnx-header__mobile-drawer"
+      data-fnx-mobile-drawer
+      hidden
+    >
+      <ul class="fnx-header__mobile-list">
+        {navItems.map((item) => (
           <li>
-            <a href={link.href} class="header-sticky__link">{link.label}</a>
+            <a href={item.href} class="fnx-header__mobile-link">{item.label}</a>
           </li>
         ))}
+        <li>
+          <a href={ctaHref} class="fnx-header__mobile-cta">{ctaText}</a>
+        </li>
       </ul>
-    </nav>
-    <div class="header-sticky__actions">
-      <slot name="actions">
-        {ctaText && (
-          <a href={ctaHref} class="header-sticky__cta">{ctaText}</a>
-        )}
-      </slot>
     </div>
-    <button class="header-sticky__mobile-toggle" aria-label="menu" aria-expanded="false">
-      <span class="header-sticky__hamburger"></span>
-    </button>
-  </div>
+  </Container>
 </header>
 
+<script>
+  function initFnxHeader() {
+    const header = document.querySelector("[data-fnx-header]");
+    const toggle = document.querySelector(
+      "[data-fnx-menu-toggle]"
+    );
+    const drawer = document.querySelector("[data-fnx-mobile-drawer]");
+    if (!header || !toggle || !drawer) return;
+
+    const setScrollState = () => {
+      if (window.scrollY > 12) header.classList.add("fnx-header--scrolled");
+      else header.classList.remove("fnx-header--scrolled");
+    };
+    setScrollState();
+    window.addEventListener("scroll", setScrollState, { passive: true });
+
+    toggle.addEventListener("click", () => {
+      const isOpen = !drawer.hasAttribute("hidden");
+      if (isOpen) {
+        drawer.setAttribute("hidden", "");
+        toggle.setAttribute("aria-expanded", "false");
+      } else {
+        drawer.removeAttribute("hidden");
+        toggle.setAttribute("aria-expanded", "true");
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (
+        (e as KeyboardEvent).key === "Escape" &&
+        !drawer.hasAttribute("hidden")
+      ) {
+        drawer.setAttribute("hidden", "");
+        toggle.setAttribute("aria-expanded", "false");
+      }
+    });
+  }
+
+  initFnxHeader();
+  document.addEventListener("astro:after-swap", initFnxHeader);
+</script>
+
 <style>
-  @import "../../styles/sections/header-sticky.css";
+  .fnx-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--color-background) 85%, transparent);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: background var(--duration-fast) var(--easing-default),
+      border-color var(--duration-fast) var(--easing-default);
+  }
+  .fnx-header--scrolled {
+    background: color-mix(in srgb, var(--color-background) 96%, transparent);
+    border-bottom-color: var(--color-border);
+  }
+
+  .fnx-header__inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-block: 0.875rem;
+  }
+
+  .fnx-header__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-foreground);
+    text-decoration: none;
+    font-weight: 700;
+    font-family: var(--font-headline);
+  }
+  .fnx-header__monogram {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .fnx-header__wordmark {
+    font-size: 1.125rem;
+  }
+  .fnx-header__logo-img {
+    height: 1.5rem;
+    width: auto;
+  }
+
+  .fnx-header__nav {
+    display: none;
+    margin-left: 2rem;
+  }
+  .fnx-header__nav-list {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .fnx-header__nav-link {
+    color: color-mix(in srgb, var(--color-foreground) 75%, transparent);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: color var(--duration-fast) var(--easing-default);
+  }
+  .fnx-header__nav-link:hover,
+  .fnx-header__nav-link:focus-visible {
+    color: var(--color-foreground);
+  }
+  .fnx-header__nav-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 4px;
+    border-radius: var(--radius-sm);
+  }
+
+  .fnx-header__actions {
+    display: none;
+    margin-left: auto;
+  }
+
+  .fnx-header__menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    padding: 0.5rem;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-foreground);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--easing-default);
+  }
+  .fnx-header__menu-toggle:hover {
+    background: var(--color-surface);
+  }
+  .fnx-header__menu-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .fnx-header__mobile-drawer {
+    padding-block: 1rem 1.5rem;
+    border-top: 1px solid var(--color-border);
+  }
+  .fnx-header__mobile-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .fnx-header__mobile-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    color: var(--color-foreground);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: background var(--duration-fast) var(--easing-default);
+  }
+  .fnx-header__mobile-link:hover {
+    background: var(--color-surface);
+  }
+  .fnx-header__mobile-cta {
+    display: block;
+    margin-top: 0.5rem;
+    padding: 0.875rem 1rem;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    text-align: center;
+  }
+
+  @media (min-width: 768px) {
+    .fnx-header__nav,
+    .fnx-header__actions {
+      display: block;
+    }
+    .fnx-header__menu-toggle,
+    .fnx-header__mobile-drawer {
+      display: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fnx-header,
+    .fnx-header__nav-link,
+    .fnx-header__menu-toggle,
+    .fnx-header__mobile-link {
+      transition: none;
+    }
+  }
 </style>

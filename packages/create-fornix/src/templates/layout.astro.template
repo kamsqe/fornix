@@ -1,4 +1,6 @@
 ---
+import "../styles/global.css";
+
 type Props = {
   title: string;
   description?: string;
@@ -31,9 +33,6 @@ const { title, description, lang = "{{defaultLocale}}" } = Astro.props;
   body {
     margin: 0;
     padding: 0;
-    background: var(--color-background);
-    color: var(--color-foreground);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     line-height: 1.5;
   }
   *,

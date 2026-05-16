@@ -42,7 +42,7 @@ export function blockPath(blockName: string): string {
 }
 
 /**
- * Path to a palette JSON (e.g. `palettePath("midnight")`).
+ * Path to a palette JSON (e.g. `palettePath("obsidian")`).
  * Prefers bundled `dist/palettes/<name>.json`, falls back to workspace.
  */
 export function palettePath(paletteName: string): string {
@@ -53,6 +53,33 @@ export function palettePath(paletteName: string): string {
     "fornix-registry",
     "palettes",
     `${paletteName}.json`,
+  );
+}
+
+/**
+ * Path to the primitives directory (containing `Container.astro` et al).
+ * Prefers bundled `dist/primitives/`, falls back to workspace
+ * `packages/fornix-primitives/src/`.
+ */
+export function primitivesDir(): string {
+  const bundled = resolve(HERE, "primitives");
+  if (existsSync(bundled)) return bundled;
+  return workspacePath("packages", "fornix-primitives", "src");
+}
+
+/**
+ * Path to an archetype's JSON file. Prefers bundled
+ * `dist/archetypes/<name>.json`, falls back to workspace
+ * `packages/fornix-archetypes/archetypes/<name>.json`.
+ */
+export function archetypePath(archetypeName: string): string {
+  const bundled = resolve(HERE, "archetypes", `${archetypeName}.json`);
+  if (existsSync(bundled)) return bundled;
+  return workspacePath(
+    "packages",
+    "fornix-archetypes",
+    "archetypes",
+    `${archetypeName}.json`,
   );
 }
 

@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "name": "hero-text",
+  "version": "1.0.0",
+  "type": "section",
+  "description": "Text-only hero — eyebrow, big headline, subheadline, and up to two CTAs. Type-led, no media slot.",
+  "category": "hero",
+  "tags": ["hero", "landing", "typography", "v0.3"],
+  "dependencies": {},
+  "requires": [],
+  "conflicts": ["hero-media", "hero-gradient", "hero-glass", "hero-split", "hero-video"],
+  "envVars": [],
+  "variants": ["default"],
+  "slots": [],
+  "files": [
+    {
+      "source": "hero-text.astro",
+      "destination": "src/components/sections/hero-text.astro"
+    }
+  ],
+  "ai": {
+    "whenToUse": "Use when the brand is type-led and the message is short — SaaS, agency, portfolio, personal sites. Pairs naturally with a logo-cloud below for social proof.",
+    "whenNotToUse": "Don't use when the product needs a screenshot, video preview, or illustration — use `hero-media` instead. Don't use for restaurant/hospitality sites where mood is imagery-led.",
+    "pairsWith": ["header-sticky", "logo-cloud", "features-grid"],
+    "contentSlots": {
+      "eyebrow": {
+        "type": "string",
+        "description": "Tiny pre-headline label (release name, category, tagline).",
+        "maxLength": 40,
+        "example": "Now in beta"
+      },
+      "headline": {
+        "type": "string",
+        "description": "The primary message. Keep it short and specific — one clear claim.",
+        "maxLength": 90,
+        "example": "Calendars that protect deep work"
+      },
+      "subheadline": {
+        "type": "string",
+        "description": "One- or two-line elaboration. Concrete is better than clever.",
+        "maxLength": 200,
+        "example": "Helix blocks focus time automatically when your week fills up."
+      },
+      "primaryCtaText": {
+        "type": "string",
+        "description": "Primary CTA button label. Falls back to site.ctaPrimary.",
+        "maxLength": 30,
+        "example": "Start free trial"
+      },
+      "primaryCtaHref": {
+        "type": "string",
+        "description": "Primary CTA destination.",
+        "example": "/signup"
+      },
+      "secondaryCtaText": {
+        "type": "string",
+        "description": "Optional secondary CTA (demo link, learn-more). Omit to show only one button.",
+        "maxLength": 30,
+        "example": "Watch demo"
+      },
+      "secondaryCtaHref": {
+        "type": "string",
+        "description": "Secondary CTA destination.",
+        "example": "#demo"
+      }
+    }
+  }
+}

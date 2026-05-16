@@ -1,64 +1,56 @@
 {
   "schemaVersion": 1,
   "name": "header-sticky",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "section",
-  "description": "Sticky navigation header that remains fixed at the top on scroll with logo, nav links, and CTA",
+  "description": "Sticky top navigation bar — logo, primary nav, CTA button, mobile drawer. Reads nav + brand from src/site.config.ts.",
   "category": "header",
-  "tags": ["header", "navigation", "sticky", "fixed", "nav"],
+  "tags": ["header", "navigation", "sticky", "v0.3"],
   "dependencies": {},
   "requires": [],
   "conflicts": ["header-transparent"],
   "envVars": [],
-  "variants": ["default", "compact", "with-search"],
-  "slots": ["logo", "actions"],
+  "variants": ["default"],
+  "slots": [],
   "files": [
     {
       "source": "header-sticky.astro",
       "destination": "src/components/sections/header-sticky.astro"
-    },
-    {
-      "source": "header-sticky.css",
-      "destination": "src/styles/sections/header-sticky.css"
     }
   ],
   "ai": {
-    "whenToUse": "Use as the primary navigation header on marketing sites, SaaS applications, and any multi-page site that benefits from persistent navigation. Best when users need to access navigation at all times.",
-    "whenNotToUse": "Don't use on landing pages where a transparent header would be more visually impactful. Avoid on simple single-page sites without real navigation needs.",
-    "pairsWith": ["hero-split", "features-grid", "pricing-table", "footer-rich"],
+    "whenToUse": "Use as the persistent top navigation on every page. Reads nav links, logo, and primary CTA from `src/site.config.ts`; per-page overrides via content slots. Stays pinned on scroll with a subtle backdrop blur.",
+    "whenNotToUse": "Don't use with `header-transparent`. Don't place two headers on one page. For nav-less landing pages, omit headers entirely.",
+    "pairsWith": ["hero-text", "hero-media", "footer-columns"],
     "contentSlots": {
-      "brandName": {
-        "type": "string",
-        "description": "Brand or site name displayed in the header",
-        "maxLength": 30,
-        "example": "Fornix"
-      },
-      "navLinks": {
-        "type": "array",
-        "description": "Array of navigation link objects",
-        "minItems": 2,
-        "maxItems": 8,
-        "items": {
-          "label": { "type": "string" },
-          "href": { "type": "string" }
-        },
-        "example": [
-          { "label": "Features", "href": "#features" },
-          { "label": "Pricing", "href": "#pricing" },
-          { "label": "Blog", "href": "/blog" },
-          { "label": "Docs", "href": "/docs" }
-        ]
-      },
       "ctaText": {
         "type": "string",
-        "description": "CTA button text in the header",
-        "maxLength": 20,
-        "example": "Get Started"
+        "description": "Override the global CTA button label for this page. Falls back to `site.ctaPrimary.text`.",
+        "maxLength": 32,
+        "example": "Start free trial"
       },
       "ctaHref": {
         "type": "string",
-        "description": "CTA button URL",
-        "example": "#signup"
+        "description": "Override the global CTA button destination. Falls back to `site.ctaPrimary.href`.",
+        "example": "/signup"
+      },
+      "ctaVariant": {
+        "type": "string",
+        "description": "Visual treatment of the CTA: primary | secondary | ghost.",
+        "maxLength": 16,
+        "example": "primary"
+      },
+      "navAriaLabel": {
+        "type": "string",
+        "description": "Accessibility label for the primary nav element (read by screen readers).",
+        "maxLength": 40,
+        "example": "Primary"
+      },
+      "menuToggleAriaLabel": {
+        "type": "string",
+        "description": "Accessibility label for the mobile hamburger button.",
+        "maxLength": 60,
+        "example": "Toggle navigation menu"
       }
     }
   }

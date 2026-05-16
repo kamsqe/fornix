@@ -1,0 +1,145 @@
+---
+import Shell from "../layouts/Shell.astro";
+
+const articles = [
+  {
+    n: "01",
+    title: "Restraint, first.",
+    body: "Every element on a page is a promise the maintainer has to keep. The cheapest promise is the one not made. Liminal starts at zero and asks the work to argue for additions.",
+  },
+  {
+    n: "02",
+    title: "The frame is the design.",
+    body: "We borrow the gestures of editorial print — numbered sections, a hairline rule, a column that holds its width — because they have already survived centuries of attention.",
+  },
+  {
+    n: "03",
+    title: "Motion is a sentence.",
+    body: "Animation is grammar, not garnish. A boot sequence sets tense. A view transition holds the reader's gaze across a clause. If a motion is not load-bearing, cut it.",
+  },
+  {
+    n: "04",
+    title: "Mobile is the medium.",
+    body: "Designs are not tested on phones. They are made on them. The shader degrades. The cursor disappears. The grid stacks. Nothing essential is lost.",
+  },
+  {
+    n: "05",
+    title: "The shader is not decoration.",
+    body: "Liminal ships exactly one fragment shader. It exists because there is no truthful way to render an empty page that is not also a quiet page. The pixels are the silence.",
+  },
+];
+---
+
+<Shell title="Manifesto" sigil="DOCTRINE" index="02 / 04" description="Five articles. Read once.">
+  <article class="doc">
+    <header class="doc-head rise rise-1">
+      <p class="label">↳ Filed under doctrine · revised 05.2025</p>
+      <h1 class="display doc-title">Five articles. <em>Read once.</em></h1>
+    </header>
+
+    <ol class="doc-list">
+      {articles.map((a, i) => (
+        <li class={`doc-row rise rise-${Math.min(i + 2, 6)}`}>
+          <span class="doc-n mono">{a.n}</span>
+          <div class="doc-body">
+            <h2 class="display doc-h">{a.title}</h2>
+            <p class="doc-p">{a.body}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    <footer class="doc-foot rise rise-6">
+      <p class="doc-sig">Signed, in the negative space,</p>
+      <p class="doc-name display">— the maintainer.</p>
+    </footer>
+  </article>
+</Shell>
+
+<style>
+  .doc {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .doc-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .doc-title {
+    font-size: var(--step-7);
+    line-height: 0.95;
+    max-width: 14ch;
+  }
+  .doc-title em {
+    color: var(--blood);
+  }
+
+  .doc-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--ink-300);
+  }
+
+  .doc-row {
+    display: grid;
+    grid-template-columns: 6ch 1fr;
+    gap: var(--space-m);
+    padding: var(--space-l) 0;
+    border-bottom: 1px solid var(--ink-300);
+  }
+
+  .doc-n {
+    font-size: var(--step--1);
+    color: var(--cream-400);
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.4em;
+  }
+
+  .doc-h {
+    font-size: var(--step-3);
+    color: var(--cream-100);
+    margin-bottom: var(--space-2xs);
+    line-height: 1;
+  }
+
+  .doc-p {
+    max-width: 64ch;
+    color: var(--cream-200);
+    font-size: var(--step-0);
+    line-height: 1.65;
+  }
+
+  .doc-foot {
+    text-align: right;
+    padding-top: var(--space-l);
+  }
+  .doc-sig {
+    color: var(--cream-300);
+    font-size: var(--step--1);
+    margin-bottom: var(--space-2xs);
+  }
+  .doc-name {
+    font-size: var(--step-3);
+    color: var(--cream-100);
+  }
+
+  @media (max-width: 720px) {
+    .doc-title { font-size: var(--step-5); }
+    .doc-row {
+      grid-template-columns: 4ch 1fr;
+      gap: var(--space-s);
+      padding: var(--space-m) 0;
+    }
+    .doc-h { font-size: var(--step-2); }
+    .doc-p { font-size: var(--step--1); }
+  }
+</style>

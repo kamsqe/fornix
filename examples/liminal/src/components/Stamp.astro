@@ -1,0 +1,101 @@
+---
+interface Props {
+  /** Page sigil shown in the bottom-right HUD. */
+  sigil: string;
+  /** Page numeric prefix shown top-left, e.g. "00 / 04" */
+  index: string;
+}
+const { sigil, index } = Astro.props;
+---
+
+<header class="stamp-top" aria-hidden="true">
+  <span class="stamp-mark">◆</span>
+  <span class="stamp-id mono">LIMINAL · 0.1.0</span>
+</header>
+
+<aside class="stamp-index mono" aria-hidden="true">{index}</aside>
+
+<footer class="stamp-bottom mono" aria-hidden="true">
+  <span class="stamp-sigil">[ {sigil} ]</span>
+  <time id="stamp-clock" datetime="">--:--:--</time>
+  <span class="stamp-coord">N <span id="stamp-coord-y">000</span>·E <span id="stamp-coord-x">000</span></span>
+</footer>
+
+<style>
+  .stamp-top,
+  .stamp-bottom {
+    position: fixed;
+    left: var(--space-m);
+    z-index: 55;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    font-size: var(--step--2);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cream-400);
+    font-variant-numeric: tabular-nums;
+  }
+  .stamp-top { top: var(--space-m); }
+  .stamp-bottom { bottom: var(--space-m); }
+
+  .stamp-mark { color: var(--blood); }
+  .stamp-sigil { color: var(--cream-200); }
+
+  .stamp-index {
+    position: fixed;
+    top: var(--space-m);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 55;
+    color: var(--cream-300);
+    font-size: var(--step--2);
+    letter-spacing: 0.3em;
+    view-transition-name: numeral;
+  }
+
+  .stamp-bottom { right: var(--space-m); left: auto; }
+
+  .stamp-coord {
+    margin-left: var(--space-xs);
+    color: var(--cream-400);
+  }
+
+  @media (max-width: 720px) {
+    .stamp-bottom {
+      bottom: calc(var(--space-l) + var(--space-2xl));
+      right: var(--space-s);
+      gap: var(--space-3xs);
+    }
+    .stamp-coord { display: none; }
+    .stamp-top { top: var(--space-s); left: var(--space-s); }
+    .stamp-index { top: var(--space-s); }
+  }
+</style>
+
+<script>
+  (() => {
+    const clock = document.getElementById("stamp-clock");
+    const cx = document.getElementById("stamp-coord-x");
+    const cy = document.getElementById("stamp-coord-y");
+    if (!clock) return;
+
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    const tick = () => {
+      const d = new Date();
+      clock.textContent = `${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}·UTC`;
+      clock.setAttribute("datetime", d.toISOString());
+    };
+    tick();
+    setInterval(tick, 1000);
+
+    if (cx && cy) {
+      document.addEventListener("pointermove", (e) => {
+        const x = Math.round((e.clientX / window.innerWidth) * 999);
+        const y = Math.round((e.clientY / window.innerHeight) * 999);
+        cx.textContent = x.toString().padStart(3, "0");
+        cy.textContent = y.toString().padStart(3, "0");
+      }, { passive: true });
+    }
+  })();
+</script>

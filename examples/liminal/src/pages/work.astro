@@ -1,0 +1,170 @@
+---
+import Shell from "../layouts/Shell.astro";
+import { getCollection } from "astro:content";
+
+const works = (await getCollection("works")).sort((a, b) =>
+  a.data.id.localeCompare(b.data.id),
+);
+---
+
+<Shell title="Work" sigil="LEDGER" index="01 / 04" description="Selected work, ordered by entry.">
+  <section class="ledger">
+    <header class="ledger-head rise rise-1">
+      <p class="label">↳ The ledger · 2023—2025</p>
+      <h1 class="display ledger-title">
+        <span>Four</span><br>
+        <span>quiet</span><br>
+        <em>artefacts.</em>
+      </h1>
+    </header>
+
+    <ol class="ledger-rows">
+      {works.map((w, i) => (
+        <li class={`row rise rise-${Math.min(i + 2, 6)}`}>
+          <a href="#" class="row-link" data-cursor="link">
+            <span class="row-id mono">{w.data.id}</span>
+            <span class="row-title display">{w.data.title}</span>
+            <span class="row-client">{w.data.client}</span>
+            <span class="row-role">{w.data.role}</span>
+            <span class={`row-status row-status--${w.data.status.toLowerCase()}`}>
+              <span class="dot"></span>{w.data.status}
+            </span>
+            <span class="row-year mono">{w.data.year}</span>
+          </a>
+          <p class="row-summary">{w.data.summary}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+</Shell>
+
+<style>
+  .ledger {
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+
+  .ledger-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .ledger-title {
+    font-size: var(--step-7);
+    line-height: 0.92;
+  }
+  .ledger-title em {
+    color: var(--cream-200);
+  }
+
+  .ledger-rows {
+    list-style: none;
+    border-top: 1px solid var(--ink-300);
+  }
+
+  .row {
+    border-bottom: 1px solid var(--ink-300);
+    transition: background 0.4s var(--ease-out);
+  }
+  .row:hover {
+    background: rgba(232, 228, 213, 0.02);
+  }
+
+  .row-link {
+    display: grid;
+    grid-template-columns: 5ch minmax(0, 3fr) minmax(0, 2fr) minmax(0, 2fr) 11ch 6ch;
+    gap: var(--space-m);
+    align-items: baseline;
+    padding: var(--space-m) var(--space-s);
+    color: var(--cream-200);
+  }
+
+  .row-id {
+    color: var(--cream-400);
+    font-size: var(--step--1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row-title {
+    font-size: var(--step-3);
+    color: var(--cream-100);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .row-client,
+  .row-role {
+    font-size: var(--step--1);
+    color: var(--cream-300);
+  }
+
+  .row-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+    font-size: var(--step--2);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cream-300);
+  }
+  .row-status .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cream-400);
+  }
+  .row-status--live .dot { background: #5cd682; box-shadow: 0 0 8px #5cd68290; }
+  .row-status--archived .dot { background: var(--cream-400); }
+  .row-status--quiet .dot { background: var(--blood); }
+
+  .row-year {
+    color: var(--cream-300);
+    font-size: var(--step--1);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .row-summary {
+    padding: 0 var(--space-s) var(--space-m) calc(5ch + var(--space-m) + var(--space-s));
+    max-width: 70ch;
+    color: var(--cream-300);
+    font-size: var(--step--1);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 980px) {
+    .row-link {
+      grid-template-columns: 5ch 1fr 8ch;
+      grid-template-rows: auto auto auto;
+      gap: var(--space-2xs) var(--space-s);
+      padding: var(--space-s) 0;
+    }
+    .row-id { grid-column: 1; grid-row: 1 / 3; }
+    .row-title { grid-column: 2; grid-row: 1; font-size: var(--step-2); }
+    .row-year { grid-column: 3; grid-row: 1; }
+    .row-client { grid-column: 2; grid-row: 2; }
+    .row-role { grid-column: 2 / 4; grid-row: 3; color: var(--cream-400); }
+    .row-status { grid-column: 3; grid-row: 2; justify-self: end; }
+    .row-summary {
+      padding: 0 0 var(--space-s) calc(5ch + var(--space-s));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .ledger-title { font-size: var(--step-5); }
+    .row-link {
+      grid-template-columns: 1fr auto;
+      gap: var(--space-3xs) var(--space-s);
+    }
+    .row-id { grid-column: 1; grid-row: 1; }
+    .row-year { grid-column: 2; grid-row: 1; }
+    .row-title { grid-column: 1 / 3; grid-row: 2; font-size: var(--step-2); }
+    .row-client { grid-column: 1 / 3; grid-row: 3; }
+    .row-role { grid-column: 1; grid-row: 4; }
+    .row-status { grid-column: 2; grid-row: 4; }
+    .row-summary { padding: 0 0 var(--space-s); }
+  }
+</style>

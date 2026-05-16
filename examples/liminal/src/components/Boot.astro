@@ -1,0 +1,181 @@
+---
+/**
+ * <Boot /> — terminal-style boot sequence.
+ *
+ * Runs once per session (sessionStorage). Types out a fixed buffer of system
+ * lines, then dissolves. Skippable with Esc / tap. Honors prefers-reduced-motion.
+ */
+---
+
+<div id="boot" role="status" aria-live="polite">
+  <div class="boot-inner">
+    <pre class="boot-logo">┌─────────────────────────┐
+│  L I M I N A L · 0.1.0  │
+└─────────────────────────┘</pre>
+    <div class="boot-stream" id="boot-stream"></div>
+    <div class="boot-hint">[ press <kbd>esc</kbd> to skip ]</div>
+  </div>
+</div>
+
+<style is:global>
+  #boot {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--ink-000);
+    color: var(--cream-100);
+    display: grid;
+    place-items: center;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: var(--step--1);
+    line-height: 1.55;
+    cursor: pointer;
+    transition: opacity 0.6s var(--ease-out), filter 0.6s var(--ease-out);
+  }
+
+  #boot.is-done {
+    opacity: 0;
+    filter: blur(20px);
+    pointer-events: none;
+  }
+
+  .boot-inner {
+    width: min(640px, 88vw);
+    text-align: left;
+  }
+
+  .boot-logo {
+    color: var(--cream-100);
+    font-family: ui-monospace, monospace;
+    font-size: clamp(0.5rem, 1.6vw, 0.75rem);
+    line-height: 1.05;
+    white-space: pre;
+    margin-bottom: var(--space-m);
+    opacity: 0;
+    animation: logo-in 1s var(--ease-out) 0.05s forwards;
+  }
+
+  @keyframes logo-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .boot-stream {
+    min-height: 12em;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .boot-stream .line {
+    display: block;
+    opacity: 0;
+    animation: line-in 0.25s var(--ease-out) forwards;
+  }
+
+  .boot-stream .ok { color: var(--cream-100); }
+  .boot-stream .dim { color: var(--cream-400); }
+  .boot-stream .warn { color: var(--blood); }
+
+  .boot-stream .cursor::after {
+    content: "▍";
+    animation: blink 1s steps(2, end) infinite;
+    margin-left: 2px;
+    color: var(--cream-100);
+  }
+
+  @keyframes line-in {
+    from { opacity: 0; transform: translateY(2px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .boot-hint {
+    margin-top: var(--space-l);
+    color: var(--cream-400);
+    font-size: var(--step--2);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .boot-hint kbd {
+    font-family: inherit;
+    border: 1px solid var(--cream-400);
+    padding: 1px 6px;
+    border-radius: 2px;
+    color: var(--cream-300);
+  }
+</style>
+
+<script>
+  (() => {
+    const SKIP_KEY = "liminal:booted";
+    const root = document.getElementById("boot");
+    const stream = document.getElementById("boot-stream");
+    if (!root || !stream) return;
+
+    // Suppress on subsequent loads in same session
+    if (sessionStorage.getItem(SKIP_KEY) === "1") {
+      root.remove();
+      return;
+    }
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const lines: { text: string; klass?: string; delay?: number }[] = [
+      { text: "liminal-os v0.1.0 · cold boot", klass: "dim", delay: 80 },
+      { text: "[ ok ] mounting /shader … flowfield-04", klass: "ok", delay: 220 },
+      { text: "[ ok ] mounting /font   … editorial-fallback", klass: "ok", delay: 180 },
+      { text: "[ ok ] mounting /cursor … halo, blend:diff", klass: "ok", delay: 180 },
+      { text: "[ ok ] linking view-transitions", klass: "ok", delay: 160 },
+      { text: "[ -- ] handshake with anthropic ... skipped", klass: "dim", delay: 220 },
+      { text: "[ ok ] entropy seeded · " + (Math.random().toString(16).slice(2, 10)), klass: "ok", delay: 200 },
+      { text: "you are entering a quiet place.", klass: "ok", delay: 600 },
+    ];
+
+    const finish = () => {
+      root.classList.add("is-done");
+      sessionStorage.setItem(SKIP_KEY, "1");
+      setTimeout(() => root.remove(), 700);
+      window.dispatchEvent(new CustomEvent("liminal:booted"));
+    };
+
+    root.addEventListener("click", finish);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "Enter" || e.key === " ") finish();
+    };
+    window.addEventListener("keydown", onKey, { once: false });
+
+    if (reduced) {
+      // Render all lines instantly, then finish quickly
+      for (const l of lines) {
+        const el = document.createElement("span");
+        el.className = "line " + (l.klass ?? "");
+        el.textContent = l.text;
+        stream.appendChild(el);
+      }
+      setTimeout(finish, 400);
+      return;
+    }
+
+    let i = 0;
+    const next = () => {
+      if (i >= lines.length) {
+        const cur = document.createElement("span");
+        cur.className = "line cursor";
+        stream.appendChild(cur);
+        setTimeout(finish, 700);
+        return;
+      }
+      const l = lines[i++]!;
+      const el = document.createElement("span");
+      el.className = "line " + (l.klass ?? "");
+      el.textContent = l.text;
+      stream.appendChild(el);
+      setTimeout(next, l.delay ?? 180);
+    };
+    setTimeout(next, 350);
+  })();
+</script>

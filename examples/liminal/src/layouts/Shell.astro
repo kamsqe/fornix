@@ -1,0 +1,88 @@
+---
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
+import Field from "../components/Field.astro";
+import Cursor from "../components/Cursor.astro";
+import Boot from "../components/Boot.astro";
+import Nav from "../components/Nav.astro";
+import Stamp from "../components/Stamp.astro";
+
+interface Props {
+  title: string;
+  description?: string;
+  sigil: string;
+  index: string;
+}
+
+const { title, description = "An anti-template.", sigil, index } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} · LIMINAL</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={`${title} · LIMINAL`} />
+    <meta property="og:description" content={description} />
+    <ClientRouter />
+  </head>
+  <body>
+    <Field />
+
+    <div class="grain" aria-hidden="true"></div>
+    <div class="scan" aria-hidden="true"></div>
+    <div class="frame" aria-hidden="true"></div>
+
+    <Stamp sigil={sigil} index={index} />
+    <Nav />
+
+    <main class="shell-main" transition:animate="fade">
+      <slot />
+    </main>
+
+    <Cursor />
+    <Boot />
+
+    <script>
+      /* ── easter egg: type "matrix" anywhere to invert the world ── */
+      (() => {
+        let buf = "";
+        const trigger = "matrix";
+        let inverted = false;
+        window.addEventListener("keydown", (e) => {
+          if (e.key.length !== 1) return;
+          buf = (buf + e.key.toLowerCase()).slice(-trigger.length);
+          if (buf === trigger) {
+            inverted = !inverted;
+            document.documentElement.style.filter = inverted ? "invert(1) hue-rotate(180deg)" : "";
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .shell-main {
+    position: relative;
+    z-index: 10;
+    min-height: 100dvh;
+    padding: var(--space-3xl) var(--space-m);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @media (max-width: 720px) {
+    .shell-main {
+      padding: var(--space-2xl) var(--space-s) calc(var(--space-3xl) + var(--space-l));
+      justify-content: flex-start;
+      min-height: 100dvh;
+    }
+  }
+</style>

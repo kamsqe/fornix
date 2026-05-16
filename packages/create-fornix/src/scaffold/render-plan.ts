@@ -1,6 +1,7 @@
 import type { BlockManifest } from "fornix-registry";
 
 import type { ResolvedConfig } from "../schemas/config.js";
+import type { SiteConfig } from "../schemas/site-config.js";
 import type { BlockSource } from "./blocks.js";
 import type { PaletteCss } from "./palette.js";
 
@@ -19,6 +20,13 @@ export interface RenderPlan {
   locales: ReadonlyArray<string>;
 
   palette: PaletteCss;
+
+  /**
+   * Site-wide configuration object emitted to `src/site.config.ts` and read
+   * by every block. The single source of truth for brand, nav, CTAs, social,
+   * legal, and archetype-specific extension data.
+   */
+  siteConfig: SiteConfig;
 
   /** Where the generated project will deploy. Drives wrangler.json emission. */
   deployTarget: "cloudflare" | "vercel" | "netlify" | "static";
@@ -101,6 +109,7 @@ export function buildRenderPlan(
   blocks: ReadonlyArray<BlockSource>,
   palette: PaletteCss,
   contentByLocale: ContentByLocale = {},
+  siteConfig?: SiteConfig,
 ): RenderPlan {
   // Stable sort by category priority. Section blocks only — layout/integration
   // blocks aren't rendered as sections on index.astro.
@@ -147,6 +156,7 @@ export function buildRenderPlan(
     locale: config.defaultLocale,
     locales: config.locales,
     palette,
+    siteConfig: siteConfig ?? defaultSiteConfig(config),
     deployTarget: config.deployTarget,
     layout: {
       title: config.projectName,
@@ -156,6 +166,46 @@ export function buildRenderPlan(
     contentEntries,
     dependencies,
   };
+}
+
+/**
+ * Reasonable site-config defaults derived from `ResolvedConfig`. Archetype
+ * authors will override these in week 3; for now this gives every scaffold
+ * a populated `src/site.config.ts` consistent with the rest of the project.
+ */
+function defaultSiteConfig(config: ResolvedConfig): SiteConfig {
+  const displayName = humanizeProjectName(config.projectName);
+  const initials = monogramFrom(displayName);
+  return {
+    name: displayName,
+    archetype: config.createdWith === "ai" ? "ai-generated" : undefined,
+    locale: {
+      default: config.defaultLocale,
+      supported: [...config.locales],
+    },
+    logo: { type: "monogram", text: initials },
+    legal: {
+      copyright: `© ${new Date().getUTCFullYear()} ${displayName}`,
+    },
+  };
+}
+
+function humanizeProjectName(slug: string): string {
+  return slug
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ") || slug;
+}
+
+function monogramFrom(name: string): string {
+  const words = name
+    .split(/[\s]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase());
+  if (words.length === 0) return "F";
+  if (words.length === 1) return words[0];
+  return (words[0] + words[1]).slice(0, 2);
 }
 
 function mergeDependencies(

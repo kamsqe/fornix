@@ -78,6 +78,13 @@ export function renderToFiles(plan: RenderPlan): FileMap {
     { schemaDeclarations, sectionsSchema },
   );
 
+  // ── src/site.config.ts ───────────────────────────────────
+  // The single source of truth for site-wide brand/nav/CTAs/social/legal.
+  // Every block (once rewritten in v0.3 week 2) reads from this.
+  files["src/site.config.ts"] = fillTemplate(loadTemplate("site.config.ts"), {
+    siteConfigJson: JSON.stringify(plan.siteConfig, null, 2),
+  });
+
   // ── .gitignore ───────────────────────────────────────────
   files[".gitignore"] = loadTemplate("gitignore");
 

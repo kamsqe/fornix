@@ -255,7 +255,7 @@ function renderProjectManifest(plan: RenderPlan): string {
 
   const manifest = {
     schemaVersion: 1,
-    fornixVersion: "0.3.0",
+    fornixVersion: "0.4.0",
     scaffoldedAt: new Date().toISOString(),
     projectName: plan.projectName,
     brand: plan.siteConfig.name,

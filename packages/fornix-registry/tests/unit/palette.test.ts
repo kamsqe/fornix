@@ -8,18 +8,40 @@ import {
 
 // ── Fixtures ──────────────────────────────────────────────
 
+// v0.3 palette shape — includes typography, radius, motion, shadow groups.
+// Mirrored from palettes/obsidian.json so the test fixture stays in lockstep
+// with what ships.
 const validPalette = {
-  schemaVersion: 1,
-  name: "midnight",
-  displayName: "Midnight",
-  category: "dark",
+  schemaVersion: 2,
+  name: "obsidian",
+  displayName: "Obsidian",
+  category: "premium-dark",
   mode: "dark" as const,
   colors: {
-    primary: "#6366f1",
-    secondary: "#818cf8",
-    accent: "#c084fc",
-    background: "#0f172a",
-    foreground: "#f8fafc",
+    primary: "#8b5cf6",
+    secondary: "#6366f1",
+    accent: "#06b6d4",
+    background: "#0a0a0a",
+    foreground: "#f4f4f5",
+  },
+  typography: {
+    headline: { family: "'Inter', system-ui, sans-serif", weight: 700 },
+    body: { family: "'Inter', system-ui, sans-serif", weight: 400 },
+  },
+  radius: {
+    sm: "0.25rem",
+    md: "0.375rem",
+    lg: "0.5rem",
+    full: "9999px",
+  },
+  motion: {
+    duration: { fast: "150ms", normal: "200ms", slow: "300ms" },
+    easing: { default: "cubic-bezier(0.16, 1, 0.3, 1)" },
+  },
+  shadow: {
+    sm: "0 1px 2px rgba(0, 0, 0, 0.4)",
+    md: "0 4px 12px rgba(0, 0, 0, 0.45)",
+    lg: "0 16px 48px rgba(0, 0, 0, 0.55)",
   },
 };
 
@@ -49,9 +71,9 @@ describe("PaletteSchema", () => {
     const result = PaletteSchema.safeParse(validPalette);
     expect(result.success).toBe(true);
     if (result.success) {
-      expect(result.data.name).toBe("midnight");
+      expect(result.data.name).toBe("obsidian");
       expect(result.data.mode).toBe("dark");
-      expect(result.data.colors.primary).toBe("#6366f1");
+      expect(result.data.colors.primary).toBe("#8b5cf6");
     }
   });
 
@@ -177,14 +199,28 @@ describe("PaletteRegistrySchema", () => {
 describe("Palette JSON files", () => {
   const palettes = loadAllPaletteFiles();
 
-  it("has at least 30 palette files", () => {
-    expect(palettes.length).toBeGreaterThanOrEqual(30);
+  // v0.3 deliberately consolidated to 7 stunning, opinionated palettes
+  // (vs v1's 32 generic ones). Each one is the canonical face of a
+  // specific archetype voice. New palettes ship only when they earn it.
+  it("ships the 7 v0.3 palettes — no more, no less", () => {
+    expect(palettes.map(({ data }) => (data as { name: string }).name).sort()).toEqual([
+      "aurora",
+      "ember",
+      "fraktur",
+      "obsidian",
+      "paper",
+      "sage",
+      "terracotta",
+    ]);
   });
 
   it("every palette file validates against PaletteSchema", () => {
     for (const { filename, data } of palettes) {
       const result = PaletteSchema.safeParse(data);
-      expect(result.success, `${filename} failed validation: ${JSON.stringify(result.success ? null : result.error.issues)}`).toBe(true);
+      expect(
+        result.success,
+        `${filename} failed validation: ${JSON.stringify(result.success ? null : result.error.issues)}`,
+      ).toBe(true);
     }
   });
 
@@ -194,29 +230,13 @@ describe("Palette JSON files", () => {
     expect(uniqueNames.size).toBe(names.length);
   });
 
-  it("every category from registry-agent.md has at least 3 palettes", () => {
-    const requiredCategories = [
-      "dark",
-      "light",
-      "vibrant",
-      "professional",
-      "nature",
-      "warm",
-      "cool",
-      "brand-inspired",
-    ];
-
-    const categoryCounts: Record<string, number> = {};
-    for (const { data } of palettes) {
-      const category = (data as { category: string }).category;
-      categoryCounts[category] = (categoryCounts[category] ?? 0) + 1;
-    }
-
-    for (const category of requiredCategories) {
+  it("every palette declares a non-empty category", () => {
+    for (const { filename, data } of palettes) {
+      const category = (data as { category?: string }).category;
       expect(
-        categoryCounts[category],
-        `Category "${category}" has ${categoryCounts[category] ?? 0} palettes, needs at least 3`
-      ).toBeGreaterThanOrEqual(3);
+        typeof category === "string" && category.length > 0,
+        `${filename} is missing a category`,
+      ).toBe(true);
     }
   });
 });

@@ -40,7 +40,7 @@ import { estimateCost, formatEstimate } from "./ai/cost-estimate.js";
 const main = defineCommand({
   meta: {
     name: "create-fornix",
-    version: "0.3.0",
+    version: "0.4.0",
     description:
       "Scaffold Astro projects from curated archetypes + a 13-block design system",
   },

@@ -1,7 +1,7 @@
 {
   "name": "create-fornix",
-  "version": "0.3.0",
-  "description": "Scaffold a production-ready Astro site in one command. 5 archetypes (SaaS, agency, portfolio, gym, restaurant), 13 hand-built blocks, 7 design palettes, multi-page sites, multi-deploy-target configs (Cloudflare/Vercel/Netlify), and AGENTS.md emission so Claude Code & Cursor can pick up where the CLI left off.",
+  "version": "0.4.0",
+  "description": "Scaffold a production-ready Astro site in one command. Pass --prompt and Claude picks the archetype + writes the copy. 5 archetypes (SaaS, agency, portfolio, gym, restaurant), 13 hand-built blocks, 7 design palettes, multi-page sites, multi-deploy-target configs (Cloudflare/Vercel/Netlify), and AGENTS.md emission so Claude Code & Cursor can pick up where the CLI left off.",
   "type": "module",
   "license": "MIT",
   "author": "kambar <kambar.mirmanov@gmail.com> (https://github.com/kamsqe)",

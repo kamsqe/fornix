@@ -42,14 +42,25 @@ describe("build-registry", () => {
       }
     });
 
-    it("includes hero-gradient, footer-minimal, features-grid, theme-switcher, db-d1, auth-better-auth", () => {
+    it("includes the v0.3 13-block lineup", () => {
       const names = result.registry.blocks.map((b) => b.name);
-      expect(names).toContain("hero-gradient");
-      expect(names).toContain("footer-minimal");
-      expect(names).toContain("features-grid");
-      expect(names).toContain("theme-switcher");
-      expect(names).toContain("db-d1");
-      expect(names).toContain("auth-better-auth");
+      for (const expected of [
+        "header-sticky",
+        "hero-text",
+        "hero-media",
+        "features-grid",
+        "features-bento",
+        "logo-cloud",
+        "testimonials-grid",
+        "stats-strip",
+        "how-it-works",
+        "pricing-table",
+        "faq",
+        "cta-strip",
+        "footer-columns",
+      ]) {
+        expect(names, `Missing v0.3 block: ${expected}`).toContain(expected);
+      }
     });
 
     it("has no duplicate block names", () => {
@@ -74,11 +85,17 @@ describe("build-registry", () => {
       expect(result.registry.palettes.length).toBe(paletteFiles.length);
     });
 
-    it("includes known palettes (midnight, arctic, forest)", () => {
-      const names = result.registry.palettes.map((p) => p.name);
-      expect(names).toContain("midnight");
-      expect(names).toContain("arctic");
-      expect(names).toContain("forest");
+    it("includes the v0.3 7 palettes", () => {
+      const names = result.registry.palettes.map((p) => p.name).sort();
+      expect(names).toEqual([
+        "aurora",
+        "ember",
+        "fraktur",
+        "obsidian",
+        "paper",
+        "sage",
+        "terracotta",
+      ]);
     });
 
     it("has no duplicate palette names", () => {

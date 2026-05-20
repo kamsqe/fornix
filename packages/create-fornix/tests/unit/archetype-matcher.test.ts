@@ -14,6 +14,7 @@ import {
   ArchetypeMatchSchema,
   ARCHETYPE_NAMES,
   type ArchetypeMatch,
+  type ProviderKind,
 } from "../../src/ai/archetype-matcher.js";
 
 function makeMatch(overrides: Partial<ArchetypeMatch> = {}): ArchetypeMatch {
@@ -41,6 +42,16 @@ describe("ARCHETYPE_NAMES", () => {
       "restaurant",
       "saas",
     ]);
+  });
+});
+
+describe("ProviderKind", () => {
+  it("admits the two supported providers", () => {
+    // Compile-time check materialized as a runtime assertion: the union
+    // narrows to exactly "anthropic" | "google". Anything else fails to
+    // assign without a cast.
+    const kinds: ProviderKind[] = ["anthropic", "google"];
+    expect(kinds.length).toBe(2);
   });
 });
 

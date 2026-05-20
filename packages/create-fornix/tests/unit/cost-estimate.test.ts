@@ -64,6 +64,56 @@ describe("estimateCost", () => {
     expect(haiku.usd).toBeLessThan(sonnet.usd);
   });
 
+  it("Gemini 3 Flash is materially cheaper than Sonnet on a typical scaffold", () => {
+    const sonnet = estimateCost({
+      copyCalls: 10,
+      includesMatcher: true,
+      model: "claude-sonnet-4-6",
+    });
+    const flash = estimateCost({
+      copyCalls: 10,
+      includesMatcher: true,
+      model: "gemini-3-flash-preview",
+    });
+    expect(flash.usd).toBeLessThan(sonnet.usd / 2);
+    expect(flash.usd).toBeGreaterThan(0);
+  });
+
+  it("Gemini 3.1 Flash-Lite is the cheapest tier", () => {
+    const flash = estimateCost({
+      copyCalls: 10,
+      includesMatcher: false,
+      model: "gemini-3-flash-preview",
+    });
+    const lite = estimateCost({
+      copyCalls: 10,
+      includesMatcher: false,
+      model: "gemini-3.1-flash-lite",
+    });
+    expect(lite.usd).toBeLessThan(flash.usd);
+    expect(lite.usd).toBeGreaterThan(0);
+  });
+
+  it("Gemini 3.1 Pro sits between Flash and Claude Opus for cost", () => {
+    const flash = estimateCost({
+      copyCalls: 10,
+      includesMatcher: false,
+      model: "gemini-3-flash-preview",
+    });
+    const pro = estimateCost({
+      copyCalls: 10,
+      includesMatcher: false,
+      model: "gemini-3.1-pro-preview",
+    });
+    const opus = estimateCost({
+      copyCalls: 10,
+      includesMatcher: false,
+      model: "claude-opus-4-7",
+    });
+    expect(pro.usd).toBeGreaterThan(flash.usd);
+    expect(pro.usd).toBeLessThan(opus.usd);
+  });
+
   it("excluding the matcher reduces the call count by exactly 1", () => {
     const withMatcher = estimateCost({
       copyCalls: 8,
@@ -90,6 +140,18 @@ describe("formatEstimate", () => {
     expect(formatted).toContain("24s");
     expect(formatted).toContain("9 calls");
     expect(formatted).toContain("Sonnet");
+  });
+
+  it("recognizes Gemini model family names", () => {
+    expect(
+      formatEstimate({ usd: 0.01, seconds: 8, calls: 9 }, "gemini-3-flash-preview"),
+    ).toContain("Gemini 3 Flash");
+    expect(
+      formatEstimate({ usd: 0.04, seconds: 8, calls: 9 }, "gemini-3.1-pro-preview"),
+    ).toContain("Gemini 3.1 Pro");
+    expect(
+      formatEstimate({ usd: 0.002, seconds: 8, calls: 9 }, "gemini-3.1-flash-lite"),
+    ).toContain("Flash-Lite");
   });
 
   it("singularizes the call label when calls=1", () => {

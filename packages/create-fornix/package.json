@@ -62,6 +62,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.78",
+    "@ai-sdk/google": "^3.0.75",
     "ai": "^6.0.183",
     "citty": "^0.1.6",
     "zod": "^3.24.0"

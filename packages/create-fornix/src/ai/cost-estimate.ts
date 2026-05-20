@@ -28,16 +28,24 @@ export interface CostEstimate {
   calls: number;
 }
 
-// Per-million-token rates (USD). Approximate; revise when Anthropic posts
+// Per-million-token rates (USD). Approximate; revise when providers post
 // new rate cards. The cost preview is a guidance number, not an invoice.
 const RATES: Record<string, { inputPerM: number; outputPerM: number }> = {
+  // Anthropic — Claude 4 series
   "claude-sonnet-4-6": { inputPerM: 3, outputPerM: 15 },
   "claude-opus-4-7": { inputPerM: 15, outputPerM: 75 },
   "claude-haiku-4-5-20251001": { inputPerM: 0.8, outputPerM: 4 },
-  // Older / forward-compatible aliases the user may pass:
   "claude-sonnet": { inputPerM: 3, outputPerM: 15 },
   "claude-opus": { inputPerM: 15, outputPerM: 75 },
   "claude-haiku": { inputPerM: 0.8, outputPerM: 4 },
+
+  // Google — Gemini 3 series. Pricing per Google's published rate cards
+  // (May 2026). Flash sits at Pro-level reasoning for ~1/8 the cost.
+  "gemini-3-flash-preview": { inputPerM: 0.3, outputPerM: 2.5 },
+  "gemini-3.1-flash-lite": { inputPerM: 0.1, outputPerM: 0.4 },
+  "gemini-3.1-pro-preview": { inputPerM: 2, outputPerM: 12 },
+  "gemini-3-flash": { inputPerM: 0.3, outputPerM: 2.5 },
+  "gemini-3.1-pro": { inputPerM: 2, outputPerM: 12 },
 };
 
 // Per-call token estimates. Tuned by inspecting prompt + typical output
@@ -95,6 +103,11 @@ export function formatEstimate(
 }
 
 function friendlyModelName(model: string): string {
+  if (model.includes("gemini-3.1-pro")) return "Gemini 3.1 Pro";
+  if (model.includes("gemini-3.1-flash-lite")) return "Gemini 3.1 Flash-Lite";
+  if (model.includes("gemini-3.1-flash")) return "Gemini 3.1 Flash";
+  if (model.includes("gemini-3-flash")) return "Gemini 3 Flash";
+  if (model.includes("gemini")) return "Gemini";
   if (model.includes("opus")) return "Opus";
   if (model.includes("sonnet")) return "Sonnet";
   if (model.includes("haiku")) return "Haiku";

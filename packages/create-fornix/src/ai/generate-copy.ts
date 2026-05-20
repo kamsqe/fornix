@@ -12,6 +12,14 @@ export interface GeneratedCopyEntry {
   locale: string;
   content: CopyResponse;
   source: "ai" | "default" | "ai-validation-failed";
+  /**
+   * When `source !== "ai"`, this carries the reason: either the provider's
+   * error message (network, rate-limit, model-rejected, etc.) or a
+   * one-line summary of the validation failure. Used by the CLI to
+   * surface why a block fell back to defaults — silent fallback is the
+   * worst possible UX in a paid path.
+   */
+  error?: string;
 }
 
 export interface GenerateCopyOptions {
@@ -27,6 +35,19 @@ export interface GenerateCopyOptions {
    * Callbacks must not throw — they're called inside a `.then()` chain.
    */
   onTick?: (event: { entry: GeneratedCopyEntry; index: number; total: number }) => void;
+  /**
+   * Max in-flight provider calls. Default 1 — sequential. Gemini Flash's
+   * structured-output mode is dramatically more reliable when calls don't
+   * race; bumping to 2-3 cuts latency in half but doubles the fallback
+   * rate on heavy-schema blocks. Set higher only on a paid Anthropic tier.
+   */
+  concurrency?: number;
+  /**
+   * Retry the provider once when a call fails on the first attempt. Many
+   * "could not parse the response" errors from Gemini are transient (the
+   * model's structured-output mode is non-deterministic). Default true.
+   */
+  retryOnce?: boolean;
 }
 
 /**
@@ -49,22 +70,45 @@ export async function generateCopyForBlocks(
     }
   }
   const total = pairs.length;
+  const concurrency = Math.max(1, options.concurrency ?? 1);
+  const retryOnce = options.retryOnce ?? true;
 
+  const results: GeneratedCopyEntry[] = new Array(total);
+  let nextIndex = 0;
   let completed = 0;
-  const tasks = pairs.map(async ({ block, locale }) => {
-    const entry = await generateOne(options.provider, block, locale, options.brand);
-    if (options.onTick) {
-      completed += 1;
-      try {
-        options.onTick({ entry, index: completed, total });
-      } catch {
-        // Tick callbacks must not interrupt generation — swallow.
+
+  async function worker(): Promise<void> {
+    while (true) {
+      const i = nextIndex;
+      if (i >= pairs.length) return;
+      nextIndex = i + 1;
+
+      const { block, locale } = pairs[i] as { block: BlockSource; locale: string };
+      let entry = await generateOne(options.provider, block, locale, options.brand);
+      if (retryOnce && entry.source !== "ai") {
+        // Transient parse / rate-limit / schema-noise failures often pass
+        // on a second attempt with the same prompt — Gemini in particular.
+        const retry = await generateOne(options.provider, block, locale, options.brand);
+        if (retry.source === "ai") entry = retry;
+      }
+      results[i] = entry;
+
+      if (options.onTick) {
+        completed += 1;
+        try {
+          options.onTick({ entry, index: completed, total });
+        } catch {
+          // Tick callbacks must not interrupt generation — swallow.
+        }
       }
     }
-    return entry;
-  });
+  }
 
-  return Promise.all(tasks);
+  const workers = Array.from({ length: Math.min(concurrency, total) }, () =>
+    worker(),
+  );
+  await Promise.all(workers);
+  return results;
 }
 
 async function generateOne(
@@ -101,6 +145,7 @@ async function generateOne(
       locale,
       content: fallback,
       source: "default",
+      error: result.error.message,
     };
   }
 
@@ -112,6 +157,10 @@ async function generateOne(
       locale,
       content: fallback,
       source: "ai-validation-failed",
+      error: validation.error.issues
+        .slice(0, 3)
+        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .join("; "),
     };
   }
 

@@ -16,12 +16,15 @@
  *   - the response fails schema validation
  *   - confidence < 0.4 (matcher isn't sure → safer default than wrong pick)
  *
- * Cost: one Sonnet call per scaffold (~200 input tokens, ~300 output) —
- * roughly $0.003. Cheap enough to be unconditional when --prompt is set.
+ * Provider-agnostic — dispatches on `kind` to either Anthropic Claude
+ * (via @ai-sdk/anthropic) or Google Gemini (via @ai-sdk/google). One
+ * structured-output call per scaffold; cheap enough to be unconditional
+ * when --prompt is set.
  */
 
 import { z } from "zod";
 import { createAnthropic } from "@ai-sdk/anthropic";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
 
 import { ok, err, type Result } from "../utils/result.js";
@@ -86,9 +89,22 @@ export type ArchetypeMatch = z.infer<typeof ArchetypeMatchSchema>;
 
 // ── Public API ────────────────────────────────────────────
 
+export type ProviderKind = "anthropic" | "google";
+
 export interface MatchArchetypeOptions {
   prompt: string;
+  /**
+   * Which AI provider to call. Determined by the CLI from which API key
+   * is in the env — GEMINI_API_KEY → "google", ANTHROPIC_API_KEY →
+   * "anthropic". Both providers expose the same generateObject surface,
+   * so the matcher is identical except for client construction.
+   */
+  kind: ProviderKind;
   apiKey: string;
+  /**
+   * Model ID. Defaults differ per provider — see DEFAULT_MODELS below.
+   * Override via `FORNIX_ANTHROPIC_MODEL` or `FORNIX_GEMINI_MODEL`.
+   */
   model?: string;
   /**
    * Project name (CLI positional). Used as the fallback brand name when the
@@ -98,30 +114,48 @@ export interface MatchArchetypeOptions {
   projectName: string;
 }
 
-const DEFAULT_MODEL = "claude-sonnet-4-6";
+const DEFAULT_MODELS: Record<ProviderKind, string> = {
+  anthropic: "claude-sonnet-4-6",
+  google: "gemini-3-flash-preview",
+};
 const DEFAULT_MAX_OUTPUT_TOKENS = 800;
 const MIN_CONFIDENCE = 0.4;
 
 export async function matchArchetype(
   options: MatchArchetypeOptions,
 ): Promise<Result<ArchetypeMatch, ProviderError>> {
-  const anthropic = createAnthropic({ apiKey: options.apiKey });
-  const modelId = options.model ?? DEFAULT_MODEL;
+  const modelId = options.model ?? DEFAULT_MODELS[options.kind];
+  const model =
+    options.kind === "google"
+      ? createGoogleGenerativeAI({ apiKey: options.apiKey })(modelId)
+      : createAnthropic({ apiKey: options.apiKey })(modelId);
 
   try {
     const result = await generateObject({
-      model: anthropic(modelId),
+      model,
       schema: ArchetypeMatchSchema,
       maxOutputTokens: DEFAULT_MAX_OUTPUT_TOKENS,
       system: buildSystemPrompt(),
       prompt: buildUserPrompt(options.prompt, options.projectName),
+      // For Gemini: keep thinking minimal — classifier-style task, no
+      // benefit from reasoning trace; the schema does the heavy lifting.
+      ...(options.kind === "google"
+        ? {
+            providerOptions: {
+              google: {
+                thinkingConfig: { thinkingLevel: "minimal" },
+                structuredOutputs: true,
+              },
+            },
+          }
+        : {}),
     });
     return ok(result.object);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     return err({
       kind: "ProviderError",
-      provider: "anthropic",
+      provider: options.kind,
       message,
     });
   }

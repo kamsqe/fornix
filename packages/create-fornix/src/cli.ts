@@ -29,11 +29,16 @@ import { loadPaletteData } from "./scaffold/palette.js";
 import { loadArchetype, archetypeOverlay } from "./scaffold/archetype.js";
 import type { ResolvedConfig } from "./schemas/config.js";
 import { createAnthropicProvider } from "./ai/providers/anthropic.js";
+import {
+  createGoogleProvider,
+  DEFAULT_GOOGLE_MODEL,
+} from "./ai/providers/google.js";
 import type { AIProvider, BrandContext } from "./ai/provider.js";
 import {
   matchArchetype,
   resolveMatch,
   brandFromMatch,
+  type ProviderKind,
 } from "./ai/archetype-matcher.js";
 import { estimateCost, formatEstimate } from "./ai/cost-estimate.js";
 
@@ -95,21 +100,30 @@ const main = defineCommand({
       );
     }
 
+    // ── AI provider detection ─────────────────────────────────────
+    // Prefer Gemini if its key is set (the user can run lower-cost +
+    // higher-tier limits there). Fall back to Anthropic if its key is
+    // set. Neither = AI features disabled (matcher + copy gen skipped).
+    const aiProvider = detectAiProvider();
+
     // ── Archetype resolution ──────────────────────────────────────
     // Three paths to picking an archetype, in priority order:
     //   1. Explicit `--archetype <name>` flag
-    //   2. AI matcher from `--prompt "..."` (requires ANTHROPIC_API_KEY)
+    //   2. AI matcher from `--prompt "..."` (requires an AI key)
     //   3. None — fall through to custom block mode
     let archetypeName = args.archetype.trim();
     let matchedBrand: BrandContext | null = null;
 
-    if (!archetypeName && args.prompt.trim() && process.env.ANTHROPIC_API_KEY) {
-      process.stdout.write(`→ Matching archetype from prompt…\n`);
+    if (!archetypeName && args.prompt.trim() && aiProvider) {
+      process.stdout.write(
+        `→ Matching archetype from prompt via ${aiProvider.label}…\n`,
+      );
       const matcherResult = await matchArchetype({
         prompt: args.prompt.trim(),
-        apiKey: process.env.ANTHROPIC_API_KEY,
+        kind: aiProvider.kind,
+        apiKey: aiProvider.apiKey,
+        model: aiProvider.matcherModel,
         projectName: args.name,
-        model: process.env.FORNIX_ANTHROPIC_MODEL,
       });
       if (matcherResult.ok) {
         const resolved = resolveMatch(matcherResult.value);
@@ -209,6 +223,7 @@ const main = defineCommand({
       projectName: args.name,
       matchedBrand,
       archetypeName: isKnownArchetype(archetypeName) ? archetypeName : null,
+      aiProvider,
     });
     if (archetype) {
       process.stdout.write(
@@ -249,8 +264,9 @@ const main = defineCommand({
                 : entry.source === "ai-validation-failed"
                   ? "!"
                   : "·";
+            const reason = entry.error ? ` — ${truncate(entry.error, 90)}` : "";
             process.stderr.write(
-              `  ${status} [${index}/${total}] ${entry.blockName} (${entry.locale})\n`,
+              `  ${status} [${index}/${total}] ${entry.blockName} (${entry.locale})${reason}\n`,
             );
           }
         : undefined,
@@ -339,19 +355,87 @@ function isKnownArchetype(name: string): name is KnownArchetype {
   );
 }
 
+interface AiProviderSpec {
+  kind: ProviderKind;
+  /** Friendly label for stdout — e.g. "Gemini 3 Flash". */
+  label: string;
+  apiKey: string;
+  /** Model used by the prompt-→-archetype matcher (one structured call). */
+  matcherModel: string;
+  /** Model used by the per-block copy generator (N parallel calls). */
+  copyModel: string;
+}
+
+/**
+ * Detect which AI provider to use based on env. Order of preference:
+ *   1. Gemini  — `GEMINI_API_KEY` or lowercase `gemini_api_key` (dotenv style)
+ *   2. Anthropic — `ANTHROPIC_API_KEY`
+ *   3. None — AI features off.
+ *
+ * Per-provider model overrides: `FORNIX_GEMINI_MODEL` (e.g.
+ * `gemini-3.1-pro-preview`) or `FORNIX_ANTHROPIC_MODEL`.
+ */
+function detectAiProvider(): AiProviderSpec | null {
+  const geminiKey =
+    process.env.GEMINI_API_KEY ?? process.env.gemini_api_key;
+  if (geminiKey) {
+    const model = process.env.FORNIX_GEMINI_MODEL ?? DEFAULT_GOOGLE_MODEL;
+    return {
+      kind: "google",
+      label: friendlyModelLabel(model),
+      apiKey: geminiKey,
+      matcherModel: model,
+      copyModel: model,
+    };
+  }
+
+  const anthropicKey = process.env.ANTHROPIC_API_KEY;
+  if (anthropicKey) {
+    const model = process.env.FORNIX_ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
+    return {
+      kind: "anthropic",
+      label: friendlyModelLabel(model),
+      apiKey: anthropicKey,
+      matcherModel: model,
+      copyModel: model,
+    };
+  }
+
+  return null;
+}
+
+function truncate(s: string, max: number): string {
+  if (s.length <= max) return s;
+  return s.slice(0, max - 1) + "…";
+}
+
+function friendlyModelLabel(model: string): string {
+  if (model.includes("gemini-3.1-pro")) return "Gemini 3.1 Pro";
+  if (model.includes("gemini-3.1-flash-lite")) return "Gemini 3.1 Flash-Lite";
+  if (model.includes("gemini-3.1-flash")) return "Gemini 3.1 Flash";
+  if (model.includes("gemini-3-flash")) return "Gemini 3 Flash";
+  if (model.includes("gemini")) return model;
+  if (model.includes("opus")) return "Claude Opus";
+  if (model.includes("sonnet")) return "Claude Sonnet";
+  if (model.includes("haiku")) return "Claude Haiku";
+  return model;
+}
+
 function resolveAiSetup(opts: {
   prompt: string;
   projectName: string;
   matchedBrand: BrandContext | null;
   archetypeName: KnownArchetype | null;
+  aiProvider: AiProviderSpec | null;
 }): AiSetup | null {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
   const description = opts.prompt.trim();
+  if (!opts.aiProvider || description.length === 0) return null;
 
-  if (!apiKey || description.length === 0) return null;
-
-  const model = process.env.FORNIX_ANTHROPIC_MODEL ?? "claude-sonnet-4-6";
-  const provider = createAnthropicProvider({ apiKey, model });
+  const { kind, apiKey, copyModel } = opts.aiProvider;
+  const provider: AIProvider =
+    kind === "google"
+      ? createGoogleProvider({ apiKey, model: copyModel })
+      : createAnthropicProvider({ apiKey, model: copyModel });
 
   // Prefer the matcher-inferred brand when present — it has a real
   // industry/tone/audience rather than the generic fallback.
@@ -370,7 +454,7 @@ function resolveAiSetup(opts: {
     ? { ...baseBrand, archetype: opts.archetypeName }
     : baseBrand;
 
-  return { provider, brand, model };
+  return { provider, brand, model: copyModel };
 }
 
 runMain(main);

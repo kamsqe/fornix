@@ -38,8 +38,27 @@ export function buildSlotSchema(
         base = z.record(z.unknown());
         break;
     }
-    if (slot.description) {
-      base = base.describe(slot.description);
+    // Always emit a description — for AI providers that drive structured
+    // output from the schema (Gemini in particular), the description is the
+    // ONLY place where length/count limits actually steer generation. Zod's
+    // .max()/.maxItems gets translated to JSON-schema constraints that the
+    // model often ignores; baking the limit into the prose makes the model
+    // self-limit instead of overshooting and getting truncated mid-token.
+    const descParts: string[] = [];
+    if (slot.description) descParts.push(slot.description);
+    if (slot.type === "string" && slot.maxLength !== undefined) {
+      descParts.push(`STAY UNDER ${slot.maxLength} characters.`);
+    }
+    if (slot.type === "array") {
+      if (slot.maxItems !== undefined) {
+        descParts.push(`Return AT MOST ${slot.maxItems} items.`);
+      }
+      if (slot.minItems !== undefined) {
+        descParts.push(`Return AT LEAST ${slot.minItems} items.`);
+      }
+    }
+    if (descParts.length > 0) {
+      base = base.describe(descParts.join(" "));
     }
     shape[key] = base.optional();
   }
@@ -54,6 +73,11 @@ export function buildSlotSchema(
  *   `items: { type: "string" }`        → array of strings
  *   `items: { icon: {type:"string"},   → array of objects with those fields
  *             title: {type:"string"} }`
+ *
+ * Convention 2 is fully expanded into a per-field Zod object so AI providers
+ * that derive structured-output schemas (Gemini, in particular) see what
+ * fields belong in each item — without this, the model gets `additionalProperties`
+ * and either omits the array or hallucinates field names.
  */
 function buildArrayItemSchema(
   items: ContentSlot["items"],
@@ -74,9 +98,45 @@ function buildArrayItemSchema(
     }
   }
 
-  // Convention 2: items is a record of field specs (each value has its own
-  // `type`). Wrap as `z.array(z.record(z.unknown()))` — full per-field
-  // validation would require recursive ContentSlot parsing of `items`'s
-  // record, which the schema doesn't currently model.
-  return z.array(z.record(z.unknown()));
+  // Convention 2: items is a record of field specs. Build a Zod object whose
+  // shape matches the declared fields so the AI sees the exact schema.
+  const fieldShape: Record<string, z.ZodTypeAny> = {};
+  for (const [fieldName, fieldSpec] of Object.entries(
+    items as Record<string, { type?: string; description?: string; maxLength?: number }>,
+  )) {
+    if (!fieldSpec || typeof fieldSpec !== "object") continue;
+    let fieldBase: z.ZodTypeAny;
+    switch (fieldSpec.type) {
+      case "string":
+        fieldBase =
+          fieldSpec.maxLength !== undefined
+            ? z.string().max(fieldSpec.maxLength)
+            : z.string();
+        break;
+      case "number":
+        fieldBase = z.number();
+        break;
+      case "boolean":
+        fieldBase = z.boolean();
+        break;
+      default:
+        fieldBase = z.unknown();
+    }
+    const fieldDesc: string[] = [];
+    if (fieldSpec.description) fieldDesc.push(fieldSpec.description);
+    if (fieldSpec.type === "string" && fieldSpec.maxLength !== undefined) {
+      fieldDesc.push(`STAY UNDER ${fieldSpec.maxLength} characters.`);
+    }
+    if (fieldDesc.length > 0) {
+      fieldBase = fieldBase.describe(fieldDesc.join(" "));
+    }
+    // Per-item fields are optional too — the AI may not know every value
+    // and Zod validation downstream handles missing data via fallback to
+    // block defaults.
+    fieldShape[fieldName] = fieldBase.optional();
+  }
+  if (Object.keys(fieldShape).length === 0) {
+    return z.array(z.record(z.unknown()));
+  }
+  return z.array(z.object(fieldShape));
 }
